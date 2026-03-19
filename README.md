@@ -179,7 +179,7 @@ database/
 
 ## 👨‍💻 Developer
 
-**Rudy Boringot Jr.**
+**Rudy Boringot Jr. &**
 **Justine Velasquez**
 
 - BS Information Technology  
