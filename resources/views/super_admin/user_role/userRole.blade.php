@@ -1283,7 +1283,7 @@
                                 <option value="arbo"        {{ old('role') === 'arbo'        ? 'selected' : '' }}>Arbo</option>
                             </select>
                         </div>
-                        <div class="col-md-6" id="pbdRegionWrapper" style="{{ old('role') === 'pbd' ? '' : 'display:none;' }}">
+                        <div class="col-md-6" id="pbdRegionWrapper" style="{{ old('role') ? '' : 'display:none;' }}">
                             <label class="form-label">Province</label>
                             <select name="province_id" id="pbdRegionSelect" class="form-select" style="border-radius:8px;">
                                 <option value="">Select province</option>
@@ -1471,7 +1471,8 @@ document.addEventListener('DOMContentLoaded', function(){
 
     function toggleRegion(){
         if(!role || !wrapper) return;
-        if(role.value === 'pbd'){
+        // Show province selector for any selected role (not only 'pbd')
+        if(role.value){
             wrapper.style.display = '';
             if(region) region.setAttribute('required','required');
         } else {
