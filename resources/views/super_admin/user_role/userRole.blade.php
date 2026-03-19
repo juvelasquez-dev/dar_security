@@ -1281,6 +1281,20 @@
                                 <option value="arbo"        {{ old('role') === 'arbo'        ? 'selected' : '' }}>Arbo</option>
                             </select>
                         </div>
+                        <div class="col-md-6" id="pbdRegionWrapper" style="{{ old('role') === 'pbd' ? '' : 'display:none;' }}">
+                            <label class="form-label">PBD Region</label>
+                            <select name="region" id="pbdRegionSelect" class="form-select" style="border-radius:8px;">
+                                <option value="">Select region</option>
+                                <option value="Camarines Sur I" {{ old('region') === 'Camarines Sur I' ? 'selected' : '' }}>Camarines Sur I</option>
+                                <option value="Camarines Sur II" {{ old('region') === 'Camarines Sur II' ? 'selected' : '' }}>Camarines Sur II</option>
+                                <option value="Albay" {{ old('region') === 'Albay' ? 'selected' : '' }}>Albay</option>
+                                <option value="Camarines Norte" {{ old('region') === 'Camarines Norte' ? 'selected' : '' }}>Camarines Norte</option>
+                                <option value="Sorsogon" {{ old('region') === 'Sorsogon' ? 'selected' : '' }}>Sorsogon</option>
+                                <option value="Masbate" {{ old('region') === 'Masbate' ? 'selected' : '' }}>Masbate</option>
+                                <option value="Catanduanes" {{ old('region') === 'Catanduanes' ? 'selected' : '' }}>Catanduanes</option>
+                                <option value="Regional Office" {{ old('region') === 'Regional Office' ? 'selected' : '' }}>Regional Office</option>
+                            </select>
+                        </div>
                         <div class="col-md-6">
                             <label class="form-label">Status</label>
                             <select name="status" class="form-select" required style="border-radius:8px;">
@@ -1449,6 +1463,31 @@ function openBranchesPanel(url){
 document.addEventListener('DOMContentLoaded', function(){
     var close = document.getElementById('branchesPanelClose');
     if(close) close.addEventListener('click', function(){ var p=document.getElementById('branchesPanel'); if(p){ p.classList.remove('open'); p.setAttribute('aria-hidden','true'); }});
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+    var role = document.getElementById('roleSelect');
+    var wrapper = document.getElementById('pbdRegionWrapper');
+    var region = document.getElementById('pbdRegionSelect');
+
+    function toggleRegion(){
+        if(!role || !wrapper) return;
+        if(role.value === 'pbd'){
+            wrapper.style.display = '';
+            if(region) region.setAttribute('required','required');
+        } else {
+            wrapper.style.display = 'none';
+            if(region){ region.removeAttribute('required'); region.value = ''; }
+        }
+    }
+
+    if(role){
+        role.addEventListener('change', toggleRegion);
+        // initial state
+        toggleRegion();
+    }
 });
 </script>
 
