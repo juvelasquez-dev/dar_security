@@ -995,6 +995,15 @@
         </div>
         <div class="col-6 col-md-4 col-xl-2">
             <div class="stat-card">
+                <div class="stat-icon-wrap stat-icon-purple"><i class="bi bi-wallet2"></i></div>
+                <div>
+                    <div class="stat-value">{{ $totalFinance ?? 0 }}</div>
+                    <p class="stat-label">Finance</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="stat-card">
                 <div class="stat-icon-wrap stat-icon-green"><i class="bi bi-shop"></i></div>
                 <div>
                     <div class="stat-value">{{ $totalSellers ?? 0 }}</div>
@@ -1265,14 +1274,7 @@
                             <label class="form-label">Username</label>
                             <input type="text" name="username" class="form-control" required style="border-radius:8px;" value="{{ old('username') }}">
                         </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Password</label>
-                            <input type="password" name="password" class="form-control" required style="border-radius:8px;">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Confirm Password</label>
-                            <input type="password" name="password_confirmation" class="form-control" required style="border-radius:8px;">
-                        </div>
+                        <!-- Passwords removed: system will generate a password if none provided -->
                         <div class="col-md-6">
                             <label class="form-label">Role</label>
                             <select name="role" id="roleSelect" class="form-select" required style="border-radius:8px;">
