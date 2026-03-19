@@ -1,6 +1,12 @@
 # 🌾 E-Agraryo Merkado  
 ### Role-Based Agricultural Marketplace & Management System  
 
+<p align="center">
+  <img src="https://img.shields.io/badge/Laravel-Framework-red?style=for-the-badge&logo=laravel">
+  <img src="https://img.shields.io/badge/MySQL-Database-blue?style=for-the-badge&logo=mysql">
+  <img src="https://img.shields.io/badge/Status-Development-yellow?style=for-the-badge">
+  <img src="https://img.shields.io/badge/Auth-Google%20OAuth-green?style=for-the-badge&logo=google">
+</p>
 ---
 
 🚀 A full-stack Laravel web application designed to digitize and streamline agricultural operations for DAR Region V, including user management, ARBO monitoring, and a scalable marketplace platform.
