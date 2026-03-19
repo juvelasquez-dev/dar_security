@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Database\Seeders\RolesTableSeeder;
+use Database\Seeders\ProvincesTableSeeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 
@@ -22,6 +23,9 @@ class DatabaseSeeder extends Seeder
 
         // Seed roles first
         $this->call(RolesTableSeeder::class);
+
+        // Seed provinces
+        $this->call(ProvincesTableSeeder::class);
 
         // Find super admin role id
         $super = DB::table('roles')->where('slug', 'super_admin')->first();

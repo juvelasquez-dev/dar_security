@@ -38,7 +38,10 @@ class UserRoleController extends Controller
             $query->where('status', $request->status);
         }
 
-        $users = $query->latest()->paginate(10);
+        $users = $query->with(['role', 'province'])->latest()->paginate(10);
+
+        // Load provinces for the add-user form
+        $provinces = \App\Models\Province::orderBy('name')->get();
 
         $totalUsers = User::count();
         $totalSuperAdmins = User::whereHas('role', fn($q) => $q->where('slug', 'super_admin'))->count();
@@ -52,7 +55,8 @@ class UserRoleController extends Controller
             'totalSuperAdmins',
             'totalPBD',
             'totalFinance',
-            'totalArbo'
+            'totalArbo',
+            'provinces'
         ));
     }
 
@@ -71,11 +75,19 @@ class UserRoleController extends Controller
             'password' => 'required|string|min:8|confirmed',
             'role' => 'required|in:super_admin,pbd,finance,arbo',
             'status' => 'required|in:active,inactive',
+            'province_id' => 'nullable|exists:provinces,id',
         ]);
 
         $role = $request->role;
 
         $roleModel = Role::where('slug', $role)->first();
+
+        // If role is pbd, province_id is required
+        if ($request->role === 'pbd') {
+            $request->validate([
+                'province_id' => 'required|exists:provinces,id',
+            ]);
+        }
 
         User::create([
             'first_name' => $request->first_name,
@@ -87,6 +99,7 @@ class UserRoleController extends Controller
             'password' => Hash::make($request->password),
             'role_id' => $roleModel?->id,
             'status' => $request->status,
+            'province_id' => $request->province_id ?? null,
             'is_verified' => true,
         ]);
 

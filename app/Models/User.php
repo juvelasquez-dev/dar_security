@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Models\Role;
+use App\Models\Province;
 
 class User extends Authenticatable
 {
@@ -26,6 +27,7 @@ class User extends Authenticatable
         'password',
         'avatar',
         'role_id',
+        'province_id',
         'is_verified',
         'contact_number',
         'username',
@@ -62,5 +64,13 @@ class User extends Authenticatable
     public function role()
     {
         return $this->belongsTo(Role::class);
+    }
+
+    /**
+     * Get the province for the user.
+     */
+    public function province()
+    {
+        return $this->belongsTo(Province::class);
     }
 }

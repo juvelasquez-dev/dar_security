@@ -1103,7 +1103,9 @@
                                         {{ $roleLabel }}
                                     </span>
                                 </td>
-                                <td style="font-size:.82rem; color:var(--text-muted);">—</td>
+                                <td style="font-size:.82rem; color:var(--text-muted);">
+                                    {{ $user->province->name ?? '—' }}
+                                </td>
                                 <td>
                                     @if($user->status === 'active')
                                         <span class="status-badge status-active"><span class="status-dot"></span> Active</span>
@@ -1282,17 +1284,12 @@
                             </select>
                         </div>
                         <div class="col-md-6" id="pbdRegionWrapper" style="{{ old('role') === 'pbd' ? '' : 'display:none;' }}">
-                            <label class="form-label">PBD Region</label>
-                            <select name="region" id="pbdRegionSelect" class="form-select" style="border-radius:8px;">
-                                <option value="">Select region</option>
-                                <option value="Camarines Sur I" {{ old('region') === 'Camarines Sur I' ? 'selected' : '' }}>Camarines Sur I</option>
-                                <option value="Camarines Sur II" {{ old('region') === 'Camarines Sur II' ? 'selected' : '' }}>Camarines Sur II</option>
-                                <option value="Albay" {{ old('region') === 'Albay' ? 'selected' : '' }}>Albay</option>
-                                <option value="Camarines Norte" {{ old('region') === 'Camarines Norte' ? 'selected' : '' }}>Camarines Norte</option>
-                                <option value="Sorsogon" {{ old('region') === 'Sorsogon' ? 'selected' : '' }}>Sorsogon</option>
-                                <option value="Masbate" {{ old('region') === 'Masbate' ? 'selected' : '' }}>Masbate</option>
-                                <option value="Catanduanes" {{ old('region') === 'Catanduanes' ? 'selected' : '' }}>Catanduanes</option>
-                                <option value="Regional Office" {{ old('region') === 'Regional Office' ? 'selected' : '' }}>Regional Office</option>
+                            <label class="form-label">Province</label>
+                            <select name="province_id" id="pbdRegionSelect" class="form-select" style="border-radius:8px;">
+                                <option value="">Select province</option>
+                                @foreach($provinces as $prov)
+                                    <option value="{{ $prov->id }}" {{ old('province_id') == $prov->id ? 'selected' : '' }}>{{ $prov->name }}</option>
+                                @endforeach
                             </select>
                         </div>
                         <div class="col-md-6">
