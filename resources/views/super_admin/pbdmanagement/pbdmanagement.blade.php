@@ -1165,5 +1165,46 @@
     });
     </script>
 
+<!-- Branches slide-over panel (loaded via AJAX) -->
+<style>
+    #branchesPanel{position:fixed;top:62px;right:0;bottom:0;width:420px;max-width:92%;background:#fff;box-shadow:-12px 0 34px rgba(0,0,0,0.12);transform:translateX(100%);transition:transform .28s ease-in-out;z-index:2050;overflow:auto}
+    #branchesPanel.open{transform:translateX(0)}
+    #branchesPanelHeader{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid #f1f1f1}
+    #branchesPanelContent{padding:14px}
+</style>
+<div id="branchesPanel" aria-hidden="true">
+    <div id="branchesPanelHeader">
+        <strong>Branches</strong>
+        <button id="branchesPanelClose" class="btn btn-sm btn-outline-secondary">Close</button>
+    </div>
+    <div id="branchesPanelContent">Loading…</div>
+</div>
+<script>
+document.addEventListener('click', function(e){
+    var btn = e.target.closest && e.target.closest('.open-branches-panel');
+    if(!btn) return;
+    e.preventDefault();
+    var url = btn.getAttribute('data-href') || btn.getAttribute('href');
+    openBranchesPanel(url);
+});
+function openBranchesPanel(url){
+    var panel = document.getElementById('branchesPanel');
+    var content = document.getElementById('branchesPanelContent');
+    if(!panel||!content) return;
+    panel.classList.add('open'); panel.setAttribute('aria-hidden','false');
+    content.innerHTML = 'Loading…';
+    fetch(url, {headers:{'X-Requested-With':'XMLHttpRequest'}})
+        .then(r=>r.text())
+        .then(html=>{
+            var m = html.match(/<main[\s\S]*?>[\s\S]*?<\/main>/i);
+            if(m) content.innerHTML = m[0]; else content.innerHTML = html;
+        }).catch(()=>{ content.innerHTML = '<div class="p-3 text-danger">Failed to load branches.</div>'; });
+}
+document.addEventListener('DOMContentLoaded', function(){
+    var close = document.getElementById('branchesPanelClose');
+    if(close) close.addEventListener('click', function(){ var p=document.getElementById('branchesPanel'); if(p){ p.classList.remove('open'); p.setAttribute('aria-hidden','true'); }});
+});
+</script>
+
 </body>
 </html>

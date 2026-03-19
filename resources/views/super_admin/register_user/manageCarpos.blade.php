@@ -445,26 +445,58 @@
     <!-- ── Sidebar ─────────────────────────────────────────── -->
     <aside class="sidebar" id="mainSidebar">
         <div class="sidebar-inner">
+
+            <!-- Role chip -->
             <div class="sidebar-office-chip">
                 <div class="office-label">Role</div>
                 <div class="office-name">Super Admin</div>
             </div>
+
+            <!-- Main menu -->
             <span class="sidebar-section-label">Main Menu</span>
-            <a href="{{ url('/dashboard') }}" class="sidebar-link"><i class="bi bi-speedometer2"></i> Dashboard</a>
-            <a href="{{ url('/roles') }}" class="sidebar-link"><i class="bi bi-person-badge"></i> User Roles</a>
-            <a href="{{ url('/branches') }}" class="sidebar-link active"><i class="bi bi-building"></i> Branches <span class="sidebar-link-badge">8</span></a>
-            <a href="{{ url('/marketplace') }}" class="sidebar-link"><i class="bi bi-shop"></i> ARBOS Marketplace</a>
-            <a href="{{ url('/orders') }}" class="sidebar-link"><i class="bi bi-cart-check"></i> Orders</a>
-            <a href="{{ url('/logs') }}" class="sidebar-link"><i class="bi bi-clock-history"></i> Activity Logs</a>
-            <span class="sidebar-section-label">Reports</span>
-            <a href="{{ url('/reports') }}" class="sidebar-link"><i class="bi bi-bar-chart-line"></i> Reports</a>
+
+            <a href="{{ url('/dashboard') }}" class="sidebar-link active">
+                <i class="bi bi-speedometer2"></i>
+                Dashboard
+            </a>
+
+            <a href="{{ url('/roles') }}" class="sidebar-link">
+                <i class="bi bi-person-badge"></i>
+                User Roles
+            </a>
+
+            <a href="{{ url('/branches') }}" class="sidebar-link">
+                <i class="bi bi-building"></i>
+                PBD Management
+                <span class="sidebar-link-badge">{{ $totalBranches ?? '8' }}</span>
+            </a>
+
+            <a href="{{ url('/logs') }}" class="sidebar-link">
+                <i class="bi bi-clock-history"></i>
+                Activity Logs
+            </a>
+
+            <span class="sidebar-section-label">Sales Report</span>
+
+            <a href="{{ url('/reports') }}" class="sidebar-link">
+                <i class="bi bi-bar-chart-line"></i>
+                Sales Report
+            </a>
+
             <span class="sidebar-section-label">System</span>
-            <a href="{{ url('/settings') }}" class="sidebar-link"><i class="bi bi-gear"></i> Settings</a>
+
+            <a href="{{ url('/settings') }}" class="sidebar-link">
+                <i class="bi bi-gear"></i>
+                Settings
+            </a>
+
+            <!-- Logout -->
             <div class="sidebar-logout">
                 <form method="POST" action="{{ url('/logout') }}">
                     @csrf
                     <button type="submit" class="sidebar-link w-100 text-start border-0 bg-transparent">
-                        <i class="bi bi-box-arrow-right"></i> Logout
+                        <i class="bi bi-box-arrow-right"></i>
+                        Logout
                     </button>
                 </form>
             </div>
@@ -827,6 +859,47 @@
         }).then(r => r.json()).then(() => location.reload()).catch(() => location.reload());
     }
     </script>
+
+<!-- Branches slide-over panel (loaded via AJAX) -->
+<style>
+    #branchesPanel{position:fixed;top:62px;right:0;bottom:0;width:420px;max-width:92%;background:#fff;box-shadow:-12px 0 34px rgba(0,0,0,0.12);transform:translateX(100%);transition:transform .28s ease-in-out;z-index:2050;overflow:auto}
+    #branchesPanel.open{transform:translateX(0)}
+    #branchesPanelHeader{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid #f1f1f1}
+    #branchesPanelContent{padding:14px}
+</style>
+<div id="branchesPanel" aria-hidden="true">
+    <div id="branchesPanelHeader">
+        <strong>Branches</strong>
+        <button id="branchesPanelClose" class="btn btn-sm btn-outline-secondary">Close</button>
+    </div>
+    <div id="branchesPanelContent">Loading…</div>
+</div>
+<script>
+document.addEventListener('click', function(e){
+    var btn = e.target.closest && e.target.closest('.open-branches-panel');
+    if(!btn) return;
+    e.preventDefault();
+    var url = btn.getAttribute('data-href') || btn.getAttribute('href');
+    openBranchesPanel(url);
+});
+function openBranchesPanel(url){
+    var panel = document.getElementById('branchesPanel');
+    var content = document.getElementById('branchesPanelContent');
+    if(!panel||!content) return;
+    panel.classList.add('open'); panel.setAttribute('aria-hidden','false');
+    content.innerHTML = 'Loading…';
+    fetch(url, {headers:{'X-Requested-With':'XMLHttpRequest'}})
+        .then(r=>r.text())
+        .then(html=>{
+            var m = html.match(/<main[\s\S]*?>[\s\S]*?<\/main>/i);
+            if(m) content.innerHTML = m[0]; else content.innerHTML = html;
+        }).catch(()=>{ content.innerHTML = '<div class="p-3 text-danger">Failed to load branches.</div>'; });
+}
+document.addEventListener('DOMContentLoaded', function(){
+    var close = document.getElementById('branchesPanelClose');
+    if(close) close.addEventListener('click', function(){ var p=document.getElementById('branchesPanel'); if(p){ p.classList.remove('open'); p.setAttribute('aria-hidden','true'); }});
+});
+</script>
 
 </body>
 </html>
