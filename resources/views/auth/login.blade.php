@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>Sign In – Acme</title>
 
   <link rel="icon" href="{{ asset('images/dar-logo.png') }}" type="image/png">
@@ -263,7 +264,7 @@
               <input class="form-check-input" type="checkbox" id="remember" value="remember">
               <label class="form-check-label small" for="remember">Stay signed in</label>
             </div>
-            <a href="#" class="small text-decoration-none">Forgot password?</a>
+            <a href="#" id="forgotPasswordLink" class="small text-decoration-none">Forgot password?</a>
           </div>
 
           <!-- Submit -->
@@ -369,6 +370,53 @@
       const html = document.documentElement;
       const current = html.getAttribute('data-bs-theme');
       html.setAttribute('data-bs-theme', current === 'dark' ? 'light' : 'dark');
+    });
+
+    // Forgot password: open email input and send reset link
+    document.getElementById('forgotPasswordLink')?.addEventListener('click', function (e) {
+      e.preventDefault();
+      Swal.fire({
+        title: 'Reset password',
+        input: 'email',
+        inputLabel: 'Enter your email address',
+        inputPlaceholder: 'name@example.com',
+        showCancelButton: true,
+        confirmButtonText: 'Send Reset Link',
+        preConfirm: (email) => {
+          if (!email) {
+            Swal.showValidationMessage('Please enter your email address');
+            return false;
+          }
+          const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+          return fetch('{{ url('/forgot-password') }}', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRF-TOKEN': token,
+              'Accept': 'application/json'
+            },
+            body: JSON.stringify({ email })
+          })
+          .then(res => res.json().then(body => ({ ok: res.ok, body })))
+          .then(({ ok, body }) => {
+            if (ok && body.success) {
+              return body;
+            }
+            throw new Error(body.message || 'Unable to send reset link');
+          })
+          .catch(err => {
+            Swal.showValidationMessage(err.message || 'Request failed');
+          });
+        }
+      }).then(result => {
+        if (result.isConfirmed && result.value) {
+          Swal.fire({
+            icon: 'success',
+            title: 'Reset link sent',
+            text: result.value.message || 'Check your email for reset instructions.'
+          });
+        }
+      });
     });
   </script>
 

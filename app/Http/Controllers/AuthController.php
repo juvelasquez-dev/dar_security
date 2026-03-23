@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use App\Models\Role;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Hash as FacadesHash;
 
 class AuthController extends Controller
 {
@@ -14,6 +17,69 @@ class AuthController extends Controller
     public function showLoginForm()
     {
         return view('auth.login');
+    }
+
+    // Send password reset link to given email (AJAX)
+    public function sendResetLink(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+        ]);
+
+        $status = Password::sendResetLink(
+            $request->only('email')
+        );
+
+        if ($status === Password::RESET_LINK_SENT) {
+            return response()->json([
+                'success' => true,
+                'message' => __($status),
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => __($status),
+        ], 422);
+    }
+
+    // Show password reset form (from emailed link)
+    public function showResetForm(Request $request, $token = null)
+    {
+        $email = $request->query('email', '');
+        return view('auth.reset-password', ['token' => $token, 'email' => $email]);
+    }
+
+    // Handle password reset submission
+    public function reset(Request $request)
+    {
+        $request->validate([
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' => 'required|confirmed|min:6',
+        ]);
+
+        $status = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user, $password) {
+                $user->password = FacadesHash::make($password);
+                $user->save();
+            }
+        );
+
+        if ($status === Password::PASSWORD_RESET) {
+            return redirect()->route('login')->with('swal', [
+                'icon' => 'success',
+                'title' => 'Password reset',
+                'text' => 'Your password has been reset. You can now sign in.'
+            ]);
+        }
+
+        return back()->withInput()->with('swal', [
+            'icon' => 'error',
+            'title' => 'Reset failed',
+            'text' => __($status)
+        ]);
     }
 
     // Show Register Page
