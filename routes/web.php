@@ -110,6 +110,8 @@ Route::get('/roles', [UserRoleController::class, 'index'])->name('superadmin.rol
 // Super Admin: Branches
 Route::get('/branches/create', [RegisterCarposController::class, 'create'])->name('branches.create');
 Route::get('/branches', [PbdController::class, 'index'])->name('superadmin.pbd');
+// Assign admin to a PBD office (province)
+Route::patch('/super-admin/pbd-management/{province}/assign-admin', [PbdController::class, 'assignAdmin'])->name('superadmin.pbd.assign');
 Route::get('/branches/{branch}', [RegisterCarposController::class, 'manage'])->name('branches.manage');
 
 // Super Admin: Activity logs
