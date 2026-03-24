@@ -80,6 +80,11 @@ Route::get('/arbos/dashboard', [ArbosDashboardController::class, 'index'])->name
 // Finance dashboard
 Route::get('/finance/dashboard', [\App\Http\Controllers\Finance\DashboardController::class, 'index'])->name('finance.dashboard');
 
+// Super Admin: Profile
+Route::get('/profile', [\App\Http\Controllers\SuperAdmin\ProfileController::class, 'index'])->name('profile');
+Route::patch('/profile', [\App\Http\Controllers\SuperAdmin\ProfileController::class, 'update'])->name('profile.update');
+Route::patch('/profile/password', [\App\Http\Controllers\SuperAdmin\ProfileController::class, 'password'])->name('profile.password');
+
 Route::get('/admin-carpos/dashboard', [AdminDashboardController::class, 'index'])->name('admin.carpos.dashboard');
 
 // CARPOS: ARBO management listing
