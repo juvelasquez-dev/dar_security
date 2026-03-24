@@ -1035,16 +1035,16 @@
             <div class="row g-3 align-items-end">
                 <div class="col-md-4">
                     <label class="form-label">Search</label>
-                    <input type="text"
-                           name="search"
-                           class="form-control"
-                           placeholder="Name, email, or username"
-                           value="{{ request('search') }}"
-                           style="border-radius:8px;">
+                          <input id="userSearch" type="text"
+                              name="search"
+                              class="form-control"
+                              placeholder="Name, email, or username"
+                              value="{{ request('search') }}"
+                              style="border-radius:8px;">
                 </div>
                 <div class="col-md-3">
                     <label class="form-label">Role</label>
-                    <select name="role" class="form-select" style="border-radius:8px;">
+                    <select id="filterRole" name="role" class="form-select" style="border-radius:8px;">
                         <option value="">All Roles</option>
                         <option value="super_admin" {{ request('role') === 'super_admin' ? 'selected' : '' }}>Super Admin</option>
                         <option value="pbd"         {{ request('role') === 'pbd'         ? 'selected' : '' }}>PBD</option>
@@ -1054,7 +1054,7 @@
                 </div>
                 <div class="col-md-3">
                     <label class="form-label">Status</label>
-                    <select name="status" class="form-select" style="border-radius:8px;">
+                    <select id="filterStatus" name="status" class="form-select" style="border-radius:8px;">
                         <option value="">All Status</option>
                         <option value="active"   {{ request('status') === 'active'   ? 'selected' : '' }}>Active</option>
                         <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Inactive</option>
@@ -1089,7 +1089,7 @@
                     <table class="user-table">
                         <thead>
                             <tr>
-                                <th>User ID</th>
+                                <th>Profile</th>
                                 <th>Full Name</th>
                                 <th>Email / Username</th>
                                 <th>Role</th>
@@ -1112,9 +1112,10 @@
                                 }
                             @endphp
                             <tr>
-                                <td class="cell-id">USR-{{ str_pad($user->id, 4, '0', STR_PAD_LEFT) }}</td>
+                                <td class="cell-avatar">
+                                    <img src="{{ $avatarUrl }}" alt="avatar" style="width:40px;height:40px;border-radius:50%;object-fit:cover;vertical-align:middle;">
+                                </td>
                                 <td class="cell-name">
-                                    <img src="{{ $avatarUrl }}" alt="avatar" style="width:40px;height:40px;border-radius:50%;object-fit:cover;margin-right:10px;vertical-align:middle;">
                                     {{ $fullName }}
                                     <small>{{ $user->username ?? '—' }}</small>
                                 </td>
@@ -1505,6 +1506,41 @@ document.addEventListener('DOMContentLoaded', function(){
         // initial state
         toggleRegion();
     }
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+    var search = document.getElementById('userSearch');
+    var tbody = document.querySelector('.user-table tbody');
+    if(!search || !tbody) return;
+
+    var roleFilter = document.getElementById('filterRole');
+    var statusFilter = document.getElementById('filterStatus');
+
+    function applyFilters(){
+        var q = String(search.value || '').trim().toLowerCase();
+        var roleVal = roleFilter ? String(roleFilter.value || '').trim().toLowerCase() : '';
+        var statusVal = statusFilter ? String(statusFilter.value || '').trim().toLowerCase() : '';
+        var rows = tbody.querySelectorAll('tr');
+        rows.forEach(function(row){
+            var text = (row.textContent || '').toLowerCase();
+            var roleEl = row.querySelector('.role-badge');
+            var statusEl = row.querySelector('.status-badge');
+            var rowRole = roleEl ? (roleEl.textContent || '').toLowerCase() : '';
+            var rowStatus = statusEl ? (statusEl.textContent || '').toLowerCase() : '';
+
+            var matchesQuery = q === '' || text.indexOf(q) !== -1;
+            var matchesRole = roleVal === '' || rowRole.indexOf(roleVal) !== -1;
+            var matchesStatus = statusVal === '' || rowStatus.indexOf(statusVal) !== -1;
+
+            row.style.display = (matchesQuery && matchesRole && matchesStatus) ? '' : 'none';
+        });
+    }
+
+    search.addEventListener('input', applyFilters);
+    if(roleFilter) roleFilter.addEventListener('change', applyFilters);
+    if(statusFilter) statusFilter.addEventListener('change', applyFilters);
 });
 </script>
 
