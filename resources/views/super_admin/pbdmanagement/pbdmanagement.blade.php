@@ -397,152 +397,167 @@
 </head>
 <body>
 
-    <!-- ── Top Navbar ──────────────────────────────────────── -->
-    <header class="top-navbar">
-        <button class="mobile-sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
-            <i class="bi bi-list"></i>
-        </button>
+@php
+        $authUser = auth()->user();
+        $authFullName = $authUser
+            ? trim(($authUser->first_name ?? $authUser->name ?? '') . ' ' . ($authUser->last_name ?? ''))
+            : 'Super Admin';
+        $roleSlug = $authUser->role->slug ?? 'super_admin';
+        $roleLabel = $authUser->role->name ?? ucwords(str_replace('_', ' ', $roleSlug));
 
-        <a class="navbar-brand-area" href="{{ url('/dashboard') }}">
-            <img src="{{ asset('images/dar-logo.png') }}" alt="DAR Logo">
-            <div>
-                <div class="navbar-system-title">E-Agraryo Merkado</div>
-                <div class="navbar-system-sub">DAR Region V</div>
-            </div>
+        if ($authUser && ! empty($authUser->avatar)) {
+            $avatarUrl = asset('storage/' . $authUser->avatar);
+        } else {
+            $avatarUrl = 'https://ui-avatars.com/api/?name=' . urlencode($authFullName) . '&background=1a6932&color=fff&rounded=true&size=64';
+        }
+    @endphp
+
+<!-- ── Top Navbar ──────────────────────────────────────── -->
+<header class="top-navbar">
+    <!-- Mobile toggle -->
+    <button class="mobile-sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
+        <i class="bi bi-list"></i>
+    </button>
+
+    <!-- Brand -->
+    <a class="navbar-brand-area" href="{{ url('/dashboard') }}">
+        <img src="{{ asset('images/dar-logo.png') }}" alt="DAR Logo">
+        <div>
+            <div class="navbar-system-title">E-Agraryo Merkado</div>
+            <div class="navbar-system-sub">DAR Region V</div>
+        </div>
+    </a>
+
+    <span class="navbar-page-badge"><i class="bi bi-shield-fill-check me-1"></i> Super Admin</span>
+
+    <!-- Right actions -->
+    <div class="navbar-right">
+        <!-- Notifications -->
+        <div class="dropdown">
+            <button class="nav-icon-btn" data-bs-toggle="dropdown" aria-label="Notifications">
+                <i class="bi bi-bell"></i>
+                <span class="nav-notif-dot"></span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0" style="min-width:280px; border-radius:12px; margin-top:8px;">
+                <li class="px-3 py-2 border-bottom">
+                    <span class="fw-bold" style="font-size:.82rem;">Notifications</span>
+                </li>
+                <li>
+                    <a class="dropdown-item py-2" href="#" style="font-size:.82rem;">
+                        <i class="bi bi-person-plus text-success me-2"></i> New user registered
+                        <div class="text-muted" style="font-size:.72rem; padding-left:1.4rem;">2 hours ago</div>
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item py-2" href="#" style="font-size:.82rem;">
+                        <i class="bi bi-building text-primary me-2"></i> Branch updated
+                        <div class="text-muted" style="font-size:.72rem; padding-left:1.4rem;">5 hours ago</div>
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item py-2" href="#" style="font-size:.82rem;">
+                        <i class="bi bi-cart-check text-warning me-2"></i> Order completed
+                        <div class="text-muted" style="font-size:.72rem; padding-left:1.4rem;">Yesterday</div>
+                    </a>
+                </li>
+                <li class="border-top">
+                    <a class="dropdown-item text-center py-2" href="#" style="font-size:.78rem; color: var(--green-700);">View all notifications</a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="navbar-divider d-none d-sm-block"></div>
+
+        <!-- User Dropdown -->
+        <div class="dropdown">
+            <a class="user-pill dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                <img class="user-avatar" src="{{ $avatarUrl }}" alt="User avatar">
+                <div class="d-none d-md-block" style="line-height:1.2;">
+                    <div class="user-pill-name">{{ $authFullName }}</div>
+                    <div class="user-pill-role">Super Admin</div>
+                </div>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0" style="border-radius:12px; margin-top:8px; min-width:200px;">
+                <li class="px-3 py-2 border-bottom">
+                    <div class="fw-bold" style="font-size:.83rem;">{{ $authFullName }}</div>
+                    <div class="text-muted" style="font-size:.72rem;">{{ auth()->user()->email ?? '' }}</div>
+                </li>
+                <li><a class="dropdown-item py-2" href="{{ url('/profile') }}" style="font-size:.84rem;"><i class="bi bi-person me-2 text-muted"></i>Profile</a></li>
+                <li><a class="dropdown-item py-2" href="{{ url('/settings') }}" style="font-size:.84rem;"><i class="bi bi-gear me-2 text-muted"></i>System Settings</a></li>
+                <li class="border-top">
+                    <form method="POST" action="{{ url('/logout') }}">
+                        @csrf
+                        <button class="dropdown-item py-2 text-danger" type="submit" style="font-size:.84rem;"><i class="bi bi-box-arrow-right me-2"></i>Logout</button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </div>
+</header>
+
+<!-- ── Sidebar Overlay (mobile) ────────────────────────── -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- ── Sidebar ─────────────────────────────────────────── -->
+<aside class="sidebar" id="mainSidebar">
+    <div class="sidebar-inner">
+
+        <!-- Role chip -->
+        <div class="sidebar-office-chip">
+            <div class="office-label">Role</div>
+            <div class="office-name">Super Admin</div>
+        </div>
+
+        <!-- Main menu -->
+        <span class="sidebar-section-label">Main Menu</span>
+
+        <a href="{{ url('/dashboard') }}" class="sidebar-link">
+            <i class="bi bi-speedometer2"></i>
+            Dashboard
         </a>
 
-        <span class="navbar-page-badge"><i class="bi bi-shield-fill-check me-1"></i> Super Admin</span>
+        <a href="{{ url('/roles') }}" class="sidebar-link ">
+            <i class="bi bi-person-badge"></i>
+            User Roles
+        </a>
 
-        <div class="navbar-right">
-            <!-- Notifications -->
-            <div class="dropdown">
-                <button class="nav-icon-btn" data-bs-toggle="dropdown" aria-label="Notifications">
-                    <i class="bi bi-bell"></i>
-                    <span class="nav-notif-dot"></span>
+        <a href="{{ url('/branches') }}" class="sidebar-link active">
+            <i class="bi bi-building"></i>
+            PBD Management
+            <span class="sidebar-link-badge">8</span>
+        </a>
+
+        <a href="{{ url('/logs') }}" class="sidebar-link">
+            <i class="bi bi-clock-history"></i>
+            Activity Logs
+        </a>
+
+        <span class="sidebar-section-label">Sales Report</span>
+
+        <a href="{{ url('/reports') }}" class="sidebar-link">
+            <i class="bi bi-bar-chart-line"></i>
+            Sales Report
+        </a>
+
+        <span class="sidebar-section-label">System</span>
+
+        <a href="{{ url('/settings') }}" class="sidebar-link">
+            <i class="bi bi-gear"></i>
+            Settings
+        </a>
+
+        <!-- Logout -->
+        <div class="sidebar-logout">
+            <form method="POST" action="{{ url('/logout') }}">
+                @csrf
+                <button type="submit" class="sidebar-link w-100 text-start border-0 bg-transparent">
+                    <i class="bi bi-box-arrow-right"></i>
+                    Logout
                 </button>
-                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0" style="min-width:280px; border-radius:12px; margin-top:8px;">
-                    <li class="px-3 py-2 border-bottom">
-                        <span class="fw-bold" style="font-size:.82rem;">Notifications</span>
-                    </li>
-                    <li>
-                        <a class="dropdown-item py-2" href="#" style="font-size:.82rem;">
-                            <i class="bi bi-building text-success me-2"></i> New PBD office added
-                            <div class="text-muted" style="font-size:.72rem; padding-left:1.4rem;">Just now</div>
-                        </a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item py-2" href="#" style="font-size:.82rem;">
-                            <i class="bi bi-person-badge text-primary me-2"></i> Admin assigned to office
-                            <div class="text-muted" style="font-size:.72rem; padding-left:1.4rem;">2 hours ago</div>
-                        </a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item py-2" href="#" style="font-size:.82rem;">
-                            <i class="bi bi-slash-circle text-danger me-2"></i> Office deactivated
-                            <div class="text-muted" style="font-size:.72rem; padding-left:1.4rem;">Yesterday</div>
-                        </a>
-                    </li>
-                    <li class="border-top">
-                        <a class="dropdown-item text-center py-2" href="#" style="font-size:.78rem; color: var(--green-700);">View all notifications</a>
-                    </li>
-                </ul>
-            </div>
-
-            <div class="navbar-divider d-none d-sm-block"></div>
-
-            <!-- User Dropdown -->
-            <div class="dropdown">
-                <a class="user-pill dropdown-toggle" href="#" data-bs-toggle="dropdown">
-                    {{-- <img class="user-avatar"
-                        src="{{ auth()->user()->avatar ?: 'https://ui-avatars.com/api/?name=' . urlencode(auth()->user()->name ?? 'Super Admin') . '&background=1a6932&color=fff&rounded=true&size=64' }}"
-                        alt="User avatar"> --}}
-                    <div class="d-none d-md-block" style="line-height:1.2;">
-                        <div class="user-pill-name">{{ auth()->user()->name ?? 'Super Admin' }}</div>
-                        <div class="user-pill-role">Super Admin</div>
-                    </div>
-                </a>
-                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0" style="border-radius:12px; margin-top:8px; min-width:200px;">
-                    <li class="px-3 py-2 border-bottom">
-                        <div class="fw-bold" style="font-size:.83rem;">{{ auth()->user()->name ?? 'Super Admin' }}</div>
-                        <div class="text-muted" style="font-size:.72rem;">{{ auth()->user()->email ?? '' }}</div>
-                    </li>
-                    <li><a class="dropdown-item py-2" href="{{ url('/profile') }}" style="font-size:.84rem;"><i class="bi bi-person me-2 text-muted"></i>Profile</a></li>
-                    <li><a class="dropdown-item py-2" href="{{ url('/settings') }}" style="font-size:.84rem;"><i class="bi bi-gear me-2 text-muted"></i>System Settings</a></li>
-                    <li class="border-top">
-                        <form method="POST" action="{{ url('/logout') }}">
-                            @csrf
-                            <button class="dropdown-item py-2 text-danger" type="submit" style="font-size:.84rem;"><i class="bi bi-box-arrow-right me-2"></i>Logout</button>
-                        </form>
-                    </li>
-                </ul>
-            </div>
+            </form>
         </div>
-    </header>
-
-    <!-- ── Sidebar Overlay (mobile) ────────────────────────── -->
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
-
-    <!-- ── Sidebar ─────────────────────────────────────────── -->
-    <aside class="sidebar" id="mainSidebar">
-        <div class="sidebar-inner">
-
-            <!-- Role chip -->
-            <div class="sidebar-office-chip">
-                <div class="office-label">Role</div>
-                <div class="office-name">Super Admin</div>
-            </div>
-
-            <!-- Main menu -->
-            <span class="sidebar-section-label">Main Menu</span>
-
-            <a href="{{ url('/dashboard') }}" class="sidebar-link">
-                <i class="bi bi-speedometer2"></i>
-                Dashboard
-            </a>
-
-            <a href="{{ url('/roles') }}" class="sidebar-link">
-                <i class="bi bi-person-badge"></i>
-                User Roles
-            </a>
-
-            <a href="{{ url('/branches') }}" class="sidebar-link active">
-                <i class="bi bi-building"></i>
-                PBD Management
-                <span class="sidebar-link-badge">{{ $totalBranches ?? '8' }}</span>
-            </a>
-
-            <a href="{{ url('/logs') }}" class="sidebar-link">
-                <i class="bi bi-clock-history"></i>
-                Activity Logs
-            </a>
-
-            <span class="sidebar-section-label">Sales Report</span>
-
-            <a href="{{ url('/reports') }}" class="sidebar-link">
-                <i class="bi bi-bar-chart-line"></i>
-                Sales Report
-            </a>
-
-            <span class="sidebar-section-label">System</span>
-
-            <a href="{{ url('/settings') }}" class="sidebar-link">
-                <i class="bi bi-gear"></i>
-                Settings
-            </a>
-
-            <!-- Logout -->
-            <div class="sidebar-logout">
-                <form method="POST" action="{{ url('/logout') }}">
-                    @csrf
-                    <button type="submit" class="sidebar-link w-100 text-start border-0 bg-transparent">
-                        <i class="bi bi-box-arrow-right"></i>
-                        Logout
-                    </button>
-                </form>
-            </div>
-        </div>
-    </aside>
-
+    </div>
+</aside>
     <!-- ── Main Content ─────────────────────────────────────── -->
     <main class="page-wrapper">
 

@@ -746,13 +746,20 @@
 </head>
 <body>
 
-@php
-    $authUser = auth()->user();
-    $authFullName = $authUser
-        ? trim(($authUser->first_name ?? '') . ' ' . ($authUser->last_name ?? ''))
-        : 'Super Admin';
-    $avatarUrl = 'https://ui-avatars.com/api/?name=' . urlencode($authFullName) . '&background=1a6932&color=fff&rounded=true&size=64';
-@endphp
+ @php
+        $authUser = auth()->user();
+        $authFullName = $authUser
+            ? trim(($authUser->first_name ?? $authUser->name ?? '') . ' ' . ($authUser->last_name ?? ''))
+            : 'Super Admin';
+        $roleSlug = $authUser->role->slug ?? 'super_admin';
+        $roleLabel = $authUser->role->name ?? ucwords(str_replace('_', ' ', $roleSlug));
+
+        if ($authUser && ! empty($authUser->avatar)) {
+            $avatarUrl = asset('storage/' . $authUser->avatar);
+        } else {
+            $avatarUrl = 'https://ui-avatars.com/api/?name=' . urlencode($authFullName) . '&background=1a6932&color=fff&rounded=true&size=64';
+        }
+    @endphp
 
 <!-- ── Top Navbar ──────────────────────────────────────── -->
 <header class="top-navbar">
@@ -1098,10 +1105,16 @@
                                 $fullName  = trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? ''));
                                 $roleSlug  = $user->role->slug ?? '';
                                 $roleLabel = $user->role->name ?? ucwords(str_replace('_', ' ', $roleSlug));
+                                if (! empty($user->avatar)) {
+                                    $avatarUrl = asset('storage/' . $user->avatar);
+                                } else {
+                                    $avatarUrl = 'https://ui-avatars.com/api/?name=' . urlencode($fullName ?: ($user->username ?? 'User')) . '&background=1a6932&color=fff&rounded=true&size=48';
+                                }
                             @endphp
                             <tr>
                                 <td class="cell-id">USR-{{ str_pad($user->id, 4, '0', STR_PAD_LEFT) }}</td>
                                 <td class="cell-name">
+                                    <img src="{{ $avatarUrl }}" alt="avatar" style="width:40px;height:40px;border-radius:50%;object-fit:cover;margin-right:10px;vertical-align:middle;">
                                     {{ $fullName }}
                                     <small>{{ $user->username ?? '—' }}</small>
                                 </td>
@@ -1239,7 +1252,7 @@
 <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
-            <form method="POST" action="{{ route('super_admin.user_roles.store') }}">
+            <form method="POST" action="{{ route('super_admin.user_roles.store') }}" enctype="multipart/form-data">
                 @csrf
                 <div class="modal-header">
                     <h5 class="modal-title fw-bold" id="addUserModalLabel">
@@ -1273,6 +1286,10 @@
                         <div class="col-md-6">
                             <label class="form-label">Username</label>
                             <input type="text" name="username" class="form-control" required style="border-radius:8px;" value="{{ old('username') }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Avatar</label>
+                            <input type="file" name="avatar" accept="image/*" class="form-control" style="border-radius:8px;">
                         </div>
                         <!-- Passwords removed: system will generate a password if none provided -->
                         <div class="col-md-6">

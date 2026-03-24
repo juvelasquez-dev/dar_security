@@ -85,6 +85,7 @@ class UserRoleController extends Controller
             'role' => 'required|in:super_admin,pbd,finance,arbo',
             'status' => 'required|in:active,inactive',
             'province_id' => 'nullable|exists:provinces,id',
+            'avatar' => 'nullable|file|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
         ]);
 
         $role = $request->role;
@@ -102,6 +103,11 @@ class UserRoleController extends Controller
         $plainPassword = $request->filled('password') ? $request->password : Str::random(12);
         $passwordHash = Hash::make($plainPassword);
 
+        $avatarPath = null;
+        if ($request->hasFile('avatar')) {
+            $avatarPath = $request->file('avatar')->store('avatars', 'public');
+        }
+
         $user = User::create([
             'first_name' => $request->first_name,
             'middle_name' => $request->middle_name,
@@ -110,6 +116,7 @@ class UserRoleController extends Controller
             'contact_number' => $request->contact_number,
             'username' => $request->username,
             'password' => $passwordHash,
+            'avatar' => $avatarPath,
             'role_id' => $roleModel?->id,
             'status' => $request->status,
             'province_id' => $request->province_id ?? null,
