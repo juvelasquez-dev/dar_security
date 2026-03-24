@@ -641,21 +641,28 @@
                             <div class="timeline-dot td-green"><i class="bi bi-box-arrow-in-right"></i></div>
                             <div>
                                 <div class="timeline-title">Logged in</div>
-                                <div class="timeline-meta">Just now · Web Browser</div>
+                                <div class="timeline-meta">
+                                    <time class="timeago" datetime="{{ optional($authUser->last_login_at ?? now())->toIso8601String() }}">{{ optional($authUser->last_login_at ?? now())->diffForHumans() ?? 'Just now' }}</time>
+                                    · Web Browser
+                                </div>
                             </div>
                         </li>
                         <li class="timeline-item px-4">
                             <div class="timeline-dot td-blue"><i class="bi bi-pencil-fill"></i></div>
                             <div>
                                 <div class="timeline-title">Profile updated</div>
-                                <div class="timeline-meta">2 days ago</div>
+                                <div class="timeline-meta">
+                                    <time class="timeago" datetime="{{ optional($authUser->updated_at)->toIso8601String() }}">{{ optional($authUser->updated_at)->diffForHumans() ?? '—' }}</time>
+                                </div>
                             </div>
                         </li>
                         <li class="timeline-item px-4">
                             <div class="timeline-dot td-gold"><i class="bi bi-shield-lock-fill"></i></div>
                             <div>
                                 <div class="timeline-title">Password changed</div>
-                                <div class="timeline-meta">1 week ago</div>
+                                <div class="timeline-meta">
+                                    <time class="timeago" datetime="{{ optional($authUser->password_changed_at ?? $authUser->updated_at)->toIso8601String() }}">{{ optional($authUser->password_changed_at ?? $authUser->updated_at)->diffForHumans() ?? '—' }}</time>
+                                </div>
                             </div>
                         </li>
                         <li class="timeline-item px-4">
@@ -835,6 +842,16 @@ function checkStrength(val) {
     fill.style.background = val ? lv.bg : '';
     label.textContent     = val ? lv.text : '';
 }
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/timeago.js/4.0.2/timeago.min.js"></script>
+<script>
+    // Activate timeago for existing timestamps
+    if (typeof timeago !== 'undefined') {
+        document.addEventListener('DOMContentLoaded', function () {
+            try { timeago.render(document.querySelectorAll('.timeago')); } catch (e) { /* ignore */ }
+        });
+    }
 </script>
 
 </body>

@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use App\Events\ProfileUpdated;
+use App\Events\PasswordChanged;
 
 class ProfileController extends Controller
 {
@@ -56,6 +58,9 @@ class ProfileController extends Controller
 
 		$user->save();
 
+		// Broadcast profile-updated event for realtime UI
+		event(new ProfileUpdated($user));
+
 		return back()->with('success', 'Profile updated successfully.')->with('swal', [
 			'title' => 'Profile Updated',
 			'text' => 'Your profile has been updated successfully.',
@@ -82,6 +87,9 @@ class ProfileController extends Controller
 
 		$user->password = Hash::make($request->input('password'));
 		$user->save();
+
+		// Broadcast password-changed event for realtime UI
+		event(new PasswordChanged($user));
 
 		return back()->with('success', 'Password updated successfully.')->with('swal', [
 			'title' => 'Password Updated',
