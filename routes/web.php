@@ -18,6 +18,7 @@ use App\Http\Controllers\Carpos\DashboardController as CarposDashboardController
 use App\Http\Controllers\Carpos\CarposManagementController;
 use App\Http\Controllers\Carpos\ArboAdminController;
 use App\Http\Controllers\Carpos\MarketMonitoringController;
+use App\Http\Controllers\Carpos\ProfileController as CarposProfileController;
 use App\Http\Controllers\SuperAdmin\UserRoleController;
 use App\Http\Controllers\SuperAdmin\PendingUsersController;
 use App\Http\Controllers\SuperAdmin\RegisterCarposController;
@@ -84,6 +85,9 @@ Route::get('/finance/dashboard', [\App\Http\Controllers\Finance\DashboardControl
 Route::get('/profile', [\App\Http\Controllers\SuperAdmin\ProfileController::class, 'index'])->name('profile');
 Route::patch('/profile', [\App\Http\Controllers\SuperAdmin\ProfileController::class, 'update'])->name('profile.update');
 Route::patch('/profile/password', [\App\Http\Controllers\SuperAdmin\ProfileController::class, 'password'])->name('profile.password');
+
+// CARPOS profile route
+Route::get('/admin/profile', [CarposProfileController::class, 'index'])->name('admin.profile');
 
 Route::get('/admin-carpos/dashboard', [AdminDashboardController::class, 'index'])->name('admin.carpos.dashboard');
 

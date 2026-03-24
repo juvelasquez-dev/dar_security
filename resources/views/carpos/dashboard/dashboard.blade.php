@@ -695,6 +695,16 @@
 </head>
 <body>
 
+@php
+    $carposUser = auth()->user();
+    $authFullName = $carposUser ? trim(($carposUser->first_name ?? '') . ' ' . ($carposUser->last_name ?? '')) : ($carposUser->name ?? 'CARPOS Admin');
+    if ($carposUser && ! empty($carposUser->avatar)) {
+        $avatarUrl = asset('storage/' . $carposUser->avatar);
+    } else {
+        $avatarUrl = 'https://ui-avatars.com/api/?name=' . urlencode($authFullName) . '&background=1a6932&color=fff&rounded=true&size=64';
+    }
+@endphp
+
     <!-- ── Top Navbar ──────────────────────────────────────── -->
     <header class="top-navbar">
         <!-- Mobile toggle -->
@@ -755,7 +765,7 @@
             <div class="dropdown">
                 <a class="user-pill dropdown-toggle" href="#" data-bs-toggle="dropdown">
                     <img class="user-avatar"
-                        src="{{ optional(auth()->user())->avatar ?: 'https://ui-avatars.com/api/?name=' . urlencode(optional(auth()->user())->name ?? 'CARPOS Admin') . '&background=1a6932&color=fff&rounded=true&size=64' }}"
+                        src="{{ $avatarUrl }}"
                         alt="User avatar">
                     <div class="d-none d-md-block" style="line-height:1.2;">
                         <div class="user-pill-name">{{ optional(auth()->user())->name ?? 'Admin CARPOS' }}</div>
@@ -767,7 +777,7 @@
                         <div class="fw-bold" style="font-size:.83rem;">{{ optional(auth()->user())->name ?? 'Admin CARPOS' }}</div>
                         <div class="text-muted" style="font-size:.72rem;">{{ optional(auth()->user())->email ?? '' }}</div>
                     </li>
-                    <li><a class="dropdown-item py-2" href="{{ url('/profile') }}" style="font-size:.84rem;"><i class="bi bi-person me-2 text-muted"></i>Profile</a></li>
+                    <li><a class="dropdown-item py-2" href="{{ url('/admin/profile') }}" style="font-size:.84rem;"><i class="bi bi-person me-2 text-muted"></i>Profile</a></li>
                     <li><a class="dropdown-item py-2" href="{{ url('/settings') }}" style="font-size:.84rem;"><i class="bi bi-gear me-2 text-muted"></i>Settings</a></li>
                     <li class="border-top">
                         <form method="POST" action="{{ url('/logout') }}">

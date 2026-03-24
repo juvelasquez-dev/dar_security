@@ -735,6 +735,21 @@
 </head>
 <body>
 
+    @php
+        $authUser = auth()->user();
+        $authFullName = $authUser
+            ? trim(($authUser->first_name ?? $authUser->name ?? '') . ' ' . ($authUser->last_name ?? ''))
+            : 'Super Admin';
+        $roleSlug = $authUser->role->slug ?? 'super_admin';
+        $roleLabel = $authUser->role->name ?? ucwords(str_replace('_', ' ', $roleSlug));
+
+        if ($authUser && ! empty($authUser->avatar)) {
+            $avatarUrl = asset('storage/' . $authUser->avatar);
+        } else {
+            $avatarUrl = 'https://ui-avatars.com/api/?name=' . urlencode($authFullName) . '&background=1a6932&color=fff&rounded=true&size=64';
+        }
+    @endphp
+
     <!-- ── Top Navbar ──────────────────────────────────────── -->
     <header class="top-navbar">
         <!-- Mobile toggle -->
@@ -794,14 +809,12 @@
             <!-- User Dropdown -->
             <div class="dropdown">
                 <a class="user-pill dropdown-toggle" href="#" data-bs-toggle="dropdown">
-                    {{-- <img class="user-avatar"
-                        src="{{ auth()->user()->avatar ?: 'https://ui-avatars.com/api/?name=' . urlencode(auth()->user()->name ?? 'Super Admin') . '&background=1a6932&color=fff&rounded=true&size=64' }}"
-                        alt="User avatar"> --}}
-                    <div class="d-none d-md-block" style="line-height:1.2;">
-                        <div class="user-pill-name">{{ auth()->user()->name ?? 'Super Admin' }}</div>
-                        <div class="user-pill-role">Super Admin</div>
-                    </div>
-                </a>
+                        <img class="user-avatar" src="{{ $avatarUrl }}" alt="User avatar">
+                        <div class="d-none d-md-block" style="line-height:1.2;">
+                            <div class="user-pill-name">{{ $authFullName }}</div>
+                            <div class="user-pill-role">{{ $roleLabel }}</div>
+                        </div>
+                    </a>
                 <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0" style="border-radius:12px; margin-top:8px; min-width:200px;">
                     <li class="px-3 py-2 border-bottom">
                         <div class="fw-bold" style="font-size:.83rem;">{{ auth()->user()->name ?? 'Super Admin' }}</div>
@@ -830,7 +843,7 @@
             <!-- Role chip -->
             <div class="sidebar-office-chip">
                 <div class="office-label">Role</div>
-                <div class="office-name">Super Admin</div>
+                <div class="office-name">{{ $roleLabel }}</div>
             </div>
 
             <!-- Main menu -->

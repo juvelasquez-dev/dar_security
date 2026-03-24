@@ -185,189 +185,66 @@
             background: var(--green-600); border-radius: 4px;
         }
 
-        .sidebar-link-badge {
-            margin-left: auto; font-size: 0.65rem; font-weight: 700;
-            background: var(--green-100); color: var(--green-700);
-            padding: 2px 7px; border-radius: 20px;
-        }
+        .sidebar-link-badge { margin-left: auto; font-size: 0.65rem; font-weight: 700; background: var(--green-100); color: var(--green-700); padding: 2px 7px; border-radius: 20px; }
 
         .sidebar-link.active .sidebar-link-badge { background: var(--green-600); color: #fff; }
 
-        .sidebar-logout {
-            margin-top: auto; padding-top: 1rem;
-            border-top: 1px solid var(--gray-200);
-        }
+        .sidebar-logout { margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--gray-200); }
 
         .sidebar-logout .sidebar-link { color: #c0392b; }
         .sidebar-logout .sidebar-link:hover { background: #fdf2f2; color: #c0392b; }
 
-        .sidebar-office-chip {
-            background: var(--green-50); border: 1px solid var(--green-200);
-            border-radius: var(--radius-sm); padding: 0.65rem 0.85rem; margin-bottom: 1rem;
-        }
+        .sidebar-office-chip { background: var(--green-50); border: 1px solid var(--green-200); border-radius: var(--radius-sm); padding: 0.65rem 0.85rem; margin-bottom: 1rem; }
 
-        .sidebar-office-chip .office-label {
-            font-size: 0.62rem; font-weight: 700;
-            letter-spacing: 0.1em; text-transform: uppercase; color: var(--green-600);
-        }
-
-        .sidebar-office-chip .office-name {
-            font-size: 0.82rem; font-weight: 600; color: var(--green-900); margin-top: 1px;
-        }
+        .sidebar-office-chip .office-label { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--green-600); }
+        .sidebar-office-chip .office-name { font-size: 0.82rem; font-weight: 600; color: var(--green-900); margin-top: 1px; }
 
         .sidebar::-webkit-scrollbar { width: 4px; }
         .sidebar::-webkit-scrollbar-track { background: transparent; }
         .sidebar::-webkit-scrollbar-thumb { background: var(--gray-200); border-radius: 4px; }
 
-        /* ─── Main Content ──────────────────────────────────── */
-        .page-wrapper {
-            margin-left: var(--sidebar-w);
-            margin-top: 62px;
-            min-height: calc(100vh - 62px);
-            padding: 2rem 2rem 3rem;
-        }
+        /* ─── Main Content ─────────────────────────────────── */
+        .page-wrapper { margin-left: var(--sidebar-w); margin-top: 62px; min-height: calc(100vh - 62px); padding: 2rem 2rem 3rem; }
 
         /* ─── Page Header ───────────────────────────────────── */
-        .page-header {
-            display: flex; align-items: flex-start;
-            justify-content: space-between;
-            margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;
-        }
+        .page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
 
-        .page-header-title {
-            font-family: 'DM Serif Display', serif;
-            font-size: 1.6rem; color: var(--green-900);
-            margin: 0 0 2px; line-height: 1.2;
-        }
+        .page-header-title { font-family: 'DM Serif Display', serif; font-size: 1.6rem; color: var(--green-900); margin: 0 0 2px; line-height: 1.2; }
+        .page-header-sub { font-size: 0.85rem; color: var(--text-muted); margin: 0; }
 
-        .page-header-sub {
-            font-size: 0.85rem; color: var(--text-muted); margin: 0;
-        }
-
-        .header-date-chip {
-            background: #fff; border: 1px solid var(--gray-200);
-            border-radius: var(--radius-sm); padding: 6px 14px;
-            font-size: 0.78rem; color: var(--gray-600);
-            display: flex; align-items: center; gap: 6px;
-            box-shadow: var(--shadow-sm); white-space: nowrap;
-        }
+        .header-date-chip { background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius-sm); padding: 6px 14px; font-size: 0.78rem; color: var(--gray-600); display: flex; align-items: center; gap: 6px; box-shadow: var(--shadow-sm); white-space: nowrap; }
 
         /* ─── Profile Cover ─────────────────────────────────── */
-        .profile-cover-card {
-            background: #fff;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--gray-200);
-            overflow: hidden;
-            margin-bottom: 1.5rem;
-        }
+        .profile-cover-card { background: #fff; border-radius: var(--radius); box-shadow: var(--shadow-sm); border: 1px solid var(--gray-200); overflow: hidden; margin-bottom: 1.5rem; }
 
-        .profile-cover-banner {
-            height: 140px;
-            background: linear-gradient(135deg, var(--green-900) 0%, var(--green-700) 50%, var(--green-500) 100%);
-            position: relative;
-            overflow: hidden;
-        }
+        .profile-cover-banner { height: 140px; background: linear-gradient(135deg, var(--green-900) 0%, var(--green-700) 50%, var(--green-500) 100%); position: relative; overflow: hidden; }
 
-        .profile-cover-banner::before {
-            content: '';
-            position: absolute; inset: 0;
-            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-        }
+        .profile-cover-banner::before { content: ''; position: absolute; inset: 0; background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"); }
 
-        .profile-cover-body {
-            padding: 0 1.75rem 1.5rem;
-            display: flex;
-            align-items: flex-end;
-            gap: 1.25rem;
-            flex-wrap: wrap;
-        }
+        .profile-cover-body { padding: 0 1.75rem 1.5rem; display: flex; align-items: flex-end; gap: 1.25rem; flex-wrap: wrap; }
 
-        .profile-avatar-wrap {
-            margin-top: -48px;
-            flex-shrink: 0;
-            position: relative;
-        }
+        .profile-avatar-wrap { margin-top: -48px; flex-shrink: 0; position: relative; }
 
-        .profile-avatar-img {
-            width: 96px; height: 96px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 4px solid #fff;
-            box-shadow: var(--shadow-md);
-        }
+        .profile-avatar-img { width: 96px; height: 96px; border-radius: 50%; object-fit: cover; border: 4px solid #fff; box-shadow: var(--shadow-md); }
 
-        .profile-avatar-badge {
-            position: absolute; bottom: 4px; right: 4px;
-            width: 22px; height: 22px;
-            background: var(--green-600);
-            border: 2px solid #fff;
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 0.6rem; color: #fff;
-        }
+        .profile-avatar-badge { position: absolute; bottom: 4px; right: 4px; width: 22px; height: 22px; background: var(--green-600); border: 2px solid #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; color: #fff; }
 
-        .profile-cover-info {
-            padding-top: 0.75rem;
-            flex: 1;
-            min-width: 200px;
-        }
+        .profile-cover-info { padding-top: 0.75rem; flex: 1; min-width: 200px; }
 
-        .profile-cover-name {
-            font-family: 'DM Serif Display', serif;
-            font-size: 1.35rem;
-            color: var(--green-900);
-            margin: 0 0 2px;
-        }
+        .profile-cover-name { font-family: 'DM Serif Display', serif; font-size: 1.35rem; color: var(--green-900); margin: 0 0 2px; }
 
-        .profile-cover-meta {
-            font-size: 0.82rem;
-            color: var(--text-muted);
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            flex-wrap: wrap;
-            margin-top: 4px;
-        }
+        .profile-cover-meta { font-size: 0.82rem; color: var(--text-muted); display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; margin-top: 4px; }
 
-        .profile-cover-meta span {
-            display: flex; align-items: center; gap: 4px;
-        }
+        .profile-cover-meta span { display: flex; align-items: center; gap: 4px; }
 
-        .profile-cover-actions {
-            margin-left: auto;
-            display: flex;
-            gap: 0.5rem;
-            padding-top: 0.75rem;
-        }
+        .profile-cover-actions { margin-left: auto; display: flex; gap: 0.5rem; padding-top: 0.75rem; }
 
         /* ─── Info Cards ────────────────────────────────────── */
-        .info-card {
-            background: #fff;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--gray-200);
-            overflow: hidden;
-            height: 100%;
-        }
+        .info-card { background: #fff; border-radius: var(--radius); box-shadow: var(--shadow-sm); border: 1px solid var(--gray-200); overflow: hidden; height: 100%; }
 
-        .info-card-header {
-            padding: 1rem 1.5rem 0.85rem;
-            border-bottom: 1px solid var(--gray-200);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
+        .info-card-header { padding: 1rem 1.5rem 0.85rem; border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; justify-content: space-between; }
 
-        .info-card-title {
-            font-size: 0.9rem;
-            font-weight: 700;
-            color: var(--text-main);
-            margin: 0;
-            display: flex;
-            align-items: center;
-            gap: 0.45rem;
-        }
+        .info-card-title { font-size: 0.9rem; font-weight: 700; color: var(--text-main); margin: 0; display: flex; align-items: center; gap: 0.45rem; }
 
         .info-card-title i { color: var(--green-600); }
 
@@ -376,32 +253,14 @@
         .info-field { margin-bottom: 1.15rem; }
         .info-field:last-child { margin-bottom: 0; }
 
-        .info-field-label {
-            font-size: 0.72rem;
-            font-weight: 700;
-            letter-spacing: 0.07em;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            margin-bottom: 3px;
-        }
+        .info-field-label { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 3px; }
 
-        .info-field-value {
-            font-size: 0.88rem;
-            font-weight: 500;
-            color: var(--text-main);
-        }
+        .info-field-value { font-size: 0.88rem; font-weight: 500; color: var(--text-main); }
 
-        .info-field-value.placeholder {
-            color: var(--gray-400);
-            font-style: italic;
-        }
+        .info-field-value.placeholder { color: var(--gray-400); font-style: italic; }
 
-        /* ─── Role Badge ────────────────────────────────────── */
-        .role-badge {
-            display: inline-flex; align-items: center; gap: 5px;
-            padding: 3px 10px; border-radius: 20px;
-            font-size: 0.71rem; font-weight: 600; white-space: nowrap;
-        }
+        /* ─── Role Badge ───────────────────────────────────── */
+        .role-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 20px; font-size: 0.71rem; font-weight: 600; white-space: nowrap; }
 
         .role-dot { width: 6px; height: 6px; border-radius: 50%; }
 
@@ -414,18 +273,12 @@
         .role-arbo { background: #e0f7f5; color: #0d8a7e; }
         .role-arbo .role-dot { background: #0d8a7e; }
 
-        .status-badge {
-            display: inline-flex; align-items: center; gap: 5px;
-            padding: 3px 10px; border-radius: 20px;
-            font-size: 0.72rem; font-weight: 600;
-        }
+        .status-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; }
 
         .status-active { background: var(--green-100); color: var(--green-700); }
         .status-inactive { background: #fdecea; color: #c0392b; }
 
-        .status-dot {
-            width: 6px; height: 6px; border-radius: 50%; display: inline-block;
-        }
+        .status-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
 
         .status-active .status-dot { background: var(--green-600); }
         .status-inactive .status-dot { background: #c0392b; }
@@ -433,20 +286,11 @@
         /* ─── Activity Timeline ─────────────────────────────── */
         .timeline { list-style: none; padding: 0; margin: 0; }
 
-        .timeline-item {
-            display: flex; gap: 0.85rem;
-            padding: 0.85rem 0;
-            border-bottom: 1px solid var(--gray-100);
-            align-items: flex-start;
-        }
+        .timeline-item { display: flex; gap: 0.85rem; padding: 0.85rem 0; border-bottom: 1px solid var(--gray-100); align-items: flex-start; }
 
         .timeline-item:last-child { border-bottom: none; }
 
-        .timeline-dot {
-            width: 32px; height: 32px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 0.85rem; flex-shrink: 0; margin-top: 1px;
-        }
+        .timeline-dot { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; flex-shrink: 0; margin-top: 1px; }
 
         .td-green { background: var(--green-100); color: var(--green-700); }
         .td-gold  { background: var(--gold-light); color: var(--gold); }
@@ -457,55 +301,25 @@
         .timeline-meta  { font-size: 0.73rem; color: var(--text-muted); }
 
         /* ─── Edit Form ─────────────────────────────────────── */
-        .form-control, .form-select {
-            font-size: 0.86rem;
-            border-color: var(--gray-200);
-            border-radius: 8px !important;
-            transition: border-color 0.18s, box-shadow 0.18s;
-        }
+        .form-control, .form-select { font-size: 0.86rem; border-color: var(--gray-200); border-radius: 8px !important; transition: border-color 0.18s, box-shadow 0.18s; }
 
-        .form-control:focus, .form-select:focus {
-            border-color: var(--green-500);
-            box-shadow: 0 0 0 3px rgba(31,128,60,0.12);
-        }
+        .form-control:focus, .form-select:focus { border-color: var(--green-500); box-shadow: 0 0 0 3px rgba(31,128,60,0.12); }
 
         .form-label { font-size: 0.82rem; font-weight: 600; color: var(--text-main); margin-bottom: 0.35rem; }
 
         /* ─── Divider ───────────────────────────────────────── */
-        .section-divider {
-            font-size: 0.7rem; font-weight: 700;
-            letter-spacing: 0.1em; text-transform: uppercase;
-            color: var(--text-muted);
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid var(--gray-200);
-            margin-bottom: 1.1rem;
-        }
+        .section-divider { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); padding-bottom: 0.5rem; border-bottom: 1px solid var(--gray-200); margin-bottom: 1.1rem; }
 
         /* ─── Password Strength ─────────────────────────────── */
         .strength-bar { height: 4px; border-radius: 4px; background: var(--gray-200); overflow: hidden; margin-top: 6px; }
         .strength-fill { height: 100%; border-radius: 4px; width: 0; transition: width 0.3s, background 0.3s; }
 
         /* ─── Mobile ────────────────────────────────────────── */
-        .mobile-sidebar-toggle {
-            display: none; background: none; border: none;
-            color: #fff; font-size: 1.3rem;
-            margin-right: 0.75rem; cursor: pointer;
-        }
+        .mobile-sidebar-toggle { display: none; background: none; border: none; color: #fff; font-size: 1.3rem; margin-right: 0.75rem; cursor: pointer; }
 
-        .sidebar-overlay {
-            display: none; position: fixed; inset: 0;
-            background: rgba(0,0,0,0.4); z-index: 1029;
-        }
+        .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 1029; }
 
-        @media (max-width: 991.98px) {
-            .sidebar { transform: translateX(-100%); }
-            .sidebar.show { transform: translateX(0); }
-            .sidebar-overlay.show { display: block; }
-            .page-wrapper { margin-left: 0; padding: 1.25rem 1rem 3rem; }
-            .mobile-sidebar-toggle { display: block; }
-            .navbar-page-badge { display: none; }
-            .profile-cover-actions { width: 100%; }
-        }
+        @media (max-width: 991.98px) { .sidebar { transform: translateX(-100%); } .sidebar.show { transform: translateX(0); } .sidebar-overlay.show { display: block; } .page-wrapper { margin-left: 0; padding: 1.25rem 1rem 3rem; } .mobile-sidebar-toggle { display: block; } .navbar-page-badge { display: none; } .profile-cover-actions { width: 100%; } }
 
         /* ─── Modal ─────────────────────────────────────────── */
         .modal-content { border: none; border-radius: var(--radius); box-shadow: var(--shadow-lg); }
@@ -517,137 +331,164 @@
 <body>
 
 @php
-    $authUser   = auth()->user();
+    $authUser = auth()->user();
     $authFullName = $authUser
-        ? trim(($authUser->first_name ?? '') . ' ' . ($authUser->last_name ?? ''))
-        : 'Super Admin';
-    $roleSlug   = $authUser->role->slug ?? 'super_admin';
-    $roleLabel  = $authUser->role->name ?? ucwords(str_replace('_', ' ', $roleSlug));
+        ? trim(($authUser->first_name ?? '') . ' ' . ($authUser->last_name ?? '') )
+        : (optional(auth()->user())->name ?? 'CARPOS Admin');
+    $roleSlug = $authUser->role->slug ?? 'carpos_admin';
+    $roleLabel = $authUser->role->name ?? ucwords(str_replace('_', ' ', $roleSlug));
 
-    // Use stored avatar if present, otherwise generate UI avatar
     if ($authUser && ! empty($authUser->avatar)) {
         $avatarUrl = asset('storage/' . $authUser->avatar);
     } else {
-        $avatarUrl  = 'https://ui-avatars.com/api/?name=' . urlencode($authFullName) . '&background=1a6932&color=fff&rounded=true&size=128';
+        $avatarUrl = 'https://ui-avatars.com/api/?name=' . urlencode($authFullName) . '&background=1a6932&color=fff&rounded=true&size=128';
     }
 @endphp
 
 <!-- ── Top Navbar ──────────────────────────────────────── -->
-<header class="top-navbar">
-    <button class="mobile-sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
-        <i class="bi bi-list"></i>
-    </button>
+    <header class="top-navbar">
+        <!-- Mobile toggle -->
+        <button class="mobile-sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
+            <i class="bi bi-list"></i>
+        </button>
 
-    <a class="navbar-brand-area" href="{{ url('/dashboard') }}">
-        <img src="{{ asset('images/dar-logo.png') }}" alt="DAR Logo">
-        <div>
-            <div class="navbar-system-title">E-Agraryo Merkado</div>
-            <div class="navbar-system-sub">DAR Region V</div>
-        </div>
-    </a>
-
-    <span class="navbar-page-badge"><i class="bi bi-person-circle me-1"></i> My Profile</span>
-
-    <div class="navbar-right">
-        <div class="dropdown">
-            <button class="nav-icon-btn" data-bs-toggle="dropdown" aria-label="Notifications">
-                <i class="bi bi-bell"></i>
-                <span class="nav-notif-dot"></span>
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0" style="min-width:280px; border-radius:12px; margin-top:8px;">
-                <li class="px-3 py-2 border-bottom">
-                    <span class="fw-bold" style="font-size:.82rem;">Notifications</span>
-                </li>
-                <li>
-                    <a class="dropdown-item py-2" href="#" style="font-size:.82rem;">
-                        <i class="bi bi-person-plus text-success me-2"></i> New user registered
-                        <div class="text-muted" style="font-size:.72rem; padding-left:1.4rem;">2 hours ago</div>
-                    </a>
-                </li>
-                <li class="border-top">
-                    <a class="dropdown-item text-center py-2" href="#" style="font-size:.78rem; color:var(--green-700);">View all notifications</a>
-                </li>
-            </ul>
-        </div>
-
-        <div class="navbar-divider d-none d-sm-block"></div>
-
-        <div class="dropdown">
-            <a class="user-pill dropdown-toggle" href="#" data-bs-toggle="dropdown">
-                <img class="user-avatar" src="{{ $avatarUrl }}" alt="User avatar">
-                <div class="d-none d-md-block" style="line-height:1.2;">
-                    <div class="user-pill-name">{{ $authFullName }}</div>
-                    <div class="user-pill-role">{{ $roleLabel }}</div>
-                </div>
-            </a>
-            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0" style="border-radius:12px; margin-top:8px; min-width:200px;">
-                <li class="px-3 py-2 border-bottom">
-                    <div class="fw-bold" style="font-size:.83rem;">{{ $authFullName }}</div>
-                    <div class="text-muted" style="font-size:.72rem;">{{ $authUser->email ?? '' }}</div>
-                </li>
-                <li><a class="dropdown-item py-2" href="{{ url('/profile') }}" style="font-size:.84rem;"><i class="bi bi-person me-2 text-muted"></i>Profile</a></li>
-                <li><a class="dropdown-item py-2" href="{{ url('/settings') }}" style="font-size:.84rem;"><i class="bi bi-gear me-2 text-muted"></i>System Settings</a></li>
-                <li class="border-top">
-                    <form method="POST" action="{{ url('/logout') }}">
-                        @csrf
-                        <button class="dropdown-item py-2 text-danger" type="submit" style="font-size:.84rem;"><i class="bi bi-box-arrow-right me-2"></i>Logout</button>
-                    </form>
-                </li>
-            </ul>
-        </div>
-    </div>
-</header>
-
-<!-- ── Sidebar Overlay ─────────────────────────────────── -->
-<div class="sidebar-overlay" id="sidebarOverlay"></div>
-
-<!-- ── Sidebar ─────────────────────────────────────────── -->
-<aside class="sidebar" id="mainSidebar">
-    <div class="sidebar-inner">
-        <div class="sidebar-office-chip">
-            <div class="office-label">Role</div>
-            <div class="office-name">{{ $roleLabel }}</div>
-        </div>
-
-        <span class="sidebar-section-label">Main Menu</span>
-
-        <a href="{{ url('/dashboard') }}" class="sidebar-link">
-            <i class="bi bi-speedometer2"></i> Dashboard
-        </a>
-        <a href="{{ url('/roles') }}" class="sidebar-link">
-            <i class="bi bi-person-badge"></i> User Roles
-        </a>
-        <a href="{{ url('/branches') }}" class="sidebar-link">
-            <i class="bi bi-building"></i> PBD Management
-            <span class="sidebar-link-badge">8</span>
-        </a>
-        <a href="{{ url('/logs') }}" class="sidebar-link">
-            <i class="bi bi-clock-history"></i> Activity Logs
+        <!-- Brand -->
+        <a class="navbar-brand-area" href="{{ url('/dashboard') }}">
+            <img src="{{ asset('images/dar-logo.png') }}" alt="DAR Logo">
+            <div>
+                <div class="navbar-system-title">E-Agraryo Merkado</div>
+                <div class="navbar-system-sub">DAR Region V</div>
+            </div>
         </a>
 
-        <span class="sidebar-section-label">Sales Report</span>
-        <a href="{{ url('/reports') }}" class="sidebar-link">
-            <i class="bi bi-bar-chart-line"></i> Sales Report
-        </a>
+        <span class="navbar-page-badge"><i class="bi bi-shield-check me-1"></i> Admin CARPOS</span>
 
-        <span class="sidebar-section-label">Account</span>
-        <a href="{{ url('/profile') }}" class="sidebar-link active">
-            <i class="bi bi-person-circle"></i> My Profile
-        </a>
-        <a href="{{ url('/settings') }}" class="sidebar-link">
-            <i class="bi bi-gear"></i> Settings
-        </a>
-
-        <div class="sidebar-logout">
-            <form method="POST" action="{{ url('/logout') }}">
-                @csrf
-                <button type="submit" class="sidebar-link w-100 text-start border-0 bg-transparent">
-                    <i class="bi bi-box-arrow-right"></i> Logout
+        <!-- Right actions -->
+        <div class="navbar-right">
+            <!-- Notifications -->
+            <div class="dropdown">
+                <button class="nav-icon-btn" data-bs-toggle="dropdown" aria-label="Notifications">
+                    <i class="bi bi-bell"></i>
+                    <span class="nav-notif-dot"></span>
                 </button>
-            </form>
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0" style="min-width:280px; border-radius:12px; margin-top:8px;">
+                    <li class="px-3 py-2 border-bottom">
+                        <span class="fw-bold" style="font-size:.82rem;">Notifications</span>
+                    </li>
+                    <li>
+                        <a class="dropdown-item py-2" href="#" style="font-size:.82rem;">
+                            <i class="bi bi-person-plus text-success me-2"></i> New ARBO registered
+                            <div class="text-muted" style="font-size:.72rem; padding-left:1.4rem;">2 hours ago</div>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item py-2" href="#" style="font-size:.82rem;">
+                            <i class="bi bi-cart-check text-primary me-2"></i> Order #2041 completed
+                            <div class="text-muted" style="font-size:.72rem; padding-left:1.4rem;">5 hours ago</div>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item py-2" href="#" style="font-size:.82rem;">
+                            <i class="bi bi-exclamation-triangle text-warning me-2"></i> Seller account pending review
+                            <div class="text-muted" style="font-size:.72rem; padding-left:1.4rem;">Yesterday</div>
+                        </a>
+                    </li>
+                    <li class="border-top">
+                        <a class="dropdown-item text-center py-2" href="#" style="font-size:.78rem; color: var(--green-700);">View all notifications</a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="navbar-divider d-none d-sm-block"></div>
+
+            <!-- User Dropdown -->
+            <div class="dropdown">
+                <a class="user-pill dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                    <img class="user-avatar"
+                        src="{{ optional(auth()->user())->avatar ?: 'https://ui-avatars.com/api/?name=' . urlencode(optional(auth()->user())->name ?? 'CARPOS Admin') . '&background=1a6932&color=fff&rounded=true&size=64' }}"
+                        alt="User avatar">
+                    <div class="d-none d-md-block" style="line-height:1.2;">
+                        <div class="user-pill-name">{{ optional(auth()->user())->name ?? 'Admin CARPOS' }}</div>
+                        <div class="user-pill-role">Admin DARPO</div>
+                    </div>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0" style="border-radius:12px; margin-top:8px; min-width:200px;">
+                    <li class="px-3 py-2 border-bottom">
+                        <div class="fw-bold" style="font-size:.83rem;">{{ optional(auth()->user())->name ?? 'Admin CARPOS' }}</div>
+                        <div class="text-muted" style="font-size:.72rem;">{{ optional(auth()->user())->email ?? '' }}</div>
+                    </li>
+                    <li><a class="dropdown-item py-2" href="{{ url('/admin/profile') }}" style="font-size:.84rem;"><i class="bi bi-person me-2 text-muted"></i>Profile</a></li>
+                    <li><a class="dropdown-item py-2" href="{{ url('/settings') }}" style="font-size:.84rem;"><i class="bi bi-gear me-2 text-muted"></i>Settings</a></li>
+                    <li class="border-top">
+                        <form method="POST" action="{{ url('/logout') }}">
+                            @csrf
+                            <button class="dropdown-item py-2 text-danger" type="submit" style="font-size:.84rem;"><i class="bi bi-box-arrow-right me-2"></i>Logout</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
         </div>
-    </div>
-</aside>
+    </header>
+
+    <!-- ── Sidebar Overlay (mobile) ────────────────────────── -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- ── Sidebar ─────────────────────────────────────────── -->
+    <aside class="sidebar" id="mainSidebar">
+        <div class="sidebar-inner">
+
+            <!-- Office chip -->
+            <div class="sidebar-office-chip">
+                <div class="office-label">Assigned Office</div>
+                <div class="office-name">{{ auth()->user()->office ?? 'CARPOS-PBD Office' }}</div>
+            </div>
+
+            <!-- Main menu -->
+            <span class="sidebar-section-label">Main Menu</span>
+
+            <a href="{{ url('/admin/dashboard') }}" class="sidebar-link">
+                <i class="bi bi-speedometer2"></i>
+                Dashboard
+            </a>
+
+            <a href="{{ url('/admin/arbos') }}" class="sidebar-link">
+                <i class="bi bi-diagram-3"></i>
+                ARBO Management
+                <span class="sidebar-link-badge">{{ $totalArbos ?? '0' }}</span>
+            </a>
+
+            {{-- ── Added: ARBO Admins ── --}}
+            <a href="{{ url('/admin/arbo-admins') }}" class="sidebar-link">
+                <i class="bi bi-person-badge"></i>
+                ARBO Admins
+            </a>
+
+            {{-- ── Added: Marketplace Monitoring ── --}}
+            <a href="{{ url('/admin/marketplace') }}" class="sidebar-link">
+                <i class="bi bi-shop"></i>
+                Marketplace Monitoring
+            </a>
+
+            <span class="sidebar-section-label">Reports</span>
+
+            <a href="{{ url('/admin/reports') }}" class="sidebar-link">
+                <i class="bi bi-bar-chart-line"></i>
+                Reports
+            </a>
+
+            <!-- Logout -->
+            <div class="sidebar-logout">
+                <form method="POST" action="{{ url('/logout') }}">
+                    @csrf
+                    <button type="submit" class="sidebar-link w-100 text-start border-0 bg-transparent">
+                        <i class="bi bi-box-arrow-right"></i>
+                        Logout
+                    </button>
+                </form>
+            </div>
+        </div>
+    </aside>
+
 
 <!-- ── Main Content ─────────────────────────────────────── -->
 <main class="page-wrapper">
@@ -709,16 +550,10 @@
                 </div>
             </div>
             <div class="profile-cover-actions">
-                <button type="button"
-                        class="btn btn-sm fw-semibold d-flex align-items-center gap-2"
-                        data-bs-toggle="modal" data-bs-target="#editProfileModal"
-                        style="background:var(--green-600); color:#fff; border-radius:8px; border:none; font-size:.82rem;">
+                <button type="button" class="btn btn-sm fw-semibold d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#editProfileModal" style="background:var(--green-600); color:#fff; border-radius:8px; border:none; font-size:.82rem;">
                     <i class="bi bi-pencil-fill"></i> Edit Profile
                 </button>
-                <button type="button"
-                        class="btn btn-sm fw-semibold d-flex align-items-center gap-2"
-                        data-bs-toggle="modal" data-bs-target="#changePasswordModal"
-                        style="background:#fff; color:var(--green-700); border:1px solid var(--gray-200); border-radius:8px; font-size:.82rem;">
+                <button type="button" class="btn btn-sm fw-semibold d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#changePasswordModal" style="background:#fff; color:var(--green-700); border:1px solid var(--gray-200); border-radius:8px; font-size:.82rem;">
                     <i class="bi bi-shield-lock-fill"></i> Change Password
                 </button>
             </div>
@@ -741,9 +576,7 @@
                     </div>
                     <div class="info-field">
                         <div class="info-field-label">Middle Name</div>
-                        <div class="info-field-value {{ !($authUser->middle_name ?? null) ? 'placeholder' : '' }}">
-                            {{ $authUser->middle_name ?? 'Not provided' }}
-                        </div>
+                        <div class="info-field-value {{ !($authUser->middle_name ?? null) ? 'placeholder' : '' }}">{{ $authUser->middle_name ?? 'Not provided' }}</div>
                     </div>
                     <div class="info-field">
                         <div class="info-field-label">Last Name</div>
@@ -755,9 +588,7 @@
                     </div>
                     <div class="info-field">
                         <div class="info-field-label">Contact Number</div>
-                        <div class="info-field-value {{ !($authUser->contact_number ?? null) ? 'placeholder' : '' }}">
-                            {{ $authUser->contact_number ?? 'Not provided' }}
-                        </div>
+                        <div class="info-field-value {{ !($authUser->contact_number ?? null) ? 'placeholder' : '' }}">{{ $authUser->contact_number ?? 'Not provided' }}</div>
                     </div>
                 </div>
             </div>
@@ -772,9 +603,7 @@
                 <div class="info-card-body">
                     <div class="info-field">
                         <div class="info-field-label">User ID</div>
-                        <div class="info-field-value" style="font-family:monospace; font-size:.82rem; color:var(--text-muted);">
-                            USR-{{ str_pad($authUser->id ?? 0, 4, '0', STR_PAD_LEFT) }}
-                        </div>
+                        <div class="info-field-value" style="font-family:monospace; font-size:.82rem; color:var(--text-muted);">USR-{{ str_pad($authUser->id ?? 0, 4, '0', STR_PAD_LEFT) }}</div>
                     </div>
                     <div class="info-field">
                         <div class="info-field-label">Email Address</div>
@@ -782,32 +611,19 @@
                     </div>
                     <div class="info-field">
                         <div class="info-field-label">Assigned Role</div>
-                        <div class="info-field-value">
-                            <span class="role-badge role-{{ $roleSlug }}">
-                                <span class="role-dot"></span>{{ $roleLabel }}
-                            </span>
-                        </div>
+                        <div class="info-field-value"><span class="role-badge role-{{ $roleSlug }}"><span class="role-dot"></span>{{ $roleLabel }}</span></div>
                     </div>
                     <div class="info-field">
                         <div class="info-field-label">Assigned Province</div>
-                        <div class="info-field-value {{ !($authUser->province ?? null) ? 'placeholder' : '' }}">
-                            {{ $authUser->province->name ?? 'Not assigned' }}
-                        </div>
+                        <div class="info-field-value {{ !($authUser->province ?? null) ? 'placeholder' : '' }}">{{ $authUser->province->name ?? 'Not assigned' }}</div>
                     </div>
                     <div class="info-field">
                         <div class="info-field-label">Account Status</div>
-                        <div class="info-field-value">
-                            <span class="status-badge status-{{ $authUser->status ?? 'active' }}">
-                                <span class="status-dot"></span>
-                                {{ ucfirst($authUser->status ?? 'active') }}
-                            </span>
-                        </div>
+                        <div class="info-field-value"><span class="status-badge status-{{ $authUser->status ?? 'active' }}"><span class="status-dot"></span>{{ ucfirst($authUser->status ?? 'active') }}</span></div>
                     </div>
                     <div class="info-field">
                         <div class="info-field-label">Member Since</div>
-                        <div class="info-field-value">
-                            {{ optional($authUser->created_at)->format('F d, Y') ?? '—' }}
-                        </div>
+                        <div class="info-field-value">{{ optional($authUser->created_at)->format('F d, Y') ?? '—' }}</div>
                     </div>
                 </div>
             </div>
