@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Your Account Credentials – DARRO 5</title>
+  <title>Reset Your Password – DARRO 5</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
@@ -12,14 +12,14 @@
     img { border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic; }
 
     body {
-      background-color: #f0f4ff;
+      background-color: #f4fce8;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      color: #1a1a2e;
+      color: #1a2e0a;
     }
 
     .email-wrapper {
       width: 100%;
-      background-color: #f0f4ff;
+      background-color: #f4fce8;
       padding: 40px 16px;
     }
 
@@ -29,32 +29,14 @@
       background: #ffffff;
       border-radius: 20px;
       overflow: hidden;
-      box-shadow: 0 16px 48px rgba(13, 110, 253, 0.10);
+      box-shadow: 0 16px 48px rgba(34, 139, 34, 0.12);
     }
 
     /* Header */
     .email-header {
-      background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+      background: linear-gradient(135deg, #4caf27 0%, #2e7d0e 100%);
       padding: 36px 40px 32px;
       text-align: center;
-    }
-
-    .header-logo-circle {
-      width: 72px;
-      height: 72px;
-      background: rgba(255,255,255,0.15);
-      border: 3px solid rgba(255,255,255,0.35);
-      border-radius: 50%;
-      margin: 0 auto 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .header-logo-circle img {
-      width: 46px;
-      height: 46px;
-      object-fit: contain;
     }
 
     .header-title {
@@ -66,7 +48,7 @@
     }
 
     .header-subtitle {
-      color: rgba(255,255,255,0.80);
+      color: rgba(255,255,255,0.85);
       font-size: 14px;
       margin-top: 4px;
     }
@@ -89,76 +71,70 @@
       margin-bottom: 28px;
     }
 
-    /* Credentials block */
-    .credentials-block {
-      background: #f0f4ff;
-      border: 1.5px solid #dbeafe;
-      border-radius: 14px;
-      padding: 24px 28px;
-      margin-bottom: 28px;
-    }
-
-    .credentials-label {
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 1.2px;
-      text-transform: uppercase;
-      color: #0d6efd;
-      margin-bottom: 16px;
-    }
-
-    .credential-row {
+    /* Lock icon badge */
+    .icon-badge {
+      width: 64px;
+      height: 64px;
+      background: #f4fce8;
+      border: 1.5px solid #bbf7a0;
+      border-radius: 50%;
+      margin: 0 auto 20px;
       display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      padding: 10px 0;
-      border-bottom: 1px solid #e0eaff;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      text-align: center;
+      line-height: 64px;
     }
 
-    .credential-row:last-child {
-      border-bottom: none;
-      padding-bottom: 0;
-    }
-
-    .credential-row:first-of-type {
-      padding-top: 0;
-    }
-
-    .cred-key {
-      font-size: 12px;
-      font-weight: 600;
-      color: #6b7280;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      min-width: 80px;
-      padding-top: 2px;
-    }
-
-    .cred-value {
-      font-size: 15px;
-      font-weight: 600;
-      color: #0a58ca;
-      font-family: 'Courier New', Courier, monospace;
-      word-break: break-all;
-    }
-
-    /* CTA button */
-    .cta-wrap {
+    /* CTA block */
+    .cta-block {
+      background: #f4fce8;
+      border: 1.5px solid #bbf7a0;
+      border-radius: 14px;
+      padding: 28px 24px;
       text-align: center;
       margin-bottom: 28px;
     }
 
+    .cta-label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: #2e7d0e;
+      margin-bottom: 8px;
+    }
+
+    .cta-desc {
+      font-size: 14px;
+      color: #6b7280;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
     .btn-cta {
       display: inline-block;
-      background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
-      color: #ffffff !important;
+      background: linear-gradient(135deg, #f5c800 0%, #d4a800 100%);
+      color: #1a2e0a !important;
       text-decoration: none;
       font-size: 15px;
       font-weight: 700;
       padding: 14px 36px;
       border-radius: 10px;
       letter-spacing: 0.2px;
-      box-shadow: 0 4px 16px rgba(13, 110, 253, 0.30);
+      box-shadow: 0 4px 16px rgba(245, 200, 0, 0.40);
+    }
+
+    .expiry-note {
+      margin-top: 14px;
+      font-size: 13px;
+      color: #9ca3af;
+    }
+
+    .expiry-note span {
+      color: #e65c00;
+      font-weight: 600;
     }
 
     /* Divider */
@@ -170,31 +146,43 @@
 
     /* Warning box */
     .warning-box {
-      background: #fffbeb;
-      border-left: 4px solid #f59e0b;
+      background: #fffde7;
+      border-left: 4px solid #f5c800;
       border-radius: 8px;
       padding: 14px 16px;
       font-size: 13.5px;
-      color: #92400e;
+      color: #6b4c00;
       line-height: 1.5;
       margin-bottom: 24px;
     }
 
-    .warning-box strong { color: #78350f; }
+    .warning-box strong { color: #4a3300; }
 
-    /* Security tip */
-    .tip-box {
-      background: #f0fdf4;
-      border-left: 4px solid #22c55e;
+    /* Fallback URL block */
+    .fallback-block {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
       border-radius: 8px;
       padding: 14px 16px;
-      font-size: 13.5px;
-      color: #166534;
-      line-height: 1.5;
       margin-bottom: 24px;
     }
 
-    .tip-box strong { color: #14532d; }
+    .fallback-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+
+    .fallback-url {
+      font-size: 12px;
+      color: #2e7d0e;
+      word-break: break-all;
+      line-height: 1.5;
+      font-family: 'Courier New', Courier, monospace;
+    }
 
     /* Sign off */
     .sign-off {
@@ -207,8 +195,8 @@
 
     /* Footer */
     .email-footer {
-      background: #f9fafb;
-      border-top: 1px solid #e5e7eb;
+      background: #f4fce8;
+      border-top: 1px solid #bbf7a0;
       padding: 24px 40px;
       text-align: center;
     }
@@ -216,7 +204,7 @@
     .footer-app-name {
       font-size: 13px;
       font-weight: 700;
-      color: #0d6efd;
+      color: #2e7d0e;
       letter-spacing: 0.5px;
       margin-bottom: 4px;
     }
@@ -227,14 +215,13 @@
       line-height: 1.5;
     }
 
-    .footer-text a { color: #0d6efd; text-decoration: none; }
+    .footer-text a { color: #2e7d0e; text-decoration: none; }
 
     @media only screen and (max-width: 560px) {
       .email-body  { padding: 28px 24px; }
       .email-header { padding: 28px 24px 24px; }
       .email-footer { padding: 20px 24px; }
-      .credentials-block { padding: 18px 20px; }
-      .cred-key { min-width: 70px; }
+      .cta-block { padding: 22px 16px; }
     }
   </style>
 </head>
@@ -245,9 +232,6 @@
 
       <!-- Header -->
       <div class="email-header">
-        <div class="header-logo-circle">
-          <img src="{{ asset('images/dar-logo.png') }}" alt="DARRO 5 Logo">
-        </div>
         <p class="header-title">DARRO 5</p>
         <p class="header-subtitle">E-Agraryo Merkado Team</p>
       </div>
@@ -255,47 +239,38 @@
       <!-- Body -->
       <div class="email-body">
 
-        <p class="greeting">Hello, <strong>{{ $user->first_name ?? $user->name }}</strong> 👋</p>
+        <div class="icon-badge">🔑</div>
 
-        <p class="body-text">
-          Welcome to <strong>DARRO 5</strong>! Your account has been created by an administrator.
-          Use the credentials below to sign in for the first time.
+        <p class="greeting" style="text-align:center;">Password Reset Request</p>
+
+        <p class="body-text" style="text-align:center;">
+          We received a request to reset the password for your account.
+          Click the button below to choose a new password.
         </p>
 
-        <!-- Credentials block -->
-        <div class="credentials-block">
-          <p class="credentials-label">Your account credentials</p>
-
-          <div class="credential-row">
-            <span class="cred-key">Email</span>
-            <span class="cred-value">{{ $user->email ?? $user->username }}</span>
-          </div>
-
-          <div class="credential-row">
-            <span class="cred-key">Password</span>
-            <span class="cred-value">{{ $password }}</span>
-          </div>
-        </div>
-
-        <!-- CTA -->
-        <div class="cta-wrap">
-          <a href="{{ url('/') }}" class="btn-cta">Sign In to DARRO 5</a>
+        <!-- CTA block -->
+        <div class="cta-block">
+          <p class="cta-label">Reset your password</p>
+          <p class="cta-desc">This link is valid for <span style="color:#e65c00;font-weight:600;">{{ $expires }} minutes</span>. After that, you'll need to request a new one.</p>
+          <a href="{{ $url }}" class="btn-cta">Reset Password</a>
+          <p class="expiry-note">Link expires in <span>{{ $expires }} minutes</span></p>
         </div>
 
         <hr class="divider">
 
-        <!-- Security tip -->
-        <div class="tip-box">
-          <strong>🔒 Security tip:</strong> For your protection, please change your password immediately after your first sign-in.
-        </div>
-
         <!-- Warning -->
         <div class="warning-box">
-          <strong>Didn't expect this?</strong> If you did not request this account, please contact your system administrator immediately.
+          <strong>Didn't request this?</strong> If you did not request a password reset, no action is needed — your password will remain unchanged and this link will expire automatically.
+        </div>
+
+        <!-- Fallback URL -->
+        <div class="fallback-block">
+          <p class="fallback-label">Having trouble with the button?</p>
+          <p class="fallback-url">{{ $url }}</p>
         </div>
 
         <p class="sign-off">
-          Thanks,<br>
+          Regards,<br>
           <strong>E-Agraryo Merkado Team</strong>
         </p>
 

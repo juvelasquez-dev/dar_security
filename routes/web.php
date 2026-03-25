@@ -47,6 +47,10 @@ Route::get('/', [LandingPageController::class, 'index']);
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 
+// Login verification (code sent to email)
+Route::get('/login/verify', [\App\Http\Controllers\AuthController::class, 'showVerifyForm'])->name('login.verify');
+Route::post('/login/verify', [\App\Http\Controllers\AuthController::class, 'verifyCode'])->name('login.verify.post');
+
 Route::post('/forgot-password', [AuthController::class, 'sendResetLink'])->name('password.email');
 Route::get('/reset-password/{token}', [AuthController::class, 'showResetForm'])->name('password.reset');
 Route::post('/reset-password', [AuthController::class, 'reset'])->name('password.update');
@@ -62,6 +66,30 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', \App\Http\Middleware\PreventBackHistory::class])->group(function () {
+
+    // Generic dashboard shortcut: redirect users to the appropriate dashboard
+    Route::get('/dashboard', function () {
+        $user = auth()->user();
+        if (! $user) {
+            return redirect()->route('login');
+        }
+
+        $role = $user->role->slug ?? null;
+
+        switch ($role) {
+            case 'super_admin':
+                return redirect()->route('super.admin.dashboard');
+            case 'pbd':
+                return redirect()->route('admin.dashboard');
+            case 'finance':
+                return redirect()->route('finance.dashboard');
+            case 'arbo':
+                return redirect()->route('arbos.dashboard');
+            default:
+                return redirect()->route('profile');
+        }
+    })->name('dashboard');
+
 
     /*
     |-------------------------------

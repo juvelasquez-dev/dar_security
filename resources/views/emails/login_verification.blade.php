@@ -4,8 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Your Account Credentials – DARRO 5</title>
+  <title>Login Verification Code – DARRO 5</title>
   <style>
+    /* Reset */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
     table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
@@ -32,7 +33,7 @@
       box-shadow: 0 16px 48px rgba(13, 110, 253, 0.10);
     }
 
-    /* Header */
+    /* Header band */
     .email-header {
       background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
       padding: 36px 40px 32px;
@@ -89,76 +90,44 @@
       margin-bottom: 28px;
     }
 
-    /* Credentials block */
-    .credentials-block {
+    /* OTP block */
+    .otp-block {
       background: #f0f4ff;
       border: 1.5px solid #dbeafe;
       border-radius: 14px;
-      padding: 24px 28px;
+      text-align: center;
+      padding: 28px 24px;
       margin-bottom: 28px;
     }
 
-    .credentials-label {
+    .otp-label {
       font-size: 12px;
       font-weight: 600;
       letter-spacing: 1.2px;
       text-transform: uppercase;
       color: #0d6efd;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
     }
 
-    .credential-row {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      padding: 10px 0;
-      border-bottom: 1px solid #e0eaff;
-    }
-
-    .credential-row:last-child {
-      border-bottom: none;
-      padding-bottom: 0;
-    }
-
-    .credential-row:first-of-type {
-      padding-top: 0;
-    }
-
-    .cred-key {
-      font-size: 12px;
-      font-weight: 600;
-      color: #6b7280;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      min-width: 80px;
-      padding-top: 2px;
-    }
-
-    .cred-value {
-      font-size: 15px;
-      font-weight: 600;
+    .otp-code {
+      font-size: 42px;
+      font-weight: 800;
+      letter-spacing: 10px;
       color: #0a58ca;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
       font-family: 'Courier New', Courier, monospace;
-      word-break: break-all;
     }
 
-    /* CTA button */
-    .cta-wrap {
-      text-align: center;
-      margin-bottom: 28px;
+    .otp-expiry {
+      margin-top: 12px;
+      font-size: 13px;
+      color: #9ca3af;
     }
 
-    .btn-cta {
-      display: inline-block;
-      background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
-      color: #ffffff !important;
-      text-decoration: none;
-      font-size: 15px;
-      font-weight: 700;
-      padding: 14px 36px;
-      border-radius: 10px;
-      letter-spacing: 0.2px;
-      box-shadow: 0 4px 16px rgba(13, 110, 253, 0.30);
+    .otp-expiry span {
+      color: #ef4444;
+      font-weight: 600;
     }
 
     /* Divider */
@@ -180,21 +149,9 @@
       margin-bottom: 24px;
     }
 
-    .warning-box strong { color: #78350f; }
-
-    /* Security tip */
-    .tip-box {
-      background: #f0fdf4;
-      border-left: 4px solid #22c55e;
-      border-radius: 8px;
-      padding: 14px 16px;
-      font-size: 13.5px;
-      color: #166534;
-      line-height: 1.5;
-      margin-bottom: 24px;
+    .warning-box strong {
+      color: #78350f;
     }
-
-    .tip-box strong { color: #14532d; }
 
     /* Sign off */
     .sign-off {
@@ -203,7 +160,9 @@
       line-height: 1.6;
     }
 
-    .sign-off strong { color: #374151; }
+    .sign-off strong {
+      color: #374151;
+    }
 
     /* Footer */
     .email-footer {
@@ -227,14 +186,17 @@
       line-height: 1.5;
     }
 
-    .footer-text a { color: #0d6efd; text-decoration: none; }
+    .footer-text a {
+      color: #0d6efd;
+      text-decoration: none;
+    }
 
+    /* Responsive */
     @media only screen and (max-width: 560px) {
       .email-body  { padding: 28px 24px; }
       .email-header { padding: 28px 24px 24px; }
       .email-footer { padding: 20px 24px; }
-      .credentials-block { padding: 18px 20px; }
-      .cred-key { min-width: 70px; }
+      .otp-code { font-size: 34px; letter-spacing: 8px; }
     }
   </style>
 </head>
@@ -246,6 +208,7 @@
       <!-- Header -->
       <div class="email-header">
         <div class="header-logo-circle">
+          {{-- Use an absolute URL for email images --}}
           <img src="{{ asset('images/dar-logo.png') }}" alt="DARRO 5 Logo">
         </div>
         <p class="header-title">DARRO 5</p>
@@ -255,43 +218,26 @@
       <!-- Body -->
       <div class="email-body">
 
-        <p class="greeting">Hello, <strong>{{ $user->first_name ?? $user->name }}</strong> 👋</p>
+        <p class="greeting">Hi <strong>{{ $user->first_name ?? $user->name ?? 'User' }}</strong>,</p>
 
         <p class="body-text">
-          Welcome to <strong>DARRO 5</strong>! Your account has been created by an administrator.
-          Use the credentials below to sign in for the first time.
+          We received a login request for your account. Use the verification code below to complete your sign-in.
+          Do not share this code with anyone.
         </p>
 
-        <!-- Credentials block -->
-        <div class="credentials-block">
-          <p class="credentials-label">Your account credentials</p>
-
-          <div class="credential-row">
-            <span class="cred-key">Email</span>
-            <span class="cred-value">{{ $user->email ?? $user->username }}</span>
-          </div>
-
-          <div class="credential-row">
-            <span class="cred-key">Password</span>
-            <span class="cred-value">{{ $password }}</span>
-          </div>
-        </div>
-
-        <!-- CTA -->
-        <div class="cta-wrap">
-          <a href="{{ url('/') }}" class="btn-cta">Sign In to DARRO 5</a>
+        <!-- OTP Block -->
+        <div class="otp-block">
+          <p class="otp-label">Your verification code</p>
+          <p class="otp-code">{{ $code }}</p>
+          <p class="otp-expiry">Expires in <span>10 minutes</span></p>
         </div>
 
         <hr class="divider">
 
-        <!-- Security tip -->
-        <div class="tip-box">
-          <strong>🔒 Security tip:</strong> For your protection, please change your password immediately after your first sign-in.
-        </div>
-
         <!-- Warning -->
         <div class="warning-box">
-          <strong>Didn't expect this?</strong> If you did not request this account, please contact your system administrator immediately.
+          <strong>Didn't request this?</strong> If you did not attempt to sign in, please ignore this email.
+          Your account remains secure and no action is needed.
         </div>
 
         <p class="sign-off">

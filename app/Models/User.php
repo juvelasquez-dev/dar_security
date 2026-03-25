@@ -8,6 +8,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Models\Role;
 use App\Models\Province;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\ResetPasswordMail;
 
 class User extends Authenticatable
 {
@@ -56,6 +58,14 @@ class User extends Authenticatable
             'password' => 'hashed',
             'is_verified' => 'boolean',
         ];
+    }
+
+    /**
+     * Send the password reset notification using the custom mailable.
+     */
+    public function sendPasswordResetNotification($token)
+    {
+        Mail::to($this->email)->send(new ResetPasswordMail($this, $token));
     }
 
     /**
