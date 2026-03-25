@@ -5,6 +5,7 @@ namespace App\Http\Controllers\SuperAdmin;
 use App\Http\Controllers\Controller;
 use App\Models\Province;
 use App\Models\User;
+use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -92,11 +93,35 @@ class PbdController extends Controller
             return redirect()->back()->with('error', 'Selected user is not a PBD admin account.');
         }
 
+        $previousProvinceId = $user->province_id;
+        $previousProvinceName = $previousProvinceId ? optional(Province::find($previousProvinceId))->name : null;
+
+        // If user already assigned to a different province, require explicit confirmation
+        if ($previousProvinceId && $previousProvinceId != $provinceId && ! $request->boolean('confirm_reassign')) {
+            $msg = 'Selected user is already assigned to ' . ($previousProvinceName ?? 'another province') . ". Please confirm reassignment.";
+            return redirect()->back()->with('error', $msg);
+        }
+
         // Assign the province to the user
         $user->province_id = $provinceId;
         $saved = $user->save();
 
         if ($saved) {
+            // Log activity
+            ActivityLog::create([
+                'user_id' => auth()->id(),
+                'action' => 'assign_admin',
+                'module' => 'pbd',
+                'meta' => [
+                    'assigned_user_id' => $user->id,
+                    'assigned_user_name' => trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? '')) ?: ($user->username ?? $user->email ?? ''),
+                    'from_province_id' => $previousProvinceId,
+                    'from_province_name' => $previousProvinceName,
+                    'to_province_id' => $provinceId,
+                    'remarks' => $data['remarks'] ?? null,
+                ],
+            ]);
+
             return redirect()->back()->with('success', 'Assigned admin successfully.');
         }
 

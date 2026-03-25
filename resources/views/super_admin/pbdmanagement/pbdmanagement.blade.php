@@ -827,9 +827,10 @@
                                                     <i class="bi bi-pencil-fill"></i> Edit
                                                 </a>
                                                 <button type="button" class="action-btn btn-assign"
-                                                        data-bs-toggle="modal" data-bs-target="#assignAdminModal"
-                                                        data-id="{{ $office->id }}"
-                                                        data-name="{{ $office->name }}">
+                                                    data-bs-toggle="modal" data-bs-target="#assignAdminModal"
+                                                    data-id="{{ $office->id }}"
+                                                    data-name="{{ $office->name }}"
+                                                    data-admin-id="{{ $office->admin->id ?? '' }}">
                                                     <i class="bi bi-person-check-fill"></i> Assign Admin
                                                 </button>
                                                 @if($office->status === 'active')
@@ -1049,17 +1050,19 @@
                             <label class="form-label fw-semibold" style="font-size:.84rem;">Select Admin Account</label>
                             <select name="admin_id" class="form-select" required style="border-radius:8px;">
                                 <option value="">— Choose a CARPOS Admin —</option>
-                                @isset($availableAdmins)
-                                    @foreach($availableAdmins as $admin)
-                                        <option value="{{ $admin->id }}">{{ $admin->name }} ({{ $admin->email }})</option>
-                                    @endforeach
-                                @else
+                                    @isset($availableAdmins)
+                                        @foreach($availableAdmins as $admin)
+                                            @php $assignedTo = $admin->province?->name ?? '' ; @endphp
+                                            <option value="{{ $admin->id }}" data-assigned-to="{{ $assignedTo }}">{{ $admin->name }} ({{ $admin->email }}){{ $assignedTo ? ' — Assigned: '.$assignedTo : '' }}</option>
+                                        @endforeach
+                                    @else
                                     <option value="1">Maria Reyes Santos (mrsantos@dar.gov.ph)</option>
                                     <option value="2">Juan dela Cruz (jdelacruz@dar.gov.ph)</option>
                                     <option value="3">Linda Pascual (lpascual@dar.gov.ph)</option>
                                     <option value="4">Pedro Reyes (preyes@dar.gov.ph)</option>
                                 @endisset
                             </select>
+                                <input type="hidden" name="confirm_reassign" id="confirmReassignInput" value="0">
                             <div class="form-text">Only Admin CARPOS accounts are listed.</div>
                         </div>
                         <div class="mb-0">
@@ -1082,6 +1085,33 @@
             </div>
         </div>
     </div>
+
+        <!-- ── Modal — Confirm Reassign ───────────────────── -->
+        <div class="modal fade" id="confirmReassignModal" tabindex="-1" aria-labelledby="confirmReassignModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title fw-bold" id="confirmReassignModalLabel">
+                            <i class="bi bi-exclamation-triangle-fill me-2 text-warning"></i> Confirm Reassignment
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p id="confirmReassignMessage" class="mb-3" style="font-size:.95rem;"></p>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="confirmDontAsk" />
+                            <label class="form-check-label" for="confirmDontAsk">Don't ask again for this session</label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" id="confirmReassignCancel">Cancel</button>
+                        <button type="button" class="btn fw-semibold" id="confirmReassignBtn" style="background:var(--green-600); color:#fff; border-radius:8px; border:none;">
+                            <i class="bi bi-person-check-fill me-1"></i> Reassign Admin
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
     <!-- ── Modal — Activate / Deactivate Confirmation ──────── -->
     <div class="modal fade" id="toggleModal" tabindex="-1" aria-labelledby="toggleModalLabel" aria-hidden="true">
@@ -1136,6 +1166,76 @@
                 const name = btn.dataset.name;
                 if (name) document.getElementById('assignOfficeName').textContent = name;
                 if (id)   document.getElementById('assignAdminForm').action = '/super-admin/pbd-management/' + id + '/assign-admin';
+
+                // Pre-select the currently assigned admin if present
+                const adminId = btn.dataset.adminId || '';
+                const select = document.querySelector('#assignAdminForm select[name="admin_id"]');
+                if (select) {
+                    // reset
+                    select.value = '';
+                    if (adminId) select.value = adminId;
+                }
+            });
+        }
+
+        // When submitting the assign form, if the selected admin is assigned to another province,
+        // show a confirmation prompt and set hidden `confirm_reassign` accordingly.
+        const assignForm = document.getElementById('assignAdminForm');
+        if (assignForm) {
+            const confirmModalEl = document.getElementById('confirmReassignModal');
+            const confirmModal = confirmModalEl ? new bootstrap.Modal(confirmModalEl) : null;
+            const confirmMsg = document.getElementById('confirmReassignMessage');
+            const confirmBtn = document.getElementById('confirmReassignBtn');
+            const confirmCancel = document.getElementById('confirmReassignCancel');
+            const dontAskCheckbox = document.getElementById('confirmDontAsk');
+
+            assignForm.addEventListener('submit', function (evt) {
+                const select = assignForm.querySelector('select[name="admin_id"]');
+                const hidden = document.getElementById('confirmReassignInput');
+                if (!select) return;
+                const opt = select.options[select.selectedIndex];
+                if (!opt || !opt.value) return;
+                const assignedTo = opt.dataset.assignedTo || '';
+                const targetName = document.getElementById('assignOfficeName')?.textContent || '';
+
+                if (assignedTo && assignedTo.trim() !== '' && assignedTo.trim() !== targetName.trim()) {
+                    // prevent immediate submit and show modal
+                    evt.preventDefault();
+                    if (confirmMsg) confirmMsg.textContent = 'The selected user is already assigned to ' + assignedTo + '. Do you want to reassign to ' + targetName + '?';
+                    if (confirmModal) confirmModal.show();
+
+                    // wire confirm button to submit the form with the hidden flag
+                    const onConfirm = function () {
+                        if (hidden) hidden.value = '1';
+                        // optional: remember preference (session) - not persisted beyond page load
+                        if (dontAskCheckbox && dontAskCheckbox.checked) {
+                            sessionStorage.setItem('pbd_confirm_reassign_skip', '1');
+                        }
+                        if (confirmModal) confirmModal.hide();
+                        // remove handlers to avoid duplicate binding
+                        confirmBtn.removeEventListener('click', onConfirm);
+                        confirmCancel.removeEventListener('click', onCancel);
+                        assignForm.submit();
+                    };
+
+                    const onCancel = function () {
+                        if (confirmModal) confirmModal.hide();
+                        confirmBtn.removeEventListener('click', onConfirm);
+                        confirmCancel.removeEventListener('click', onCancel);
+                    };
+
+                    confirmBtn.addEventListener('click', onConfirm);
+                    confirmCancel.addEventListener('click', onCancel);
+
+                    return false;
+                }
+
+                // If user previously opted to skip confirmation in this session, set hidden and allow
+                if (sessionStorage.getItem('pbd_confirm_reassign_skip') === '1') {
+                    if (hidden) hidden.value = '1';
+                }
+
+                return true;
             });
         }
 
