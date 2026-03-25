@@ -137,6 +137,8 @@ class AuthController extends Controller
             $request->session()->regenerate();
 
             $user = Auth::user();
+            $fullName = trim(($user->first_name ?? '') . ' ' . ($user->middle_name ?? '') . ' ' . ($user->last_name ?? ''));
+            $welcome = $fullName ? "Welcome back, $fullName." : 'Welcome back.';
 
             // Prevent unverified users from logging in
             if (isset($user->is_verified) && !$user->is_verified) {
@@ -153,14 +155,30 @@ class AuthController extends Controller
             // Redirect based on role slug
             switch ($role) {
                 case 'super_admin':
-                    return redirect()->route('super.admin.dashboard');
+                    return redirect()->route('super.admin.dashboard')->with('swal', [
+                        'icon' => 'success',
+                        'title' => 'Welcome',
+                        'text' => $welcome,
+                    ]);
                 case 'pbd':
-                    return redirect()->route('admin.dashboard');
+                    return redirect()->route('admin.dashboard')->with('swal', [
+                        'icon' => 'success',
+                        'title' => 'Welcome',
+                        'text' => $welcome,
+                    ]);
                 case 'finance':
-                    return redirect()->route('finance.dashboard');
+                    return redirect()->route('finance.dashboard')->with('swal', [
+                        'icon' => 'success',
+                        'title' => 'Welcome',
+                        'text' => $welcome,
+                    ]);
                 case 'arbo':
                 case 'arbos':
-                    return redirect()->route('arbos.dashboard');
+                    return redirect()->route('arbos.dashboard')->with('swal', [
+                        'icon' => 'success',
+                        'title' => 'Welcome',
+                        'text' => $welcome,
+                    ]);
                 default:
                         Auth::logout();
                         return back()->withInput()->with('swal', [
@@ -191,5 +209,23 @@ class AuthController extends Controller
         }
 
         return view('super_admin.dashboard.dashboard');
+    }
+
+    // Logout
+    public function logout(Request $request)
+    {
+        $user = Auth::user();
+        $fullName = trim(($user->first_name ?? '') . ' ' . ($user->middle_name ?? '') . ' ' . ($user->last_name ?? ''));
+
+        Auth::logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('login')->with('swal', [
+            'icon' => 'success',
+            'title' => 'Logged out',
+            'text' => 'You have been logged out.'
+        ]);
     }
 }

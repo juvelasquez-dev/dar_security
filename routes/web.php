@@ -51,13 +51,7 @@ Route::post('/reset-password', [AuthController::class, 'reset'])->name('password
 Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
 Route::post('/register', [AuthController::class, 'register'])->name('register.submit');
 
-Route::post('/logout', function () {
-    Auth::logout();
-    request()->session()->invalidate();
-    request()->session()->regenerateToken();
-
-    return redirect('/login');
-})->name('logout');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 /*
 |--------------------------------------------------------------------------
@@ -70,82 +64,99 @@ Route::get('/auth/google/callback', [\App\Http\Controllers\Auth\SocialController
 
 /*
 |--------------------------------------------------------------------------
-| Dashboard Routes
+| Protected Routes (require authentication + prevent back history)
 |--------------------------------------------------------------------------
 */
 
-Route::get('/dashboard', [SuperAdminDashboardController::class, 'index'])->name('dashboard');
-Route::get('/super-admin/dashboard', [SuperAdminDashboardController::class, 'index'])->name('super.admin.dashboard');
-Route::get('/admin/dashboard', [CarposDashboardController::class, 'index'])->name('admin.dashboard');
-Route::get('/arbos/dashboard', [ArbosDashboardController::class, 'index'])->name('arbos.dashboard');
-// Finance dashboard
-Route::get('/finance/dashboard', [\App\Http\Controllers\Finance\DashboardController::class, 'index'])->name('finance.dashboard');
-
-// Super Admin: Profile
-Route::get('/profile', [\App\Http\Controllers\SuperAdmin\ProfileController::class, 'index'])->name('profile');
-Route::patch('/profile', [\App\Http\Controllers\SuperAdmin\ProfileController::class, 'update'])->name('profile.update');
-Route::patch('/profile/password', [\App\Http\Controllers\SuperAdmin\ProfileController::class, 'password'])->name('profile.password');
-
-// CARPOS profile route
-Route::get('/admin/profile', [CarposProfileController::class, 'index'])->name('admin.profile');
-
-Route::get('/admin-carpos/dashboard', [AdminDashboardController::class, 'index'])->name('admin.carpos.dashboard');
-
-// CARPOS: ARBO management listing
-Route::get('/admin/arbos', [CarposManagementController::class, 'index'])->name('admin.arbos.index');
-
-// CARPOS: ARBO admins management
-Route::get('/admin/arbo-admins', [ArboAdminController::class, 'index'])->name('admin.arbo.admins');
-
-// CARPOS: Marketplace monitoring
-Route::get('/admin/marketplace', [MarketMonitoringController::class, 'index'])->name('admin.marketplace');
-
-// Super Admin: Sales report
-Route::get('/reports', [SuperAdminSalesReportController::class, 'index'])->name('superadmin.salesreport');
-Route::get('/super-admin/user-roles', [UserRoleController::class, 'index'])->name('super_admin.user_roles.index');
-Route::post('/super-admin/user-roles', [UserRoleController::class, 'store'])->name('super_admin.user_roles.store');
-// Super Admin: User roles management
-Route::get('/roles', [UserRoleController::class, 'index'])->name('superadmin.roles');
-
-// Super Admin: Branches
-Route::get('/branches/create', [RegisterCarposController::class, 'create'])->name('branches.create');
-Route::get('/branches', [PbdController::class, 'index'])->name('superadmin.pbd');
-// Assign admin to a PBD office (province)
-Route::patch('/super-admin/pbd-management/{province}/assign-admin', [PbdController::class, 'assignAdmin'])->name('superadmin.pbd.assign');
-Route::get('/branches/{branch}', [RegisterCarposController::class, 'manage'])->name('branches.manage');
-
-// Super Admin: Activity logs
-Route::get('/logs', [ActivityLogsController::class, 'index'])->name('superadmin.logs');
-
-// Super Admin: Pending user verification
-Route::get('/superadmin/pending-users', [PendingUsersController::class, 'index'])->name('superadmin.pending.users');
-Route::post('/superadmin/pending-users/{user}/verify', [PendingUsersController::class, 'verify'])->name('superadmin.pending.verify');
-
-/*
-|--------------------------------------------------------------------------
-| ARBOS Routes
-|--------------------------------------------------------------------------
-*/
-
-Route::prefix('arbos')
-    ->name('arbos.')
-    ->group(function () {
-        Route::get('/dashboard', [ArbosDashboardController::class, 'index'])->name('dashboard');
-        Route::get('/sellers', [SellerController::class, 'index'])->name('sellers');
-        Route::get('/buyers', [BuyerController::class, 'index'])->name('buyers');
-        Route::get('/products', [ProductsController::class, 'index'])->name('products');
-        Route::get('/reports', [SalesReportController::class, 'index'])->name('reports');
-        Route::get('/reports/sales', [SalesReportController::class, 'index'])->name('reports.sales');
-        Route::get('/orders', [OrdersController::class, 'index'])->name('orders');
-        Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
+Route::middleware(['auth', \App\Http\Middleware\PreventBackHistory::class])->group(function () {
+    // Dashboard Routes (role-restricted)
+    // Super Admin only
+    Route::middleware(['App\\Http\\Middleware\\RoleMiddleware:super_admin'])->group(function () {
+        Route::get('/dashboard', [SuperAdminDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/super-admin/dashboard', [SuperAdminDashboardController::class, 'index'])->name('super.admin.dashboard');
     });
 
-// Singular `arbo/*` paths are used in ARBO dashboard templates — keep backward-compatible routes
-Route::get('/arbo/dashboard', [ArbosDashboardController::class, 'index']);
-Route::get('/arbo/sellers', [SellerController::class, 'index']);
-Route::get('/arbo/buyers', [BuyerController::class, 'index']);
-Route::get('/arbo/products', [ProductsController::class, 'index']);
-Route::get('/arbo/reports', [SalesReportController::class, 'index']);
-Route::get('/arbo/reports/sales', [SalesReportController::class, 'index']);
-Route::get('/arbo/orders', [OrdersController::class, 'index']);
-Route::get('/arbo/profile', [ProfileController::class, 'index']);
+    // PBD only
+    Route::middleware(['App\\Http\\Middleware\\RoleMiddleware:pbd'])->group(function () {
+        Route::get('/admin/dashboard', [CarposDashboardController::class, 'index'])->name('admin.dashboard');
+    });
+
+    // ARBO only
+    Route::middleware(['App\\Http\\Middleware\\RoleMiddleware:arbo'])->group(function () {
+        Route::get('/arbos/dashboard', [ArbosDashboardController::class, 'index'])->name('arbos.dashboard');
+    });
+
+    // Finance only
+    Route::middleware(['App\\Http\\Middleware\\RoleMiddleware:finance'])->group(function () {
+        Route::get('/finance/dashboard', [\App\Http\Controllers\Finance\DashboardController::class, 'index'])->name('finance.dashboard');
+    });
+
+    // Super Admin: Profile
+    Route::get('/profile', [\App\Http\Controllers\SuperAdmin\ProfileController::class, 'index'])->name('profile');
+    Route::patch('/profile', [\App\Http\Controllers\SuperAdmin\ProfileController::class, 'update'])->name('profile.update');
+    Route::patch('/profile/password', [\App\Http\Controllers\SuperAdmin\ProfileController::class, 'password'])->name('profile.password');
+
+    // CARPOS profile route
+    Route::get('/admin/profile', [CarposProfileController::class, 'index'])->name('admin.profile');
+
+    Route::get('/admin-carpos/dashboard', [AdminDashboardController::class, 'index'])->name('admin.carpos.dashboard');
+
+    // CARPOS: ARBO management listing
+    Route::get('/admin/arbos', [CarposManagementController::class, 'index'])->name('admin.arbos.index');
+
+    // CARPOS: ARBO admins management
+    Route::get('/admin/arbo-admins', [ArboAdminController::class, 'index'])->name('admin.arbo.admins');
+
+    // CARPOS: Marketplace monitoring
+    Route::get('/admin/marketplace', [MarketMonitoringController::class, 'index'])->name('admin.marketplace');
+
+    // Super Admin: Sales report
+    Route::get('/reports', [SuperAdminSalesReportController::class, 'index'])->name('superadmin.salesreport');
+    Route::get('/super-admin/user-roles', [UserRoleController::class, 'index'])->name('super_admin.user_roles.index');
+    Route::post('/super-admin/user-roles', [UserRoleController::class, 'store'])->name('super_admin.user_roles.store');
+    // Super Admin: User roles management
+    Route::get('/roles', [UserRoleController::class, 'index'])->name('superadmin.roles');
+
+    // Super Admin: Branches
+    Route::get('/branches/create', [RegisterCarposController::class, 'create'])->name('branches.create');
+    Route::get('/branches', [PbdController::class, 'index'])->name('superadmin.pbd');
+    // Assign admin to a PBD office (province)
+    Route::patch('/super-admin/pbd-management/{province}/assign-admin', [PbdController::class, 'assignAdmin'])->name('superadmin.pbd.assign');
+    Route::get('/branches/{branch}', [RegisterCarposController::class, 'manage'])->name('branches.manage');
+
+    // Super Admin: Activity logs
+    Route::get('/logs', [ActivityLogsController::class, 'index'])->name('superadmin.logs');
+
+    // Super Admin: Pending user verification
+    Route::get('/superadmin/pending-users', [PendingUsersController::class, 'index'])->name('superadmin.pending.users');
+    Route::post('/superadmin/pending-users/{user}/verify', [PendingUsersController::class, 'verify'])->name('superadmin.pending.verify');
+
+    /*
+    |--------------------------------------------------------------------------
+    | ARBOS Routes
+    |--------------------------------------------------------------------------
+    */
+
+    Route::prefix('arbos')
+        ->name('arbos.')
+        ->group(function () {
+            Route::get('/dashboard', [ArbosDashboardController::class, 'index'])->name('dashboard');
+            Route::get('/sellers', [SellerController::class, 'index'])->name('sellers');
+            Route::get('/buyers', [BuyerController::class, 'index'])->name('buyers');
+            Route::get('/products', [ProductsController::class, 'index'])->name('products');
+            Route::get('/reports', [SalesReportController::class, 'index'])->name('reports');
+            Route::get('/reports/sales', [SalesReportController::class, 'index'])->name('reports.sales');
+            Route::get('/orders', [OrdersController::class, 'index'])->name('orders');
+            Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
+        });
+
+    // Singular `arbo/*` paths are used in ARBO dashboard templates — keep backward-compatible routes
+    Route::get('/arbo/dashboard', [ArbosDashboardController::class, 'index']);
+    Route::get('/arbo/sellers', [SellerController::class, 'index']);
+    Route::get('/arbo/buyers', [BuyerController::class, 'index']);
+    Route::get('/arbo/products', [ProductsController::class, 'index']);
+    Route::get('/arbo/reports', [SalesReportController::class, 'index']);
+    Route::get('/arbo/reports/sales', [SalesReportController::class, 'index']);
+    Route::get('/arbo/orders', [OrdersController::class, 'index']);
+    Route::get('/arbo/profile', [ProfileController::class, 'index']);
+});
