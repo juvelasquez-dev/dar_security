@@ -12,14 +12,14 @@
     img { border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic; }
 
     body {
-      background-color: #f0f4ff;
+      background-color: #f4fce8;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      color: #1a1a2e;
+      color: #1a2e0a;
     }
 
     .email-wrapper {
       width: 100%;
-      background-color: #f0f4ff;
+      background-color: #f4fce8;
       padding: 40px 16px;
     }
 
@@ -29,32 +29,14 @@
       background: #ffffff;
       border-radius: 20px;
       overflow: hidden;
-      box-shadow: 0 16px 48px rgba(13, 110, 253, 0.10);
+      box-shadow: 0 16px 48px rgba(34, 139, 34, 0.12);
     }
 
     /* Header */
     .email-header {
-      background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+      background: linear-gradient(135deg, #4caf27 0%, #2e7d0e 100%);
       padding: 36px 40px 32px;
       text-align: center;
-    }
-
-    .header-logo-circle {
-      width: 72px;
-      height: 72px;
-      background: rgba(255,255,255,0.15);
-      border: 3px solid rgba(255,255,255,0.35);
-      border-radius: 50%;
-      margin: 0 auto 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .header-logo-circle img {
-      width: 46px;
-      height: 46px;
-      object-fit: contain;
     }
 
     .header-title {
@@ -66,7 +48,7 @@
     }
 
     .header-subtitle {
-      color: rgba(255,255,255,0.80);
+      color: rgba(255,255,255,0.85);
       font-size: 14px;
       margin-top: 4px;
     }
@@ -91,10 +73,10 @@
 
     /* Credentials block */
     .credentials-block {
-      background: #f0f4ff;
-      border: 1.5px solid #dbeafe;
+      background: #f4fce8;
+      border: 1.5px solid #bbf7a0;
       border-radius: 14px;
-      padding: 24px 28px;
+      padding: 24px;
       margin-bottom: 28px;
     }
 
@@ -103,16 +85,16 @@
       font-weight: 600;
       letter-spacing: 1.2px;
       text-transform: uppercase;
-      color: #0d6efd;
+      color: #2e7d0e;
       margin-bottom: 16px;
     }
 
     .credential-row {
       display: flex;
-      align-items: flex-start;
-      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
       padding: 10px 0;
-      border-bottom: 1px solid #e0eaff;
+      border-bottom: 1px solid #d1fae5;
     }
 
     .credential-row:last-child {
@@ -125,24 +107,25 @@
     }
 
     .cred-key {
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 600;
-      color: #6b7280;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      color: #374151;
       min-width: 80px;
-      padding-top: 2px;
     }
 
     .cred-value {
-      font-size: 15px;
-      font-weight: 600;
-      color: #0a58ca;
+      font-size: 13px;
+      color: #1a2e0a;
       font-family: 'Courier New', Courier, monospace;
+      background: #ffffff;
+      border: 1px solid #bbf7a0;
+      border-radius: 6px;
+      padding: 5px 10px;
       word-break: break-all;
+      text-align: right;
     }
 
-    /* CTA button */
+    /* CTA */
     .cta-wrap {
       text-align: center;
       margin-bottom: 28px;
@@ -150,15 +133,15 @@
 
     .btn-cta {
       display: inline-block;
-      background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
-      color: #ffffff !important;
+      background: linear-gradient(135deg, #f5c800 0%, #d4a800 100%);
+      color: #1a2e0a !important;
       text-decoration: none;
       font-size: 15px;
       font-weight: 700;
       padding: 14px 36px;
       border-radius: 10px;
       letter-spacing: 0.2px;
-      box-shadow: 0 4px 16px rgba(13, 110, 253, 0.30);
+      box-shadow: 0 4px 16px rgba(245, 200, 0, 0.40);
     }
 
     /* Divider */
@@ -168,33 +151,33 @@
       margin: 28px 0;
     }
 
-    /* Warning box */
-    .warning-box {
-      background: #fffbeb;
-      border-left: 4px solid #f59e0b;
-      border-radius: 8px;
-      padding: 14px 16px;
-      font-size: 13.5px;
-      color: #92400e;
-      line-height: 1.5;
-      margin-bottom: 24px;
-    }
-
-    .warning-box strong { color: #78350f; }
-
-    /* Security tip */
+    /* Tip box */
     .tip-box {
       background: #f0fdf4;
-      border-left: 4px solid #22c55e;
-      border-radius: 8px;
+      border-left: 4px solid #4caf27;
+      border-radius: 0;
       padding: 14px 16px;
       font-size: 13.5px;
-      color: #166534;
+      color: #14532d;
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+
+    .tip-box strong { color: #166534; }
+
+    /* Warning box */
+    .warning-box {
+      background: #fffde7;
+      border-left: 4px solid #f5c800;
+      border-radius: 0;
+      padding: 14px 16px;
+      font-size: 13.5px;
+      color: #6b4c00;
       line-height: 1.5;
       margin-bottom: 24px;
     }
 
-    .tip-box strong { color: #14532d; }
+    .warning-box strong { color: #4a3300; }
 
     /* Sign off */
     .sign-off {
@@ -207,8 +190,8 @@
 
     /* Footer */
     .email-footer {
-      background: #f9fafb;
-      border-top: 1px solid #e5e7eb;
+      background: #f4fce8;
+      border-top: 1px solid #bbf7a0;
       padding: 24px 40px;
       text-align: center;
     }
@@ -216,7 +199,7 @@
     .footer-app-name {
       font-size: 13px;
       font-weight: 700;
-      color: #0d6efd;
+      color: #2e7d0e;
       letter-spacing: 0.5px;
       margin-bottom: 4px;
     }
@@ -227,14 +210,15 @@
       line-height: 1.5;
     }
 
-    .footer-text a { color: #0d6efd; text-decoration: none; }
+    .footer-text a { color: #2e7d0e; text-decoration: none; }
 
     @media only screen and (max-width: 560px) {
       .email-body  { padding: 28px 24px; }
       .email-header { padding: 28px 24px 24px; }
       .email-footer { padding: 20px 24px; }
-      .credentials-block { padding: 18px 20px; }
-      .cred-key { min-width: 70px; }
+      .credentials-block { padding: 18px 16px; }
+      .credential-row { flex-direction: column; align-items: flex-start; gap: 6px; }
+      .cred-value { text-align: left; }
     }
   </style>
 </head>
@@ -245,10 +229,7 @@
 
       <!-- Header -->
       <div class="email-header">
-        <div class="header-logo-circle">
-          <img src="{{ asset('images/dar-logo.png') }}" alt="DARRO 5 Logo">
-        </div>
-        <p class="header-title">DARRO 5</p>
+      <p class="header-title">DARRO 5</p>
         <p class="header-subtitle">E-Agraryo Merkado Team</p>
       </div>
 
