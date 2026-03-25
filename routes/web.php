@@ -148,6 +148,16 @@ Route::middleware(['auth', \App\Http\Middleware\PreventBackHistory::class])->gro
 
         Route::get('/finance/dashboard', [FinanceDashboardController::class, 'index'])
             ->name('finance.dashboard');
+
+        // Placeholder named routes used by the finance dashboard view.
+        // These redirect to the dashboard to avoid RouteNotFoundException
+        // until full controllers are implemented.
+        Route::get('/finance/orders', function () { return redirect()->route('finance.dashboard'); })->name('finance.orders.index');
+        Route::get('/finance/orders/{id}', function ($id) { return redirect()->route('finance.dashboard'); })->name('finance.orders.show');
+        Route::get('/finance/payments', function () { return redirect()->route('finance.dashboard'); })->name('finance.payments.index');
+        Route::get('/finance/revenue', function () { return redirect()->route('finance.dashboard'); })->name('finance.revenue.index');
+        Route::get('/finance/reports/sales', function () { return redirect()->route('finance.dashboard'); })->name('finance.reports.sales');
+        Route::get('/finance/activity-logs', function () { return redirect()->route('finance.dashboard'); })->name('finance.activity-logs');
     });
 
     /*
