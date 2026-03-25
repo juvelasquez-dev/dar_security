@@ -6,21 +6,20 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>Login Verification Code – DARRO 5</title>
   <style>
-    /* Reset */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
     table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
     img { border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic; }
 
     body {
-      background-color: #f0f4ff;
+      background-color: #f4fce8;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      color: #1a1a2e;
+      color: #1a2e0a;
     }
 
     .email-wrapper {
       width: 100%;
-      background-color: #f0f4ff;
+      background-color: #f4fce8;
       padding: 40px 16px;
     }
 
@@ -30,32 +29,14 @@
       background: #ffffff;
       border-radius: 20px;
       overflow: hidden;
-      box-shadow: 0 16px 48px rgba(13, 110, 253, 0.10);
+      box-shadow: 0 16px 48px rgba(34, 139, 34, 0.12);
     }
 
-    /* Header band */
+    /* Header */
     .email-header {
-      background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+      background: linear-gradient(135deg, #4caf27 0%, #2e7d0e 100%);
       padding: 36px 40px 32px;
       text-align: center;
-    }
-
-    .header-logo-circle {
-      width: 72px;
-      height: 72px;
-      background: rgba(255,255,255,0.15);
-      border: 3px solid rgba(255,255,255,0.35);
-      border-radius: 50%;
-      margin: 0 auto 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .header-logo-circle img {
-      width: 46px;
-      height: 46px;
-      object-fit: contain;
     }
 
     .header-title {
@@ -67,7 +48,7 @@
     }
 
     .header-subtitle {
-      color: rgba(255,255,255,0.80);
+      color: rgba(255,255,255,0.85);
       font-size: 14px;
       margin-top: 4px;
     }
@@ -92,11 +73,11 @@
 
     /* OTP block */
     .otp-block {
-      background: #f0f4ff;
-      border: 1.5px solid #dbeafe;
+      background: #f4fce8;
+      border: 1.5px solid #bbf7a0;
       border-radius: 14px;
-      text-align: center;
       padding: 28px 24px;
+      text-align: center;
       margin-bottom: 28px;
     }
 
@@ -105,28 +86,26 @@
       font-weight: 600;
       letter-spacing: 1.2px;
       text-transform: uppercase;
-      color: #0d6efd;
-      margin-bottom: 12px;
+      color: #2e7d0e;
+      margin-bottom: 16px;
     }
 
     .otp-code {
       font-size: 42px;
-      font-weight: 800;
+      font-weight: 700;
       letter-spacing: 10px;
-      color: #0a58ca;
-      font-variant-numeric: tabular-nums;
-      line-height: 1;
+      color: #1a2e0a;
       font-family: 'Courier New', Courier, monospace;
+      margin-bottom: 14px;
     }
 
     .otp-expiry {
-      margin-top: 12px;
       font-size: 13px;
       color: #9ca3af;
     }
 
     .otp-expiry span {
-      color: #ef4444;
+      color: #e65c00;
       font-weight: 600;
     }
 
@@ -139,19 +118,17 @@
 
     /* Warning box */
     .warning-box {
-      background: #fffbeb;
-      border-left: 4px solid #f59e0b;
-      border-radius: 8px;
+      background: #fffde7;
+      border-left: 4px solid #f5c800;
+      border-radius: 0;
       padding: 14px 16px;
       font-size: 13.5px;
-      color: #92400e;
+      color: #6b4c00;
       line-height: 1.5;
       margin-bottom: 24px;
     }
 
-    .warning-box strong {
-      color: #78350f;
-    }
+    .warning-box strong { color: #4a3300; }
 
     /* Sign off */
     .sign-off {
@@ -160,14 +137,12 @@
       line-height: 1.6;
     }
 
-    .sign-off strong {
-      color: #374151;
-    }
+    .sign-off strong { color: #374151; }
 
     /* Footer */
     .email-footer {
-      background: #f9fafb;
-      border-top: 1px solid #e5e7eb;
+      background: #f4fce8;
+      border-top: 1px solid #bbf7a0;
       padding: 24px 40px;
       text-align: center;
     }
@@ -175,7 +150,7 @@
     .footer-app-name {
       font-size: 13px;
       font-weight: 700;
-      color: #0d6efd;
+      color: #2e7d0e;
       letter-spacing: 0.5px;
       margin-bottom: 4px;
     }
@@ -186,17 +161,14 @@
       line-height: 1.5;
     }
 
-    .footer-text a {
-      color: #0d6efd;
-      text-decoration: none;
-    }
+    .footer-text a { color: #2e7d0e; text-decoration: none; }
 
-    /* Responsive */
     @media only screen and (max-width: 560px) {
       .email-body  { padding: 28px 24px; }
       .email-header { padding: 28px 24px 24px; }
       .email-footer { padding: 20px 24px; }
-      .otp-code { font-size: 34px; letter-spacing: 8px; }
+      .otp-block { padding: 22px 16px; }
+      .otp-code { font-size: 34px; letter-spacing: 6px; }
     }
   </style>
 </head>
@@ -207,10 +179,6 @@
 
       <!-- Header -->
       <div class="email-header">
-        <div class="header-logo-circle">
-          {{-- Use an absolute URL for email images --}}
-          <img src="{{ asset('images/dar-logo.png') }}" alt="DARRO 5 Logo">
-        </div>
         <p class="header-title">DARRO 5</p>
         <p class="header-subtitle">E-Agraryo Merkado Team</p>
       </div>
