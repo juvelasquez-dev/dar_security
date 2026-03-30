@@ -317,20 +317,68 @@
             white-space: nowrap;
         }
 
-        /* ─── Action buttons ── */
-        .action-btn {
-            display: inline-flex; align-items: center; gap: 3px;
-            padding: 4px 9px; border-radius: 7px;
-            font-size: 0.71rem; font-weight: 600;
-            border: none; cursor: pointer; text-decoration: none;
-            transition: all 0.16s; white-space: nowrap;
+        /* ─── 3-dot Actions Dropdown ── */
+        .actions-menu-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px; height: 32px;
+            border-radius: 8px;
+            border: 1px solid var(--gray-200);
+            background: #fff;
+            color: var(--gray-600);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.16s;
+            padding: 0;
         }
-        .action-btn:hover { opacity: 0.82; transform: translateY(-1px); }
-        .btn-view       { background: var(--green-100);  color: var(--green-700); }
-        .btn-edit       { background: var(--gold-light); color: var(--gold); }
-        .btn-assign     { background: #e8f0fe;           color: #1a73e8; }
-        .btn-deactivate { background: #fdecea;           color: #c0392b; }
-        .btn-activate   { background: var(--green-100);  color: var(--green-700); }
+        .actions-menu-btn::after { display: none !important; }
+        .actions-menu-btn:hover {
+            background: var(--gray-100);
+            border-color: var(--gray-400);
+            color: var(--text-main);
+        }
+        .actions-menu-btn:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(31,128,60,0.15);
+            border-color: var(--green-600);
+        }
+        .actions-dropdown-menu {
+            border: 1px solid var(--gray-200);
+            border-radius: 10px;
+            box-shadow: 0 8px 24px rgba(13,59,30,0.13);
+            padding: 4px;
+            min-width: 175px;
+            font-size: 0.83rem;
+        }
+        .actions-dropdown-menu .dropdown-item {
+            border-radius: 7px;
+            padding: 7px 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.82rem;
+            font-weight: 500;
+            color: var(--text-main);
+            transition: background 0.13s, color 0.13s;
+        }
+        .actions-dropdown-menu .dropdown-item i {
+            font-size: 0.85rem;
+            width: 16px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .actions-dropdown-menu .dropdown-item:hover { background: var(--gray-100); color: var(--text-main); }
+        .actions-dropdown-menu .dropdown-item.item-view:hover  { background: var(--green-100); color: var(--green-700); }
+        .actions-dropdown-menu .dropdown-item.item-edit:hover  { background: var(--gold-light); color: var(--gold); }
+        .actions-dropdown-menu .dropdown-item.item-assign:hover { background: #e8f0fe; color: #1a73e8; }
+        .actions-dropdown-menu .dropdown-item.item-deactivate:hover { background: #fdecea; color: #c0392b; }
+        .actions-dropdown-menu .dropdown-item.item-activate:hover { background: var(--green-100); color: var(--green-700); }
+        .actions-dropdown-menu .dropdown-item.item-deactivate { color: #c0392b; }
+        .actions-dropdown-menu .dropdown-divider {
+            margin: 4px 0;
+            border-color: var(--gray-200);
+        }
 
         /* ─── Pagination ── */
         .pagination .page-link {
@@ -414,12 +462,10 @@
 
 <!-- ── Top Navbar ──────────────────────────────────────── -->
 <header class="top-navbar">
-    <!-- Mobile toggle -->
     <button class="mobile-sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
         <i class="bi bi-list"></i>
     </button>
 
-    <!-- Brand -->
     <a class="navbar-brand-area" href="{{ url('/dashboard') }}">
         <img src="{{ asset('images/dar-logo.png') }}" alt="DAR Logo">
         <div>
@@ -430,9 +476,7 @@
 
     <span class="navbar-page-badge"><i class="bi bi-shield-fill-check me-1"></i> Super Admin</span>
 
-    <!-- Right actions -->
     <div class="navbar-right">
-        <!-- Notifications -->
         <div class="dropdown">
             <button class="nav-icon-btn" data-bs-toggle="dropdown" aria-label="Notifications">
                 <i class="bi bi-bell"></i>
@@ -468,7 +512,6 @@
 
         <div class="navbar-divider d-none d-sm-block"></div>
 
-        <!-- User Dropdown -->
         <div class="dropdown">
             <a class="user-pill dropdown-toggle" href="#" data-bs-toggle="dropdown">
                 <img class="user-avatar" src="{{ $avatarUrl }}" alt="User avatar">
@@ -495,20 +538,16 @@
     </div>
 </header>
 
-<!-- ── Sidebar Overlay (mobile) ────────────────────────── -->
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
 <!-- ── Sidebar ─────────────────────────────────────────── -->
 <aside class="sidebar" id="mainSidebar">
     <div class="sidebar-inner">
-
-        <!-- Role chip -->
         <div class="sidebar-office-chip">
             <div class="office-label">Role</div>
             <div class="office-name">Super Admin</div>
         </div>
 
-        <!-- Main menu -->
         <span class="sidebar-section-label">Main Menu</span>
 
         <a href="{{ url('/dashboard') }}" class="sidebar-link">
@@ -546,7 +585,6 @@
             Settings
         </a>
 
-        <!-- Logout -->
         <div class="sidebar-logout">
             <form method="POST" action="{{ url('/logout') }}">
                 @csrf
@@ -558,729 +596,807 @@
         </div>
     </div>
 </aside>
-    <!-- ── Main Content ─────────────────────────────────────── -->
-    <main class="page-wrapper">
 
-        <!-- Page Header -->
-        <div class="page-header">
-            <div>
-                <h1 class="page-header-title">PBD Management</h1>
-                <p class="page-header-sub">Manage Program Beneficiaries Development offices and assigned CARPOS administrators.</p>
-            </div>
-            <div class="page-header-actions">
-                <button type="button"
-                        class="btn fw-semibold d-flex align-items-center gap-2"
-                        style="background:var(--gold-light); color:var(--gold); border:1px solid rgba(200,146,42,0.3); border-radius:10px;"
-                        data-bs-toggle="modal" data-bs-target="#assignAdminModal">
-                    <i class="bi bi-person-check-fill"></i> Assign Admin
-                </button>
-                <a href="{{ url('/super-admin/pbd-management/create') }}"
-                   class="btn fw-semibold d-flex align-items-center gap-2"
-                   style="background:var(--green-600); color:#fff; border-radius:10px; border:none;">
-                    <i class="bi bi-plus-circle-fill"></i> Add PBD Office
-                </a>
-            </div>
+<!-- ── Main Content ─────────────────────────────────────── -->
+<main class="page-wrapper">
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div>
+            <h1 class="page-header-title">PBD Management</h1>
+            <p class="page-header-sub">Manage Program Beneficiaries Development offices and assigned CARPOS administrators.</p>
         </div>
-
-        <!-- Flash messages -->
-        @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show rounded-3 mb-4" role="alert">
-                <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        @endif
-        @if(session('error'))
-            <div class="alert alert-danger alert-dismissible fade show rounded-3 mb-4" role="alert">
-                <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ session('error') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        @endif
-
-        <!-- ── Summary Stat Cards ── -->
-        <div class="mb-5">
-            <div class="section-title">
-                <div class="section-title-bar"></div>
-                Overview
-            </div>
-            <div class="row g-3">
-                <div class="col-6 col-md-3">
-                    <div class="stat-card">
-                        <div class="stat-icon-wrap si-green"><i class="bi bi-building-fill"></i></div>
-                        <div>
-                            <div class="stat-value">{{ $totalOffices ?? 0 }}</div>
-                            <p class="stat-label">Total Offices</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="stat-card">
-                        <div class="stat-icon-wrap si-green"><i class="bi bi-check-circle-fill"></i></div>
-                        <div>
-                            <div class="stat-value">{{ $activeOffices ?? 0 }}</div>
-                            <p class="stat-label">Active Offices</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="stat-card">
-                        <div class="stat-icon-wrap si-gold"><i class="bi bi-person-badge-fill"></i></div>
-                        <div>
-                            <div class="stat-value">{{ $assignedAdmins ?? 0 }}</div>
-                            <p class="stat-label">Assigned Admins</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="stat-card">
-                        <div class="stat-icon-wrap si-red"><i class="bi bi-slash-circle-fill"></i></div>
-                        <div>
-                            <div class="stat-value">{{ $inactiveOffices ?? 0 }}</div>
-                            <p class="stat-label">Inactive Offices</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="page-header-actions">
+            <button type="button"
+                    class="btn fw-semibold d-flex align-items-center gap-2"
+                    style="background:var(--gold-light); color:var(--gold); border:1px solid rgba(200,146,42,0.3); border-radius:10px;"
+                    data-bs-toggle="modal" data-bs-target="#assignAdminModal">
+                <i class="bi bi-person-check-fill"></i> Assign Admin
+            </button>
+            <a href="{{ url('/super-admin/pbd-management/create') }}"
+               class="btn fw-semibold d-flex align-items-center gap-2"
+               style="background:var(--green-600); color:#fff; border-radius:10px; border:none;">
+                <i class="bi bi-plus-circle-fill"></i> Add PBD Office
+            </a>
         </div>
+    </div>
 
-        <!-- ── Admin Coverage Summary ── -->
-        <div class="mb-5">
-            <div class="section-title">
-                <div class="section-title-bar"></div>
-                Admin Coverage by Province
-            </div>
-            <div class="row g-3">
-                @php
-                    $provinces = [
-                        ['name' => 'Camarines Sur',   'covered' => 2, 'total' => 2, 'icon' => 'si-green'],
-                        ['name' => 'Camarines Norte',  'covered' => 1, 'total' => 1, 'icon' => 'si-green'],
-                        ['name' => 'Albay',            'covered' => 1, 'total' => 1, 'icon' => 'si-green'],
-                        ['name' => 'Sorsogon',         'covered' => 0, 'total' => 1, 'icon' => 'si-red'],
-                        ['name' => 'Catanduanes',      'covered' => 1, 'total' => 1, 'icon' => 'si-green'],
-                        ['name' => 'Masbate',          'covered' => 0, 'total' => 1, 'icon' => 'si-red'],
-                    ];
-                @endphp
-                @foreach($provinces as $prov)
-                    @php
-                        $pct = $prov['total'] > 0 ? round(($prov['covered'] / $prov['total']) * 100) : 0;
-                        $covered = $prov['covered'] > 0;
-                    @endphp
-                    <div class="col-6 col-md-4 col-xl-2">
-                        <div class="coverage-card">
-                            <div class="coverage-card-header">
-                                <div class="coverage-icon {{ $prov['icon'] }}">
-                                    <i class="bi bi-geo-alt-fill"></i>
-                                </div>
-                                <div>
-                                    <p class="coverage-title">{{ $prov['name'] }}</p>
-                                    <p class="coverage-sub">{{ $prov['covered'] }}/{{ $prov['total'] }} admins</p>
-                                </div>
-                            </div>
-                            <div class="coverage-stat" style="{{ $covered ? 'color:var(--green-700)' : 'color:#c0392b' }}">
-                                {{ $pct }}%
-                            </div>
-                            <div class="coverage-bar">
-                                <div class="coverage-bar-fill"
-                                     style="width:{{ $pct }}%; background:{{ $covered ? 'var(--green-600)' : '#c0392b' }};"></div>
-                            </div>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
+    <!-- Flash messages -->
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show rounded-3 mb-4" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
-
-        <!-- ── Filter / Search Toolbar ── -->
-        <div class="mb-4">
-            <div class="filter-card">
-                <form method="GET" action="{{ url('/super-admin/pbd-management') }}">
-                    <div class="row g-3 align-items-end">
-                        <div class="col-12 col-md-4">
-                            <label class="form-label fw-semibold" style="font-size:.8rem; color:var(--text-muted);">Search Office</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-white border-end-0">
-                                    <i class="bi bi-search" style="color:var(--text-muted);"></i>
-                                </span>
-                                <input type="text" name="search"
-                                       class="form-control border-start-0 ps-0"
-                                       placeholder="Office name, admin, or ID..."
-                                       value="{{ request('search') }}"
-                                       style="border-radius:0 8px 8px 0;">
-                            </div>
-                        </div>
-                        <div class="col-6 col-md-3">
-                            <label class="form-label fw-semibold" style="font-size:.8rem; color:var(--text-muted);">Province</label>
-                            <select name="province" class="form-select" style="border-radius:8px;">
-                                <option value="">All Provinces</option>
-                                <option value="Camarines Sur"   {{ request('province') === 'Camarines Sur'   ? 'selected' : '' }}>Camarines Sur</option>
-                                <option value="Camarines Norte" {{ request('province') === 'Camarines Norte' ? 'selected' : '' }}>Camarines Norte</option>
-                                <option value="Albay"           {{ request('province') === 'Albay'           ? 'selected' : '' }}>Albay</option>
-                                <option value="Sorsogon"        {{ request('province') === 'Sorsogon'        ? 'selected' : '' }}>Sorsogon</option>
-                                <option value="Catanduanes"     {{ request('province') === 'Catanduanes'     ? 'selected' : '' }}>Catanduanes</option>
-                                <option value="Masbate"         {{ request('province') === 'Masbate'         ? 'selected' : '' }}>Masbate</option>
-                            </select>
-                        </div>
-                        <div class="col-6 col-md-2">
-                            <label class="form-label fw-semibold" style="font-size:.8rem; color:var(--text-muted);">Status</label>
-                            <select name="status" class="form-select" style="border-radius:8px;">
-                                <option value="">All Status</option>
-                                <option value="active"   {{ request('status') === 'active'   ? 'selected' : '' }}>Active</option>
-                                <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Inactive</option>
-                            </select>
-                        </div>
-                        <div class="col-12 col-md-3 d-flex gap-2">
-                            <button type="submit"
-                                    class="btn fw-semibold flex-fill"
-                                    style="background:var(--green-600); color:#fff; border-radius:8px; border:none;">
-                                <i class="bi bi-search me-1"></i> Search
-                            </button>
-                            <a href="{{ url('/super-admin/pbd-management') }}"
-                               class="btn btn-outline-secondary fw-semibold flex-fill"
-                               style="border-radius:8px;">
-                                <i class="bi bi-arrow-counterclockwise me-1"></i> Reset
-                            </a>
-                        </div>
-                    </div>
-                </form>
-            </div>
+    @endif
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show rounded-3 mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
+    @endif
 
-        <!-- ── Offices Table ── -->
-        <div class="mb-5">
-            <div class="section-title">
-                <div class="section-title-bar"></div>
-                PBD / CARPOS Offices
-            </div>
-            <div class="table-card">
-                <div class="table-card-header">
-                    <h6 class="table-card-title">
-                        <i class="bi bi-building"></i>
-                        Registered Offices
-                        @if(isset($offices))
-                            <span class="badge ms-1"
-                                  style="background:var(--green-100); color:var(--green-700); font-size:.68rem; border-radius:20px; padding:3px 8px;">
-                                {{ $offices->total() ?? count($offices) }} records
-                            </span>
-                        @endif
-                    </h6>
-                    <div class="d-flex align-items-center gap-2">
-                        <select class="form-select form-select-sm w-auto" style="border-radius:8px; font-size:.78rem;">
-                            <option>10 per page</option>
-                            <option>25 per page</option>
-                            <option>50 per page</option>
-                        </select>
-                        <a href="{{ url('/super-admin/pbd-management/export') }}"
-                           class="btn btn-sm d-flex align-items-center gap-1"
-                           style="font-size:.76rem; border-radius:8px; background:var(--green-100); color:var(--green-700); border:none; font-weight:600;">
-                            <i class="bi bi-download"></i> Export
-                        </a>
+    <!-- ── Summary Stat Cards ── -->
+    <div class="mb-5">
+        <div class="section-title">
+            <div class="section-title-bar"></div>
+            Overview
+        </div>
+        <div class="row g-3">
+            <div class="col-6 col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon-wrap si-green"><i class="bi bi-building-fill"></i></div>
+                    <div>
+                        <div class="stat-value">{{ $totalOffices ?? 0 }}</div>
+                        <p class="stat-label">Total Offices</p>
                     </div>
                 </div>
-
-                <div class="table-responsive">
-                    <table class="offices-table">
-                        <thead>
-                            <tr>
-                                <th>Office ID</th>
-                                <th>Office Name</th>
-                                <th>Province</th>
-                                <th>Assigned Admin</th>
-                                <th>Contact Number</th>
-                                <th>Status</th>
-                                <th>Date Created</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-
-                            @isset($offices)
-                                @forelse($offices as $office)
-                                    <tr>
-                                        <td class="cell-id">PBD-{{ str_pad($office->id, 4, '0', STR_PAD_LEFT) }}</td>
-                                        <td class="cell-name">
-                                            {{ $office->name }}
-                                            <small>{{ $office->address ?? '—' }}</small>
-                                        </td>
-                                        <td><span class="province-badge">{{ $office->province }}</span></td>
-                                        <td class="cell-admin">
-                                            @if($office->admin)
-                                                {{ $office->admin->name }}
-                                            @else
-                                                <span class="no-admin"><i class="bi bi-exclamation-circle"></i> Unassigned</span>
-                                            @endif
-                                        </td>
-                                        <td style="font-size:.82rem;">{{ $office->contact_number ?? '—' }}</td>
-                                        <td>
-                                            @if($office->status === 'active')
-                                                <span class="status-badge status-active"><span class="status-dot"></span> Active</span>
-                                            @else
-                                                <span class="status-badge status-inactive"><span class="status-dot"></span> Inactive</span>
-                                            @endif
-                                        </td>
-                                        <td style="font-size:.78rem; color:var(--text-muted);">
-                                            {{ \Carbon\Carbon::parse($office->created_at)->format('M d, Y') }}
-                                        </td>
-                                        <td>
-                                            <div class="d-flex gap-1 flex-wrap">
-                                                <a href="{{ url('/super-admin/pbd-management/'.$office->id) }}" class="action-btn btn-view">
-                                                    <i class="bi bi-eye-fill"></i> View
-                                                </a>
-                                                <a href="{{ url('/super-admin/pbd-management/'.$office->id.'/edit') }}" class="action-btn btn-edit">
-                                                    <i class="bi bi-pencil-fill"></i> Edit
-                                                </a>
-                                                <button type="button" class="action-btn btn-assign"
-                                                    data-bs-toggle="modal" data-bs-target="#assignAdminModal"
-                                                    data-id="{{ $office->id }}"
-                                                    data-name="{{ $office->name }}"
-                                                    data-admin-id="{{ $office->admin->id ?? '' }}">
-                                                    <i class="bi bi-person-check-fill"></i> Assign Admin
-                                                </button>
-                                                @if($office->status === 'active')
-                                                    <button type="button" class="action-btn btn-deactivate"
-                                                            data-bs-toggle="modal" data-bs-target="#toggleModal"
-                                                            data-id="{{ $office->id }}"
-                                                            data-name="{{ $office->name }}"
-                                                            data-action="deactivate">
-                                                        <i class="bi bi-slash-circle-fill"></i> Deactivate
-                                                    </button>
-                                                @else
-                                                    <button type="button" class="action-btn btn-activate"
-                                                            data-bs-toggle="modal" data-bs-target="#toggleModal"
-                                                            data-id="{{ $office->id }}"
-                                                            data-name="{{ $office->name }}"
-                                                            data-action="activate">
-                                                        <i class="bi bi-check-circle-fill"></i> Activate
-                                                    </button>
-                                                @endif
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="8">
-                                            <div class="empty-state">
-                                                <i class="bi bi-building d-block"></i>
-                                                <p class="fw-semibold mb-1">No offices found</p>
-                                                <p class="small">Try adjusting your filters or add a new PBD office.</p>
-                                                <a href="{{ url('/super-admin/pbd-management/create') }}"
-                                                   class="btn btn-sm mt-1"
-                                                   style="background:var(--green-600); color:#fff; border-radius:8px; border:none;">
-                                                    <i class="bi bi-plus-circle-fill me-1"></i> Add PBD Office
-                                                </a>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            @else
-
-                            <!-- Static sample rows -->
-                            <tr>
-                                <td class="cell-id">PBD-0001</td>
-                                <td class="cell-name">CARPOS-PBD Regional Office<small>Panganiban Drive, Naga City</small></td>
-                                <td><span class="province-badge">Camarines Sur</span></td>
-                                <td class="cell-admin">Maria Reyes Santos</td>
-                                <td style="font-size:.82rem;">(054) 472-1234</td>
-                                <td><span class="status-badge status-active"><span class="status-dot"></span> Active</span></td>
-                                <td style="font-size:.78rem; color:var(--text-muted);">Jan 05, 2024</td>
-                                <td>
-                                    <div class="d-flex gap-1 flex-wrap">
-                                        <a href="#" class="action-btn btn-view"><i class="bi bi-eye-fill"></i> View</a>
-                                        <a href="#" class="action-btn btn-edit"><i class="bi bi-pencil-fill"></i> Edit</a>
-                                        <button class="action-btn btn-assign" data-bs-toggle="modal" data-bs-target="#assignAdminModal" data-id="1" data-name="CARPOS-PBD Regional Office"><i class="bi bi-person-check-fill"></i> Assign Admin</button>
-                                        <button class="action-btn btn-deactivate" data-bs-toggle="modal" data-bs-target="#toggleModal" data-id="1" data-name="CARPOS-PBD Regional Office" data-action="deactivate"><i class="bi bi-slash-circle-fill"></i> Deactivate</button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="cell-id">PBD-0002</td>
-                                <td class="cell-name">CARPOS-PBD Albay<small>Legazpi City, Albay</small></td>
-                                <td><span class="province-badge">Albay</span></td>
-                                <td class="cell-admin">Juan dela Cruz</td>
-                                <td style="font-size:.82rem;">(052) 481-5678</td>
-                                <td><span class="status-badge status-active"><span class="status-dot"></span> Active</span></td>
-                                <td style="font-size:.78rem; color:var(--text-muted);">Jan 12, 2024</td>
-                                <td>
-                                    <div class="d-flex gap-1 flex-wrap">
-                                        <a href="#" class="action-btn btn-view"><i class="bi bi-eye-fill"></i> View</a>
-                                        <a href="#" class="action-btn btn-edit"><i class="bi bi-pencil-fill"></i> Edit</a>
-                                        <button class="action-btn btn-assign" data-bs-toggle="modal" data-bs-target="#assignAdminModal" data-id="2" data-name="CARPOS-PBD Albay"><i class="bi bi-person-check-fill"></i> Assign Admin</button>
-                                        <button class="action-btn btn-deactivate" data-bs-toggle="modal" data-bs-target="#toggleModal" data-id="2" data-name="CARPOS-PBD Albay" data-action="deactivate"><i class="bi bi-slash-circle-fill"></i> Deactivate</button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="cell-id">PBD-0003</td>
-                                <td class="cell-name">CARPOS-PBD Catanduanes<small>Virac, Catanduanes</small></td>
-                                <td><span class="province-badge">Catanduanes</span></td>
-                                <td class="cell-admin">Rosa Bautista</td>
-                                <td style="font-size:.82rem;">(053) 811-9012</td>
-                                <td><span class="status-badge status-active"><span class="status-dot"></span> Active</span></td>
-                                <td style="font-size:.78rem; color:var(--text-muted);">Feb 03, 2024</td>
-                                <td>
-                                    <div class="d-flex gap-1 flex-wrap">
-                                        <a href="#" class="action-btn btn-view"><i class="bi bi-eye-fill"></i> View</a>
-                                        <a href="#" class="action-btn btn-edit"><i class="bi bi-pencil-fill"></i> Edit</a>
-                                        <button class="action-btn btn-assign" data-bs-toggle="modal" data-bs-target="#assignAdminModal" data-id="3" data-name="CARPOS-PBD Catanduanes"><i class="bi bi-person-check-fill"></i> Assign Admin</button>
-                                        <button class="action-btn btn-deactivate" data-bs-toggle="modal" data-bs-target="#toggleModal" data-id="3" data-name="CARPOS-PBD Catanduanes" data-action="deactivate"><i class="bi bi-slash-circle-fill"></i> Deactivate</button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="cell-id">PBD-0004</td>
-                                <td class="cell-name">CARPOS-PBD Camarines Sur 1<small>Naga City, Camarines Sur</small></td>
-                                <td><span class="province-badge">Camarines Sur</span></td>
-                                <td class="cell-admin">Linda Pascual</td>
-                                <td style="font-size:.82rem;">(054) 473-3456</td>
-                                <td><span class="status-badge status-active"><span class="status-dot"></span> Active</span></td>
-                                <td style="font-size:.78rem; color:var(--text-muted);">Feb 18, 2024</td>
-                                <td>
-                                    <div class="d-flex gap-1 flex-wrap">
-                                        <a href="#" class="action-btn btn-view"><i class="bi bi-eye-fill"></i> View</a>
-                                        <a href="#" class="action-btn btn-edit"><i class="bi bi-pencil-fill"></i> Edit</a>
-                                        <button class="action-btn btn-assign" data-bs-toggle="modal" data-bs-target="#assignAdminModal" data-id="4" data-name="CARPOS-PBD Camarines Sur 1"><i class="bi bi-person-check-fill"></i> Assign Admin</button>
-                                        <button class="action-btn btn-deactivate" data-bs-toggle="modal" data-bs-target="#toggleModal" data-id="4" data-name="CARPOS-PBD Camarines Sur 1" data-action="deactivate"><i class="bi bi-slash-circle-fill"></i> Deactivate</button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="cell-id">PBD-0005</td>
-                                <td class="cell-name">CARPOS-PBD Sorsogon<small>Sorsogon City, Sorsogon</small></td>
-                                <td><span class="province-badge">Sorsogon</span></td>
-                                <td class="cell-admin"><span class="no-admin"><i class="bi bi-exclamation-circle"></i> Unassigned</span></td>
-                                <td style="font-size:.82rem;">(056) 211-7890</td>
-                                <td><span class="status-badge status-active"><span class="status-dot"></span> Active</span></td>
-                                <td style="font-size:.78rem; color:var(--text-muted);">Mar 05, 2024</td>
-                                <td>
-                                    <div class="d-flex gap-1 flex-wrap">
-                                        <a href="#" class="action-btn btn-view"><i class="bi bi-eye-fill"></i> View</a>
-                                        <a href="#" class="action-btn btn-edit"><i class="bi bi-pencil-fill"></i> Edit</a>
-                                        <button class="action-btn btn-assign" data-bs-toggle="modal" data-bs-target="#assignAdminModal" data-id="5" data-name="CARPOS-PBD Sorsogon"><i class="bi bi-person-check-fill"></i> Assign Admin</button>
-                                        <button class="action-btn btn-deactivate" data-bs-toggle="modal" data-bs-target="#toggleModal" data-id="5" data-name="CARPOS-PBD Sorsogon" data-action="deactivate"><i class="bi bi-slash-circle-fill"></i> Deactivate</button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="cell-id">PBD-0006</td>
-                                <td class="cell-name">CARPOS-PBD Masbate<small>Masbate City, Masbate</small></td>
-                                <td><span class="province-badge">Masbate</span></td>
-                                <td class="cell-admin"><span class="no-admin"><i class="bi bi-exclamation-circle"></i> Unassigned</span></td>
-                                <td style="font-size:.82rem;">(056) 333-1122</td>
-                                <td><span class="status-badge status-inactive"><span class="status-dot"></span> Inactive</span></td>
-                                <td style="font-size:.78rem; color:var(--text-muted);">Apr 14, 2024</td>
-                                <td>
-                                    <div class="d-flex gap-1 flex-wrap">
-                                        <a href="#" class="action-btn btn-view"><i class="bi bi-eye-fill"></i> View</a>
-                                        <a href="#" class="action-btn btn-edit"><i class="bi bi-pencil-fill"></i> Edit</a>
-                                        <button class="action-btn btn-assign" data-bs-toggle="modal" data-bs-target="#assignAdminModal" data-id="6" data-name="CARPOS-PBD Masbate"><i class="bi bi-person-check-fill"></i> Assign Admin</button>
-                                        <button class="action-btn btn-activate" data-bs-toggle="modal" data-bs-target="#toggleModal" data-id="6" data-name="CARPOS-PBD Masbate" data-action="activate"><i class="bi bi-check-circle-fill"></i> Activate</button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="cell-id">PBD-0007</td>
-                                <td class="cell-name">CARPOS-PBD Camarines Norte<small>Daet, Camarines Norte</small></td>
-                                <td><span class="province-badge">Camarines Norte</span></td>
-                                <td class="cell-admin">Pedro Reyes</td>
-                                <td style="font-size:.82rem;">(054) 440-3344</td>
-                                <td><span class="status-badge status-active"><span class="status-dot"></span> Active</span></td>
-                                <td style="font-size:.78rem; color:var(--text-muted);">May 20, 2024</td>
-                                <td>
-                                    <div class="d-flex gap-1 flex-wrap">
-                                        <a href="#" class="action-btn btn-view"><i class="bi bi-eye-fill"></i> View</a>
-                                        <a href="#" class="action-btn btn-edit"><i class="bi bi-pencil-fill"></i> Edit</a>
-                                        <button class="action-btn btn-assign" data-bs-toggle="modal" data-bs-target="#assignAdminModal" data-id="7" data-name="CARPOS-PBD Camarines Norte"><i class="bi bi-person-check-fill"></i> Assign Admin</button>
-                                        <button class="action-btn btn-deactivate" data-bs-toggle="modal" data-bs-target="#toggleModal" data-id="7" data-name="CARPOS-PBD Camarines Norte" data-action="deactivate"><i class="bi bi-slash-circle-fill"></i> Deactivate</button>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            @endisset
-
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Pagination -->
-                @isset($offices)
-                    @if(method_exists($offices, 'links'))
-                        <div class="px-4 py-3 border-top d-flex align-items-center justify-content-between flex-wrap gap-2"
-                             style="border-color:var(--gray-200) !important;">
-                            <div class="text-muted" style="font-size:.78rem;">
-                                Showing {{ $offices->firstItem() }}–{{ $offices->lastItem() }} of {{ $offices->total() }} offices
-                            </div>
-                            {{ $offices->withQueryString()->links('pagination::bootstrap-5') }}
-                        </div>
-                    @endif
-                @else
-                    <div class="px-4 py-3 border-top d-flex align-items-center justify-content-between flex-wrap gap-2"
-                         style="border-color:var(--gray-200) !important;">
-                        <div class="text-muted" style="font-size:.78rem;">Showing 1–7 of 7 offices</div>
-                        <nav>
-                            <ul class="pagination pagination-sm mb-0">
-                                <li class="page-item disabled"><a class="page-link" href="#">&laquo;</a></li>
-                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                <li class="page-item"><a class="page-link" href="#">&raquo;</a></li>
-                            </ul>
-                        </nav>
-                    </div>
-                @endisset
-
             </div>
-        </div>
-
-    </main>
-
-    <!-- ── Modal — Assign Admin ─────────────────────────────── -->
-    <div class="modal fade" id="assignAdminModal" tabindex="-1" aria-labelledby="assignAdminModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title fw-bold" id="assignAdminModalLabel">
-                        <i class="bi bi-person-check-fill me-2" style="color:var(--green-600);"></i>Assign CARPOS Admin
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            <div class="col-6 col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon-wrap si-green"><i class="bi bi-check-circle-fill"></i></div>
+                    <div>
+                        <div class="stat-value">{{ $activeOffices ?? 0 }}</div>
+                        <p class="stat-label">Active Offices</p>
+                    </div>
                 </div>
-                <form method="POST" id="assignAdminForm" action="">
-                    @csrf @method('PATCH')
-                    <div class="modal-body">
-                        <p class="mb-3 text-muted" style="font-size:.88rem;">
-                            Assigning an admin to:
-                            <span class="fw-semibold" id="assignOfficeName" style="color:var(--text-main);"></span>
-                        </p>
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold" style="font-size:.84rem;">Select Admin Account</label>
-                            <select name="admin_id" class="form-select" required style="border-radius:8px;">
-                                <option value="">— Choose a CARPOS Admin —</option>
-                                    @isset($availableAdmins)
-                                        @foreach($availableAdmins as $admin)
-                                            @php $assignedTo = $admin->province?->name ?? '' ; @endphp
-                                            <option value="{{ $admin->id }}" data-assigned-to="{{ $assignedTo }}">{{ $admin->name }} ({{ $admin->email }}){{ $assignedTo ? ' — Assigned: '.$assignedTo : '' }}</option>
-                                        @endforeach
-                                    @else
-                                    <option value="1">Maria Reyes Santos (mrsantos@dar.gov.ph)</option>
-                                    <option value="2">Juan dela Cruz (jdelacruz@dar.gov.ph)</option>
-                                    <option value="3">Linda Pascual (lpascual@dar.gov.ph)</option>
-                                    <option value="4">Pedro Reyes (preyes@dar.gov.ph)</option>
-                                @endisset
-                            </select>
-                                <input type="hidden" name="confirm_reassign" id="confirmReassignInput" value="0">
-                            <div class="form-text">Only Admin CARPOS accounts are listed.</div>
-                        </div>
-                        <div class="mb-0">
-                            <label class="form-label fw-semibold" style="font-size:.84rem;">
-                                Remarks <span class="text-muted fw-normal">(optional)</span>
-                            </label>
-                            <textarea name="remarks" class="form-control" rows="2"
-                                      placeholder="Reason for assignment..."
-                                      style="border-radius:8px; resize:none;"></textarea>
-                        </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon-wrap si-gold"><i class="bi bi-person-badge-fill"></i></div>
+                    <div>
+                        <div class="stat-value">{{ $assignedAdmins ?? 0 }}</div>
+                        <p class="stat-label">Assigned Admins</p>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" style="border-radius:8px;">Cancel</button>
-                        <button type="submit" class="btn fw-semibold"
-                                style="background:var(--green-600); color:#fff; border-radius:8px; border:none;">
-                            <i class="bi bi-person-check-fill me-1"></i> Assign Admin
-                        </button>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon-wrap si-red"><i class="bi bi-slash-circle-fill"></i></div>
+                    <div>
+                        <div class="stat-value">{{ $inactiveOffices ?? 0 }}</div>
+                        <p class="stat-label">Inactive Offices</p>
                     </div>
-                </form>
+                </div>
             </div>
         </div>
     </div>
 
-        <!-- ── Modal — Confirm Reassign ───────────────────── -->
-        <div class="modal fade" id="confirmReassignModal" tabindex="-1" aria-labelledby="confirmReassignModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title fw-bold" id="confirmReassignModalLabel">
-                            <i class="bi bi-exclamation-triangle-fill me-2 text-warning"></i> Confirm Reassignment
-                        </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p id="confirmReassignMessage" class="mb-3" style="font-size:.95rem;"></p>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="confirmDontAsk" />
-                            <label class="form-check-label" for="confirmDontAsk">Don't ask again for this session</label>
+    <!-- ── Admin Coverage Summary ── -->
+    <div class="mb-5">
+        <div class="section-title">
+            <div class="section-title-bar"></div>
+            Admin Coverage by Province
+        </div>
+        <div class="row g-3">
+            @php
+                $provinces = [
+                    ['name' => 'Camarines Sur',   'covered' => 2, 'total' => 2, 'icon' => 'si-green'],
+                    ['name' => 'Camarines Norte',  'covered' => 1, 'total' => 1, 'icon' => 'si-green'],
+                    ['name' => 'Albay',            'covered' => 1, 'total' => 1, 'icon' => 'si-green'],
+                    ['name' => 'Sorsogon',         'covered' => 0, 'total' => 1, 'icon' => 'si-red'],
+                    ['name' => 'Catanduanes',      'covered' => 1, 'total' => 1, 'icon' => 'si-green'],
+                    ['name' => 'Masbate',          'covered' => 0, 'total' => 1, 'icon' => 'si-red'],
+                ];
+            @endphp
+            @foreach($provinces as $prov)
+                @php
+                    $pct = $prov['total'] > 0 ? round(($prov['covered'] / $prov['total']) * 100) : 0;
+                    $covered = $prov['covered'] > 0;
+                @endphp
+                <div class="col-6 col-md-4 col-xl-2">
+                    <div class="coverage-card">
+                        <div class="coverage-card-header">
+                            <div class="coverage-icon {{ $prov['icon'] }}">
+                                <i class="bi bi-geo-alt-fill"></i>
+                            </div>
+                            <div>
+                                <p class="coverage-title">{{ $prov['name'] }}</p>
+                                <p class="coverage-sub">{{ $prov['covered'] }}/{{ $prov['total'] }} admins</p>
+                            </div>
+                        </div>
+                        <div class="coverage-stat" style="{{ $covered ? 'color:var(--green-700)' : 'color:#c0392b' }}">
+                            {{ $pct }}%
+                        </div>
+                        <div class="coverage-bar">
+                            <div class="coverage-bar-fill"
+                                 style="width:{{ $pct }}%; background:{{ $covered ? 'var(--green-600)' : '#c0392b' }};"></div>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" id="confirmReassignCancel">Cancel</button>
-                        <button type="button" class="btn fw-semibold" id="confirmReassignBtn" style="background:var(--green-600); color:#fff; border-radius:8px; border:none;">
-                            <i class="bi bi-person-check-fill me-1"></i> Reassign Admin
+                </div>
+            @endforeach
+        </div>
+    </div>
+
+    <!-- ── Filter / Search Toolbar ── -->
+    <div class="mb-4">
+        <div class="filter-card">
+            <form method="GET" action="{{ url('/super-admin/pbd-management') }}">
+                <div class="row g-3 align-items-end">
+                    <div class="col-12 col-md-4">
+                        <label class="form-label fw-semibold" style="font-size:.8rem; color:var(--text-muted);">Search Office</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0">
+                                <i class="bi bi-search" style="color:var(--text-muted);"></i>
+                            </span>
+                            <input id="officeSearch" type="text" name="search"
+                                class="form-control border-start-0 ps-0"
+                                placeholder="Office name, admin, or ID..."
+                                value="{{ request('search') }}"
+                                style="border-radius:0 8px 8px 0;">
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <label class="form-label fw-semibold" style="font-size:.8rem; color:var(--text-muted);">Province</label>
+                        <select id="provinceFilter" name="province" class="form-select" style="border-radius:8px;">
+                            <option value="">All Provinces</option>
+                            <option value="Camarines Sur"   {{ request('province') === 'Camarines Sur'   ? 'selected' : '' }}>Camarines Sur</option>
+                            <option value="Camarines Norte" {{ request('province') === 'Camarines Norte' ? 'selected' : '' }}>Camarines Norte</option>
+                            <option value="Albay"           {{ request('province') === 'Albay'           ? 'selected' : '' }}>Albay</option>
+                            <option value="Sorsogon"        {{ request('province') === 'Sorsogon'        ? 'selected' : '' }}>Sorsogon</option>
+                            <option value="Catanduanes"     {{ request('province') === 'Catanduanes'     ? 'selected' : '' }}>Catanduanes</option>
+                            <option value="Masbate"         {{ request('province') === 'Masbate'         ? 'selected' : '' }}>Masbate</option>
+                        </select>
+                    </div>
+                    <div class="col-6 col-md-2">
+                        <label class="form-label fw-semibold" style="font-size:.8rem; color:var(--text-muted);">Status</label>
+                        <select id="statusFilter" name="status" class="form-select" style="border-radius:8px;">
+                            <option value="">All Status</option>
+                            <option value="active"   {{ request('status') === 'active'   ? 'selected' : '' }}>Active</option>
+                            <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Inactive</option>
+                        </select>
+                    </div>
+                    <div class="col-12 col-md-3 d-flex gap-2">
+                        <button type="submit"
+                                class="btn fw-semibold flex-fill"
+                                style="background:var(--green-600); color:#fff; border-radius:8px; border:none;">
+                            <i class="bi bi-search me-1"></i> Search
                         </button>
+                        <a href="{{ url('/super-admin/pbd-management') }}"
+                           class="btn btn-outline-secondary fw-semibold flex-fill"
+                           style="border-radius:8px;">
+                            <i class="bi bi-arrow-counterclockwise me-1"></i> Reset
+                        </a>
                     </div>
                 </div>
-            </div>
+            </form>
         </div>
+    </div>
 
-    <!-- ── Modal — Activate / Deactivate Confirmation ──────── -->
-    <div class="modal fade" id="toggleModal" tabindex="-1" aria-labelledby="toggleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title fw-bold" id="toggleModalLabel">
-                        <span id="modalIcon"></span>
-                        <span id="modalTitle">Confirm Action</span>
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    <!-- ── Offices Table ── -->
+    <div class="mb-5">
+        <div class="section-title">
+            <div class="section-title-bar"></div>
+            PBD / CARPOS Offices
+        </div>
+        <div class="table-card">
+            <div class="table-card-header">
+                <h6 class="table-card-title">
+                    <i class="bi bi-building"></i>
+                    Registered Offices
+                    @if(isset($offices))
+                        <span class="badge ms-1"
+                              style="background:var(--green-100); color:var(--green-700); font-size:.68rem; border-radius:20px; padding:3px 8px;">
+                            {{ $offices->total() ?? count($offices) }} records
+                        </span>
+                    @endif
+                </h6>
+                <div class="d-flex align-items-center gap-2">
+                    <select class="form-select form-select-sm w-auto" style="border-radius:8px; font-size:.78rem;">
+                        <option>10 per page</option>
+                        <option>25 per page</option>
+                        <option>50 per page</option>
+                    </select>
+                    <a href="{{ url('/super-admin/pbd-management/export') }}"
+                       class="btn btn-sm d-flex align-items-center gap-1"
+                       style="font-size:.76rem; border-radius:8px; background:var(--green-100); color:var(--green-700); border:none; font-weight:600;">
+                        <i class="bi bi-download"></i> Export
+                    </a>
                 </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="offices-table">
+                    <thead>
+                        <tr>
+                            <th>Office Name</th>
+                            <th>Province</th>
+                            <th>Assigned Admin</th>
+                            <th>Contact Number</th>
+                            <th>Status</th>
+                            <th>Date Created</th>
+                            <th style="text-align:center;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        @isset($offices)
+                            @forelse($offices as $office)
+                                <tr>
+                                    <td class="cell-name">
+                                        {{ $office->name }}
+                                        <small>{{ $office->address ?? '—' }}</small>
+                                    </td>
+                                    <td><span class="province-badge">{{ $office->province }}</span></td>
+                                    <td class="cell-admin">
+                                        @if($office->admin)
+                                            {{ $office->admin->name }}
+                                        @else
+                                            <span class="no-admin"><i class="bi bi-exclamation-circle"></i> Unassigned</span>
+                                        @endif
+                                    </td>
+                                    <td style="font-size:.82rem;">{{ $office->contact_number ?? '—' }}</td>
+                                    <td>
+                                        @if($office->status === 'active')
+                                            <span class="status-badge status-active"><span class="status-dot"></span> Active</span>
+                                        @else
+                                            <span class="status-badge status-inactive"><span class="status-dot"></span> Inactive</span>
+                                        @endif
+                                    </td>
+                                    <td style="font-size:.78rem; color:var(--text-muted);">
+                                        {{ \Carbon\Carbon::parse($office->created_at)->format('M d, Y') }}
+                                    </td>
+                                    <td style="text-align:center;">
+                                        <div class="dropdown">
+                                            <button type="button"
+                                                    class="actions-menu-btn dropdown-toggle"
+                                                    data-bs-toggle="dropdown"
+                                                    data-bs-boundary="viewport"
+                                                    aria-expanded="false"
+                                                    title="Actions">
+                                                <i class="bi bi-three-dots"></i>
+                                            </button>
+                                            <ul class="dropdown-menu actions-dropdown-menu dropdown-menu-end">
+                                                <li>
+                                                    <a class="dropdown-item item-view" href="{{ url('/super-admin/pbd-management/'.$office->id) }}">
+                                                        <i class="bi bi-eye-fill"></i> View Details
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item item-edit" href="{{ url('/super-admin/pbd-management/'.$office->id.'/edit') }}">
+                                                        <i class="bi bi-pencil-fill"></i> Edit Office
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <button type="button" class="dropdown-item item-assign"
+                                                        data-bs-toggle="modal" data-bs-target="#assignAdminModal"
+                                                        data-id="{{ $office->id }}"
+                                                        data-name="{{ $office->name }}"
+                                                        data-admin-id="{{ $office->admin->id ?? '' }}">
+                                                        <i class="bi bi-person-check-fill"></i> Assign Admin
+                                                    </button>
+                                                </li>
+                                                <li><hr class="dropdown-divider"></li>
+                                                <li>
+                                                    @if($office->status === 'active')
+                                                        <button type="button" class="dropdown-item item-deactivate"
+                                                                data-bs-toggle="modal" data-bs-target="#toggleModal"
+                                                                data-id="{{ $office->id }}"
+                                                                data-name="{{ $office->name }}"
+                                                                data-action="deactivate">
+                                                            <i class="bi bi-slash-circle-fill"></i> Deactivate
+                                                        </button>
+                                                    @else
+                                                        <button type="button" class="dropdown-item item-activate"
+                                                                data-bs-toggle="modal" data-bs-target="#toggleModal"
+                                                                data-id="{{ $office->id }}"
+                                                                data-name="{{ $office->name }}"
+                                                                data-action="activate">
+                                                            <i class="bi bi-check-circle-fill"></i> Activate
+                                                        </button>
+                                                    @endif
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="7">
+                                        <div class="empty-state">
+                                            <i class="bi bi-building d-block"></i>
+                                            <p class="fw-semibold mb-1">No offices found</p>
+                                            <p class="small">Try adjusting your filters or add a new PBD office.</p>
+                                            <a href="{{ url('/super-admin/pbd-management/create') }}"
+                                               class="btn btn-sm mt-1"
+                                               style="background:var(--green-600); color:#fff; border-radius:8px; border:none;">
+                                                <i class="bi bi-plus-circle-fill me-1"></i> Add PBD Office
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforelse
+                        @else
+
+                        <!-- Static sample rows -->
+                        <tr>
+                            <td class="cell-name">CARPOS-PBD Regional Office<small>Panganiban Drive, Naga City</small></td>
+                            <td><span class="province-badge">Camarines Sur</span></td>
+                            <td class="cell-admin">Maria Reyes Santos</td>
+                            <td style="font-size:.82rem;">(054) 472-1234</td>
+                            <td><span class="status-badge status-active"><span class="status-dot"></span> Active</span></td>
+                            <td style="font-size:.78rem; color:var(--text-muted);">Jan 05, 2024</td>
+                            <td style="text-align:center;">
+                                <div class="dropdown">
+                                    <button type="button" class="actions-menu-btn" data-bs-toggle="dropdown" data-bs-boundary="viewport" aria-expanded="false" title="Actions">
+                                        <i class="bi bi-three-dots"></i>
+                                    </button>
+                                    <ul class="dropdown-menu actions-dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item item-view" href="#"><i class="bi bi-eye-fill"></i> View Details</a></li>
+                                        <li><a class="dropdown-item item-edit" href="#"><i class="bi bi-pencil-fill"></i> Edit Office</a></li>
+                                        <li><button type="button" class="dropdown-item item-assign" data-bs-toggle="modal" data-bs-target="#assignAdminModal" data-id="1" data-name="CARPOS-PBD Regional Office"><i class="bi bi-person-check-fill"></i> Assign Admin</button></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><button type="button" class="dropdown-item item-deactivate" data-bs-toggle="modal" data-bs-target="#toggleModal" data-id="1" data-name="CARPOS-PBD Regional Office" data-action="deactivate"><i class="bi bi-slash-circle-fill"></i> Deactivate</button></li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="cell-name">CARPOS-PBD Albay<small>Legazpi City, Albay</small></td>
+                            <td><span class="province-badge">Albay</span></td>
+                            <td class="cell-admin">Juan dela Cruz</td>
+                            <td style="font-size:.82rem;">(052) 481-5678</td>
+                            <td><span class="status-badge status-active"><span class="status-dot"></span> Active</span></td>
+                            <td style="font-size:.78rem; color:var(--text-muted);">Jan 12, 2024</td>
+                            <td style="text-align:center;">
+                                <div class="dropdown">
+                                    <button type="button" class="actions-menu-btn" data-bs-toggle="dropdown" data-bs-boundary="viewport" aria-expanded="false" title="Actions">
+                                        <i class="bi bi-three-dots"></i>
+                                    </button>
+                                    <ul class="dropdown-menu actions-dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item item-view" href="#"><i class="bi bi-eye-fill"></i> View Details</a></li>
+                                        <li><a class="dropdown-item item-edit" href="#"><i class="bi bi-pencil-fill"></i> Edit Office</a></li>
+                                        <li><button type="button" class="dropdown-item item-assign" data-bs-toggle="modal" data-bs-target="#assignAdminModal" data-id="2" data-name="CARPOS-PBD Albay"><i class="bi bi-person-check-fill"></i> Assign Admin</button></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><button type="button" class="dropdown-item item-deactivate" data-bs-toggle="modal" data-bs-target="#toggleModal" data-id="2" data-name="CARPOS-PBD Albay" data-action="deactivate"><i class="bi bi-slash-circle-fill"></i> Deactivate</button></li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="cell-name">CARPOS-PBD Catanduanes<small>Virac, Catanduanes</small></td>
+                            <td><span class="province-badge">Catanduanes</span></td>
+                            <td class="cell-admin">Rosa Bautista</td>
+                            <td style="font-size:.82rem;">(053) 811-9012</td>
+                            <td><span class="status-badge status-active"><span class="status-dot"></span> Active</span></td>
+                            <td style="font-size:.78rem; color:var(--text-muted);">Feb 03, 2024</td>
+                            <td style="text-align:center;">
+                                <div class="dropdown">
+                                    <button type="button" class="actions-menu-btn" data-bs-toggle="dropdown" data-bs-boundary="viewport" aria-expanded="false" title="Actions">
+                                        <i class="bi bi-three-dots"></i>
+                                    </button>
+                                    <ul class="dropdown-menu actions-dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item item-view" href="#"><i class="bi bi-eye-fill"></i> View Details</a></li>
+                                        <li><a class="dropdown-item item-edit" href="#"><i class="bi bi-pencil-fill"></i> Edit Office</a></li>
+                                        <li><button type="button" class="dropdown-item item-assign" data-bs-toggle="modal" data-bs-target="#assignAdminModal" data-id="3" data-name="CARPOS-PBD Catanduanes"><i class="bi bi-person-check-fill"></i> Assign Admin</button></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><button type="button" class="dropdown-item item-deactivate" data-bs-toggle="modal" data-bs-target="#toggleModal" data-id="3" data-name="CARPOS-PBD Catanduanes" data-action="deactivate"><i class="bi bi-slash-circle-fill"></i> Deactivate</button></li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="cell-name">CARPOS-PBD Camarines Sur 1<small>Naga City, Camarines Sur</small></td>
+                            <td><span class="province-badge">Camarines Sur</span></td>
+                            <td class="cell-admin">Linda Pascual</td>
+                            <td style="font-size:.82rem;">(054) 473-3456</td>
+                            <td><span class="status-badge status-active"><span class="status-dot"></span> Active</span></td>
+                            <td style="font-size:.78rem; color:var(--text-muted);">Feb 18, 2024</td>
+                            <td style="text-align:center;">
+                                <div class="dropdown">
+                                    <button type="button" class="actions-menu-btn" data-bs-toggle="dropdown" data-bs-boundary="viewport" aria-expanded="false" title="Actions">
+                                        <i class="bi bi-three-dots"></i>
+                                    </button>
+                                    <ul class="dropdown-menu actions-dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item item-view" href="#"><i class="bi bi-eye-fill"></i> View Details</a></li>
+                                        <li><a class="dropdown-item item-edit" href="#"><i class="bi bi-pencil-fill"></i> Edit Office</a></li>
+                                        <li><button type="button" class="dropdown-item item-assign" data-bs-toggle="modal" data-bs-target="#assignAdminModal" data-id="4" data-name="CARPOS-PBD Camarines Sur 1"><i class="bi bi-person-check-fill"></i> Assign Admin</button></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><button type="button" class="dropdown-item item-deactivate" data-bs-toggle="modal" data-bs-target="#toggleModal" data-id="4" data-name="CARPOS-PBD Camarines Sur 1" data-action="deactivate"><i class="bi bi-slash-circle-fill"></i> Deactivate</button></li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="cell-name">CARPOS-PBD Sorsogon<small>Sorsogon City, Sorsogon</small></td>
+                            <td><span class="province-badge">Sorsogon</span></td>
+                            <td class="cell-admin"><span class="no-admin"><i class="bi bi-exclamation-circle"></i> Unassigned</span></td>
+                            <td style="font-size:.82rem;">(056) 211-7890</td>
+                            <td><span class="status-badge status-active"><span class="status-dot"></span> Active</span></td>
+                            <td style="font-size:.78rem; color:var(--text-muted);">Mar 05, 2024</td>
+                            <td style="text-align:center;">
+                                <div class="dropdown">
+                                    <button type="button" class="actions-menu-btn" data-bs-toggle="dropdown" data-bs-boundary="viewport" aria-expanded="false" title="Actions">
+                                        <i class="bi bi-three-dots"></i>
+                                    </button>
+                                    <ul class="dropdown-menu actions-dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item item-view" href="#"><i class="bi bi-eye-fill"></i> View Details</a></li>
+                                        <li><a class="dropdown-item item-edit" href="#"><i class="bi bi-pencil-fill"></i> Edit Office</a></li>
+                                        <li><button type="button" class="dropdown-item item-assign" data-bs-toggle="modal" data-bs-target="#assignAdminModal" data-id="5" data-name="CARPOS-PBD Sorsogon"><i class="bi bi-person-check-fill"></i> Assign Admin</button></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><button type="button" class="dropdown-item item-deactivate" data-bs-toggle="modal" data-bs-target="#toggleModal" data-id="5" data-name="CARPOS-PBD Sorsogon" data-action="deactivate"><i class="bi bi-slash-circle-fill"></i> Deactivate</button></li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="cell-name">CARPOS-PBD Masbate<small>Masbate City, Masbate</small></td>
+                            <td><span class="province-badge">Masbate</span></td>
+                            <td class="cell-admin"><span class="no-admin"><i class="bi bi-exclamation-circle"></i> Unassigned</span></td>
+                            <td style="font-size:.82rem;">(056) 333-1122</td>
+                            <td><span class="status-badge status-inactive"><span class="status-dot"></span> Inactive</span></td>
+                            <td style="font-size:.78rem; color:var(--text-muted);">Apr 14, 2024</td>
+                            <td style="text-align:center;">
+                                <div class="dropdown">
+                                    <button type="button" class="actions-menu-btn" data-bs-toggle="dropdown" data-bs-boundary="viewport" aria-expanded="false" title="Actions">
+                                        <i class="bi bi-three-dots"></i>
+                                    </button>
+                                    <ul class="dropdown-menu actions-dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item item-view" href="#"><i class="bi bi-eye-fill"></i> View Details</a></li>
+                                        <li><a class="dropdown-item item-edit" href="#"><i class="bi bi-pencil-fill"></i> Edit Office</a></li>
+                                        <li><button type="button" class="dropdown-item item-assign" data-bs-toggle="modal" data-bs-target="#assignAdminModal" data-id="6" data-name="CARPOS-PBD Masbate"><i class="bi bi-person-check-fill"></i> Assign Admin</button></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><button type="button" class="dropdown-item item-activate" data-bs-toggle="modal" data-bs-target="#toggleModal" data-id="6" data-name="CARPOS-PBD Masbate" data-action="activate"><i class="bi bi-check-circle-fill"></i> Activate</button></li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="cell-name">CARPOS-PBD Camarines Norte<small>Daet, Camarines Norte</small></td>
+                            <td><span class="province-badge">Camarines Norte</span></td>
+                            <td class="cell-admin">Pedro Reyes</td>
+                            <td style="font-size:.82rem;">(054) 440-3344</td>
+                            <td><span class="status-badge status-active"><span class="status-dot"></span> Active</span></td>
+                            <td style="font-size:.78rem; color:var(--text-muted);">May 20, 2024</td>
+                            <td style="text-align:center;">
+                                <div class="dropdown">
+                                    <button type="button" class="actions-menu-btn" data-bs-toggle="dropdown" data-bs-boundary="viewport" aria-expanded="false" title="Actions">
+                                        <i class="bi bi-three-dots"></i>
+                                    </button>
+                                    <ul class="dropdown-menu actions-dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item item-view" href="#"><i class="bi bi-eye-fill"></i> View Details</a></li>
+                                        <li><a class="dropdown-item item-edit" href="#"><i class="bi bi-pencil-fill"></i> Edit Office</a></li>
+                                        <li><button type="button" class="dropdown-item item-assign" data-bs-toggle="modal" data-bs-target="#assignAdminModal" data-id="7" data-name="CARPOS-PBD Camarines Norte"><i class="bi bi-person-check-fill"></i> Assign Admin</button></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><button type="button" class="dropdown-item item-deactivate" data-bs-toggle="modal" data-bs-target="#toggleModal" data-id="7" data-name="CARPOS-PBD Camarines Norte" data-action="deactivate"><i class="bi bi-slash-circle-fill"></i> Deactivate</button></li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+
+                        @endisset
+
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            @isset($offices)
+                @if(method_exists($offices, 'links'))
+                    <div class="px-4 py-3 border-top d-flex align-items-center justify-content-between flex-wrap gap-2"
+                         style="border-color:var(--gray-200) !important;">
+                        <div class="text-muted" style="font-size:.78rem;">
+                            Showing {{ $offices->firstItem() }}–{{ $offices->lastItem() }} of {{ $offices->total() }} offices
+                        </div>
+                        {{ $offices->withQueryString()->links('pagination::bootstrap-5') }}
+                    </div>
+                @endif
+            @else
+                <div class="px-4 py-3 border-top d-flex align-items-center justify-content-between flex-wrap gap-2"
+                     style="border-color:var(--gray-200) !important;">
+                    <div class="text-muted" style="font-size:.78rem;">Showing 1–7 of 7 offices</div>
+                    <nav>
+                        <ul class="pagination pagination-sm mb-0">
+                            <li class="page-item disabled"><a class="page-link" href="#">&laquo;</a></li>
+                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                            <li class="page-item"><a class="page-link" href="#">&raquo;</a></li>
+                        </ul>
+                    </nav>
+                </div>
+            @endisset
+
+        </div>
+    </div>
+
+</main>
+
+<!-- ── Modal — Assign Admin ─────────────────────────────── -->
+<div class="modal fade" id="assignAdminModal" tabindex="-1" aria-labelledby="assignAdminModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold" id="assignAdminModalLabel">
+                    <i class="bi bi-person-check-fill me-2" style="color:var(--green-600);"></i>Assign CARPOS Admin
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" id="assignAdminForm" action="">
+                @csrf @method('PATCH')
                 <div class="modal-body">
-                    <p class="mb-2" id="modalMessage">Are you sure you want to perform this action on:</p>
-                    <p class="fw-semibold mb-3" id="modalOfficeName" style="color:var(--text-main);"></p>
-                    <div class="alert d-flex align-items-start gap-2 mb-0" id="modalAlert" style="border-radius:10px;">
-                        <i class="mt-1 flex-shrink-0" id="modalAlertIcon"></i>
-                        <div style="font-size:.84rem;" id="modalAlertText"></div>
+                    <p class="mb-3 text-muted" style="font-size:.88rem;">
+                        Assigning an admin to:
+                        <span class="fw-semibold" id="assignOfficeName" style="color:var(--text-main);"></span>
+                    </p>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold" style="font-size:.84rem;">Select Admin Account</label>
+                        <select name="admin_id" class="form-select" required style="border-radius:8px;">
+                            <option value="">— Choose a CARPOS Admin —</option>
+                            @isset($availableAdmins)
+                                @foreach($availableAdmins as $admin)
+                                    @php $assignedTo = $admin->province?->name ?? '' ; @endphp
+                                    <option value="{{ $admin->id }}" data-assigned-to="{{ $assignedTo }}">{{ $admin->name }} ({{ $admin->email }}){{ $assignedTo ? ' — Assigned: '.$assignedTo : '' }}</option>
+                                @endforeach
+                            @else
+                                <option value="1">Maria Reyes Santos (mrsantos@dar.gov.ph)</option>
+                                <option value="2">Juan dela Cruz (jdelacruz@dar.gov.ph)</option>
+                                <option value="3">Linda Pascual (lpascual@dar.gov.ph)</option>
+                                <option value="4">Pedro Reyes (preyes@dar.gov.ph)</option>
+                            @endisset
+                        </select>
+                        <input type="hidden" name="confirm_reassign" id="confirmReassignInput" value="0">
+                        <div class="form-text">Only Admin CARPOS accounts are listed.</div>
+                    </div>
+                    <div class="mb-0">
+                        <label class="form-label fw-semibold" style="font-size:.84rem;">
+                            Remarks <span class="text-muted fw-normal">(optional)</span>
+                        </label>
+                        <textarea name="remarks" class="form-control" rows="2"
+                                  placeholder="Reason for assignment..."
+                                  style="border-radius:8px; resize:none;"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" style="border-radius:8px;">Cancel</button>
-                    <form id="toggleForm" method="POST" action="">
-                        @csrf @method('PATCH')
-                        <button type="submit" class="btn fw-semibold" id="modalSubmitBtn" style="border-radius:8px;">Confirm</button>
-                    </form>
+                    <button type="submit" class="btn fw-semibold"
+                            style="background:var(--green-600); color:#fff; border-radius:8px; border:none;">
+                        <i class="bi bi-person-check-fill me-1"></i> Assign Admin
+                    </button>
                 </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ── Modal — Confirm Reassign ───────────────────── -->
+<div class="modal fade" id="confirmReassignModal" tabindex="-1" aria-labelledby="confirmReassignModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold" id="confirmReassignModalLabel">
+                    <i class="bi bi-exclamation-triangle-fill me-2 text-warning"></i> Confirm Reassignment
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmReassignMessage" class="mb-3" style="font-size:.95rem;"></p>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="confirmDontAsk" />
+                    <label class="form-check-label" for="confirmDontAsk">Don't ask again for this session</label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" id="confirmReassignCancel">Cancel</button>
+                <button type="button" class="btn fw-semibold" id="confirmReassignBtn" style="background:var(--green-600); color:#fff; border-radius:8px; border:none;">
+                    <i class="bi bi-person-check-fill me-1"></i> Reassign Admin
+                </button>
             </div>
         </div>
     </div>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
-    <script>
-    document.addEventListener('DOMContentLoaded', function () {
+<!-- ── Modal — Activate / Deactivate Confirmation ──────── -->
+<div class="modal fade" id="toggleModal" tabindex="-1" aria-labelledby="toggleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold" id="toggleModalLabel">
+                    <span id="modalIcon"></span>
+                    <span id="modalTitle">Confirm Action</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-2" id="modalMessage">Are you sure you want to perform this action on:</p>
+                <p class="fw-semibold mb-3" id="modalOfficeName" style="color:var(--text-main);"></p>
+                <div class="alert d-flex align-items-start gap-2 mb-0" id="modalAlert" style="border-radius:10px;">
+                    <i class="mt-1 flex-shrink-0" id="modalAlertIcon"></i>
+                    <div style="font-size:.84rem;" id="modalAlertText"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" style="border-radius:8px;">Cancel</button>
+                <form id="toggleForm" method="POST" action="">
+                    @csrf @method('PATCH')
+                    <button type="submit" class="btn fw-semibold" id="modalSubmitBtn" style="border-radius:8px;">Confirm</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
-        // ── Mobile Sidebar Toggle ─────────────────────────────
-        const toggle  = document.getElementById('sidebarToggle');
-        const sidebar = document.getElementById('mainSidebar');
-        const overlay = document.getElementById('sidebarOverlay');
-        function openSidebar()  { sidebar.classList.add('show');    overlay.classList.add('show');    document.body.style.overflow = 'hidden'; }
-        function closeSidebar() { sidebar.classList.remove('show'); overlay.classList.remove('show'); document.body.style.overflow = ''; }
-        if (toggle)  toggle.addEventListener('click', openSidebar);
-        if (overlay) overlay.addEventListener('click', closeSidebar);
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
 
-        // ── Assign admin modal ────────────────────────────────
-        const assignModal = document.getElementById('assignAdminModal');
-        if (assignModal) {
-            assignModal.addEventListener('show.bs.modal', function (e) {
-                const btn = e.relatedTarget;
-                if (!btn) return;
-                const id   = btn.dataset.id;
-                const name = btn.dataset.name;
-                if (name) document.getElementById('assignOfficeName').textContent = name;
-                if (id)   document.getElementById('assignAdminForm').action = '/super-admin/pbd-management/' + id + '/assign-admin';
+    // ── Mobile Sidebar Toggle ─────────────────────────────
+    const toggle  = document.getElementById('sidebarToggle');
+    const sidebar = document.getElementById('mainSidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    function openSidebar()  { sidebar.classList.add('show');    overlay.classList.add('show');    document.body.style.overflow = 'hidden'; }
+    function closeSidebar() { sidebar.classList.remove('show'); overlay.classList.remove('show'); document.body.style.overflow = ''; }
+    if (toggle)  toggle.addEventListener('click', openSidebar);
+    if (overlay) overlay.addEventListener('click', closeSidebar);
 
-                // Pre-select the currently assigned admin if present
-                const adminId = btn.dataset.adminId || '';
-                const select = document.querySelector('#assignAdminForm select[name="admin_id"]');
-                if (select) {
-                    // reset
-                    select.value = '';
-                    if (adminId) select.value = adminId;
-                }
-            });
-        }
+    // ── Assign admin modal ────────────────────────────────
+    const assignModal = document.getElementById('assignAdminModal');
+    if (assignModal) {
+        assignModal.addEventListener('show.bs.modal', function (e) {
+            const btn = e.relatedTarget;
+            if (!btn) return;
+            const id   = btn.dataset.id;
+            const name = btn.dataset.name;
+            if (name) document.getElementById('assignOfficeName').textContent = name;
+            if (id)   document.getElementById('assignAdminForm').action = '/super-admin/pbd-management/' + id + '/assign-admin';
 
-        // When submitting the assign form, if the selected admin is assigned to another province,
-        // show a confirmation prompt and set hidden `confirm_reassign` accordingly.
-        const assignForm = document.getElementById('assignAdminForm');
-        if (assignForm) {
-            const confirmModalEl = document.getElementById('confirmReassignModal');
-            const confirmModal = confirmModalEl ? new bootstrap.Modal(confirmModalEl) : null;
-            const confirmMsg = document.getElementById('confirmReassignMessage');
-            const confirmBtn = document.getElementById('confirmReassignBtn');
-            const confirmCancel = document.getElementById('confirmReassignCancel');
-            const dontAskCheckbox = document.getElementById('confirmDontAsk');
+            const adminId = btn.dataset.adminId || '';
+            const select = document.querySelector('#assignAdminForm select[name="admin_id"]');
+            if (select) {
+                select.value = '';
+                if (adminId) select.value = adminId;
+            }
+        });
+    }
 
-            assignForm.addEventListener('submit', function (evt) {
-                const select = assignForm.querySelector('select[name="admin_id"]');
-                const hidden = document.getElementById('confirmReassignInput');
-                if (!select) return;
-                const opt = select.options[select.selectedIndex];
-                if (!opt || !opt.value) return;
-                const assignedTo = opt.dataset.assignedTo || '';
-                const targetName = document.getElementById('assignOfficeName')?.textContent || '';
+    // Reassign confirmation
+    const assignForm = document.getElementById('assignAdminForm');
+    if (assignForm) {
+        const confirmModalEl = document.getElementById('confirmReassignModal');
+        const confirmModal = confirmModalEl ? new bootstrap.Modal(confirmModalEl) : null;
+        const confirmMsg = document.getElementById('confirmReassignMessage');
+        const confirmBtn = document.getElementById('confirmReassignBtn');
+        const confirmCancel = document.getElementById('confirmReassignCancel');
+        const dontAskCheckbox = document.getElementById('confirmDontAsk');
 
-                if (assignedTo && assignedTo.trim() !== '' && assignedTo.trim() !== targetName.trim()) {
-                    // prevent immediate submit and show modal
-                    evt.preventDefault();
-                    if (confirmMsg) confirmMsg.textContent = 'The selected user is already assigned to ' + assignedTo + '. Do you want to reassign to ' + targetName + '?';
-                    if (confirmModal) confirmModal.show();
+        assignForm.addEventListener('submit', function (evt) {
+            const select = assignForm.querySelector('select[name="admin_id"]');
+            const hidden = document.getElementById('confirmReassignInput');
+            if (!select) return;
+            const opt = select.options[select.selectedIndex];
+            if (!opt || !opt.value) return;
+            const assignedTo = opt.dataset.assignedTo || '';
+            const targetName = document.getElementById('assignOfficeName')?.textContent || '';
 
-                    // wire confirm button to submit the form with the hidden flag
-                    const onConfirm = function () {
-                        if (hidden) hidden.value = '1';
-                        // optional: remember preference (session) - not persisted beyond page load
-                        if (dontAskCheckbox && dontAskCheckbox.checked) {
-                            sessionStorage.setItem('pbd_confirm_reassign_skip', '1');
-                        }
-                        if (confirmModal) confirmModal.hide();
-                        // remove handlers to avoid duplicate binding
-                        confirmBtn.removeEventListener('click', onConfirm);
-                        confirmCancel.removeEventListener('click', onCancel);
-                        assignForm.submit();
-                    };
+            if (assignedTo && assignedTo.trim() !== '' && assignedTo.trim() !== targetName.trim()) {
+                evt.preventDefault();
+                if (confirmMsg) confirmMsg.textContent = 'The selected user is already assigned to ' + assignedTo + '. Do you want to reassign to ' + targetName + '?';
+                if (confirmModal) confirmModal.show();
 
-                    const onCancel = function () {
-                        if (confirmModal) confirmModal.hide();
-                        confirmBtn.removeEventListener('click', onConfirm);
-                        confirmCancel.removeEventListener('click', onCancel);
-                    };
-
-                    confirmBtn.addEventListener('click', onConfirm);
-                    confirmCancel.addEventListener('click', onCancel);
-
-                    return false;
-                }
-
-                // If user previously opted to skip confirmation in this session, set hidden and allow
-                if (sessionStorage.getItem('pbd_confirm_reassign_skip') === '1') {
+                const onConfirm = function () {
                     if (hidden) hidden.value = '1';
-                }
+                    if (dontAskCheckbox && dontAskCheckbox.checked) {
+                        sessionStorage.setItem('pbd_confirm_reassign_skip', '1');
+                    }
+                    if (confirmModal) confirmModal.hide();
+                    confirmBtn.removeEventListener('click', onConfirm);
+                    confirmCancel.removeEventListener('click', onCancel);
+                    assignForm.submit();
+                };
 
-                return true;
-            });
-        }
+                const onCancel = function () {
+                    if (confirmModal) confirmModal.hide();
+                    confirmBtn.removeEventListener('click', onConfirm);
+                    confirmCancel.removeEventListener('click', onCancel);
+                };
 
-        // ── Toggle (activate/deactivate) modal ───────────────
-        const toggleModal = document.getElementById('toggleModal');
-        if (toggleModal) {
-            toggleModal.addEventListener('show.bs.modal', function (e) {
-                const btn    = e.relatedTarget;
-                const id     = btn.dataset.id;
-                const name   = btn.dataset.name;
-                const action = btn.dataset.action;
+                confirmBtn.addEventListener('click', onConfirm);
+                confirmCancel.addEventListener('click', onCancel);
+                return false;
+            }
 
-                document.getElementById('modalOfficeName').textContent = name;
-                document.getElementById('toggleForm').action = '/super-admin/pbd-management/' + id + '/' + action;
+            if (sessionStorage.getItem('pbd_confirm_reassign_skip') === '1') {
+                if (hidden) hidden.value = '1';
+            }
+            return true;
+        });
+    }
 
-                if (action === 'deactivate') {
-                    document.getElementById('modalIcon').innerHTML     = '<i class="bi bi-slash-circle-fill text-danger me-2"></i>';
-                    document.getElementById('modalTitle').textContent  = 'Deactivate Office';
-                    document.getElementById('modalMessage').textContent = 'Are you sure you want to deactivate:';
-                    document.getElementById('modalAlert').className    = 'alert alert-warning d-flex align-items-start gap-2 mb-0';
-                    document.getElementById('modalAlertIcon').className = 'bi bi-exclamation-triangle-fill mt-1 flex-shrink-0';
-                    document.getElementById('modalAlertText').textContent = "Deactivating this office will suspend all associated CARPOS Admin access for this location. This action can be reversed at any time.";
-                    const sb = document.getElementById('modalSubmitBtn');
-                    sb.className = 'btn btn-danger fw-semibold';
-                    sb.style.borderRadius = '8px';
-                    sb.innerHTML = '<i class="bi bi-slash-circle-fill me-1"></i> Deactivate';
-                } else {
-                    document.getElementById('modalIcon').innerHTML     = '<i class="bi bi-check-circle-fill text-success me-2"></i>';
-                    document.getElementById('modalTitle').textContent  = 'Activate Office';
-                    document.getElementById('modalMessage').textContent = 'Are you sure you want to activate:';
-                    document.getElementById('modalAlert').className    = 'alert alert-success d-flex align-items-start gap-2 mb-0';
-                    document.getElementById('modalAlertIcon').className = 'bi bi-check-circle-fill mt-1 flex-shrink-0';
-                    document.getElementById('modalAlertText').textContent = "Activating this office will restore CARPOS Admin access for this location and resume normal operations.";
-                    const sb = document.getElementById('modalSubmitBtn');
-                    sb.className = 'btn fw-semibold';
-                    sb.style.cssText = 'border-radius:8px; background:var(--green-600); color:#fff; border:none;';
-                    sb.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i> Activate';
-                }
-            });
-        }
+    // ── Toggle (activate/deactivate) modal ───────────────
+    const toggleModal = document.getElementById('toggleModal');
+    if (toggleModal) {
+        toggleModal.addEventListener('show.bs.modal', function (e) {
+            const btn    = e.relatedTarget;
+            const id     = btn.dataset.id;
+            const name   = btn.dataset.name;
+            const action = btn.dataset.action;
 
-    });
-    </script>
+            document.getElementById('modalOfficeName').textContent = name;
+            document.getElementById('toggleForm').action = '/super-admin/pbd-management/' + id + '/' + action;
 
-<!-- Branches slide-over panel (loaded via AJAX) -->
+            if (action === 'deactivate') {
+                document.getElementById('modalIcon').innerHTML     = '<i class="bi bi-slash-circle-fill text-danger me-2"></i>';
+                document.getElementById('modalTitle').textContent  = 'Deactivate Office';
+                document.getElementById('modalMessage').textContent = 'Are you sure you want to deactivate:';
+                document.getElementById('modalAlert').className    = 'alert alert-warning d-flex align-items-start gap-2 mb-0';
+                document.getElementById('modalAlertIcon').className = 'bi bi-exclamation-triangle-fill mt-1 flex-shrink-0';
+                document.getElementById('modalAlertText').textContent = "Deactivating this office will suspend all associated CARPOS Admin access for this location. This action can be reversed at any time.";
+                const sb = document.getElementById('modalSubmitBtn');
+                sb.className = 'btn btn-danger fw-semibold';
+                sb.style.borderRadius = '8px';
+                sb.innerHTML = '<i class="bi bi-slash-circle-fill me-1"></i> Deactivate';
+            } else {
+                document.getElementById('modalIcon').innerHTML     = '<i class="bi bi-check-circle-fill text-success me-2"></i>';
+                document.getElementById('modalTitle').textContent  = 'Activate Office';
+                document.getElementById('modalMessage').textContent = 'Are you sure you want to activate:';
+                document.getElementById('modalAlert').className    = 'alert alert-success d-flex align-items-start gap-2 mb-0';
+                document.getElementById('modalAlertIcon').className = 'bi bi-check-circle-fill mt-1 flex-shrink-0';
+                document.getElementById('modalAlertText').textContent = "Activating this office will restore CARPOS Admin access for this location and resume normal operations.";
+                const sb = document.getElementById('modalSubmitBtn');
+                sb.className = 'btn fw-semibold';
+                sb.style.cssText = 'border-radius:8px; background:var(--green-600); color:#fff; border:none;';
+                sb.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i> Activate';
+            }
+        });
+    }
+
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+    var search = document.getElementById('officeSearch');
+    var tbody = document.querySelector('.offices-table tbody');
+    if(!search || !tbody) return;
+
+    var provinceFilter = document.getElementById('provinceFilter');
+    var statusFilter = document.getElementById('statusFilter');
+
+    function applyOfficeFilters(){
+        var q = String(search.value || '').trim().toLowerCase();
+        var provinceVal = provinceFilter ? String(provinceFilter.value || '').trim().toLowerCase() : '';
+        var statusVal = statusFilter ? String(statusFilter.value || '').trim().toLowerCase() : '';
+        var rows = tbody.querySelectorAll('tr');
+        rows.forEach(function(row){
+            var text = (row.textContent || '').toLowerCase();
+            var provEl = row.querySelector('.province-badge');
+            var statusEl = row.querySelector('.status-badge');
+            var rowProvince = provEl ? (provEl.textContent || '').toLowerCase() : '';
+            var rowStatus = statusEl ? (statusEl.textContent || '').toLowerCase() : '';
+
+            var matchesQuery = q === '' || text.indexOf(q) !== -1;
+            var matchesProvince = provinceVal === '' || rowProvince.indexOf(provinceVal) !== -1;
+            var matchesStatus = statusVal === '' || rowStatus.indexOf(statusVal) !== -1;
+
+            row.style.display = (matchesQuery && matchesProvince && matchesStatus) ? '' : 'none';
+        });
+    }
+
+    search.addEventListener('input', applyOfficeFilters);
+    if(provinceFilter) provinceFilter.addEventListener('change', applyOfficeFilters);
+    if(statusFilter) statusFilter.addEventListener('change', applyOfficeFilters);
+});
+</script>
+
+<!-- Branches slide-over panel -->
 <style>
     #branchesPanel{position:fixed;top:62px;right:0;bottom:0;width:420px;max-width:92%;background:#fff;box-shadow:-12px 0 34px rgba(0,0,0,0.12);transform:translateX(100%);transition:transform .28s ease-in-out;z-index:2050;overflow:auto}
     #branchesPanel.open{transform:translateX(0)}
