@@ -804,7 +804,7 @@
     <script>
         (function(){
             // Overall inactivity and warning timings
-            const INACTIVITY_MS = 60 * 1000; // 1 minute
+                    const INACTIVITY_MS = 15 * 60 * 1000; // 15 minutes
             const WARNING_MS = 10 * 1000;    // 10 seconds warning countdown
                 const DEBUG_IDLE = true; // set false to disable debug logs
 

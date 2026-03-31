@@ -1265,7 +1265,7 @@
 
     <script>
         (function(){
-            const INACTIVITY_MS = 60 * 1000; // 1 minute
+            const INACTIVITY_MS = 15 * 60 * 1000; // 15 minutes
             const WARNING_MS = 10 * 1000;    // 10 seconds
             const DEBUG_IDLE = true; // set to false to disable debug logs
 
@@ -1288,47 +1288,22 @@
             }
 
             async function performLogout(){
-                if(performedLogout) return;
-                performedLogout = true;
+                if(performedLogout) return; performedLogout = true;
                 if (DEBUG_IDLE) console.log('[idle] performLogout()', new Date().toISOString());
                 const token = getCsrfToken();
-                // Try AJAX logout first
                 try {
-                        // Send token as form data (avoid custom headers to prevent preflight OPTIONS)
-                        const res = await fetch("{{ route('logout') }}", {
-                            method: 'POST',
-                            credentials: 'same-origin',
-                            body: new URLSearchParams({ _token: token || '' })
-                        });
-                        if (res && (res.status === 200 || res.status === 204 || res.status === 302)) {
-                            window.location.href = "{{ url('/login') }}";
-                            return;
-                        }
+                    // Attempt AJAX logout in background; do not navigate to server response
+                    await fetch("{{ route('logout') }}", {
+                        method: 'POST',
+                        credentials: 'same-origin',
+                        body: new URLSearchParams({ _token: token || '' })
+                    });
                 } catch (e) {
-                    // continue to form fallback
+                    if (DEBUG_IDLE) console.log('[idle] fetch logout failed', e);
                 }
 
-                // Fallback: submit the hidden server-rendered form if present
-                try {
-                    const existingForm = document.getElementById('inactivityLogoutForm');
-                    if (existingForm) { existingForm.submit(); return; }
-                } catch (e) {}
-
-                // Last resort: create a form dynamically
-                try {
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = "{{ route('logout') }}";
-                    const tokenInput = document.createElement('input');
-                    tokenInput.type = 'hidden';
-                    tokenInput.name = '_token';
-                    tokenInput.value = token || '';
-                    form.appendChild(tokenInput);
-                    document.body.appendChild(form);
-                    form.submit();
-                } catch (e) {
-                    window.location.href = "{{ url('/login') }}";
-                }
+                // Always redirect client-side to login to avoid showing server error pages
+                setTimeout(() => { window.location.href = "{{ url('/login') }}"; }, 200);
             }
 
             function clearWarningTimers(){

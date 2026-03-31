@@ -54,7 +54,7 @@
 
   <script>
     (function(){
-      const INACTIVITY_MS = 60 * 1000; // 1 minute
+      const INACTIVITY_MS = 15 * 60 * 1000; // 15 minutes
       const WARNING_MS = 10 * 1000;    // 10 seconds
 
       let idleTimer = null;

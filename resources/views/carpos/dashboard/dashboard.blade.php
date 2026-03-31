@@ -1243,3 +1243,100 @@
         @endif
 </body>
 </html>
+
+                <!-- Inactivity Warning Modal + Logout Script -->
+                <form id="inactivityLogoutForm" method="POST" action="{{ url('/logout') }}" style="display:none;">@csrf</form>
+
+                <div class="modal fade" id="inactivityWarningModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-body text-center p-4">
+                                <h5 class="mb-2">You're about to be signed out</h5>
+                                <p class="mb-3">For your security, you'll be logged out in <strong id="idleCountdown">10</strong> seconds due to inactivity.</p>
+                                <button id="idleStayBtn" type="button" class="btn btn-success">Stay signed in</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                (function(){
+                    const DEBUG_IDLE = true;
+                    const INACTIVITY_MS = 15 * 60 * 1000; // 15 minutes
+                    const WARNING_MS = 10 * 1000; // 10 seconds
+
+                    let lastActivity = Date.now();
+                    let performedLogout = false;
+                    let warningShown = false;
+                    let countdownInterval = null;
+                    let modalInstance = null;
+
+                    function debug(...args){ if (DEBUG_IDLE) console.log('[idle]', ...args); }
+
+                    function getCsrf(){
+                        const form = document.getElementById('inactivityLogoutForm');
+                        if (!form) return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+                        const tokenInput = form.querySelector('input[name="_token"]');
+                        return tokenInput ? tokenInput.value : (document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '');
+                    }
+
+                    async function performLogout(){
+                        if (performedLogout) return; performedLogout = true;
+                        debug('performLogout()', Date.now());
+                        const token = getCsrf();
+                        try {
+                            await fetch('{{ url('/logout') }}', { method: 'POST', credentials: 'same-origin', body: new URLSearchParams({ _token: token || '' }) });
+                        } catch (e) { debug('fetch logout failed', e); }
+                        setTimeout(()=>{ window.location = '/login'; }, 200);
+                    }
+
+                    function showWarning(){
+                        if (warningShown || performedLogout) return; warningShown = true;
+                        debug('showWarning()');
+                        lastActivity += WARNING_MS; // bump slightly to avoid immediate re-trigger
+                        const modalEl = document.getElementById('inactivityWarningModal');
+                        const countEl = document.getElementById('idleCountdown');
+                        if (!modalInstance) modalInstance = new bootstrap.Modal(modalEl, { backdrop: 'static', keyboard: false });
+                        modalInstance.show();
+                        let seconds = Math.ceil(WARNING_MS/1000);
+                        if (countEl) countEl.textContent = seconds;
+                        countdownInterval = setInterval(()=>{
+                            seconds -= 1;
+                            if (countEl) countEl.textContent = Math.max(0, seconds);
+                            debug('countdown', seconds);
+                            if (seconds <= 0) { clearInterval(countdownInterval); countdownInterval = null; performLogout(); }
+                        }, 1000);
+                    }
+
+                    function hideWarning(){
+                        if (!warningShown) return; warningShown = false;
+                        debug('hideWarning()');
+                        if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
+                        const modalEl = document.getElementById('inactivityWarningModal');
+                        if (modalInstance) modalInstance.hide();
+                        const countEl = document.getElementById('idleCountdown'); if (countEl) countEl.textContent = Math.ceil(WARNING_MS/1000);
+                    }
+
+                    function markActivity(e){
+                        if (e && e.isTrusted === false) return; // ignore synthetic
+                        if (performedLogout) return;
+                        lastActivity = Date.now();
+                        debug('markActivity', lastActivity);
+                        if (warningShown) hideWarning();
+                    }
+
+                    ['click','mousemove','keydown','touchstart','scroll'].forEach(evt=>{
+                        window.addEventListener(evt, markActivity, { passive: true });
+                    });
+
+                    document.getElementById('idleStayBtn')?.addEventListener('click', function(){ markActivity(); });
+
+                    setInterval(()=>{
+                        const idleMs = Date.now() - lastActivity;
+                        const threshold = INACTIVITY_MS - WARNING_MS;
+                        debug('periodic check', { idleMs, threshold });
+                        if (idleMs >= threshold && !warningShown && !performedLogout) showWarning();
+                    }, 1000);
+
+                })();
+                </script>
