@@ -13,6 +13,8 @@
     <meta property="og:description" content="Empowering Agrarian Reform Beneficiary Organizations across Bicol with a unified digital marketplace.">
     <meta property="og:image" content="{{ asset('images/dar-logo.png') }}">
 
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -780,5 +782,170 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+
+    <!-- Inactivity warning modal -->
+    <div class="modal fade" id="inactivityWarningModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">You're about to be signed out</h5>
+          </div>
+          <div class="modal-body">
+            <p>You have been inactive. You will be automatically logged out in <strong id="inactivity-countdown">10</strong> seconds.</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" id="staySignedInBtn" class="btn btn-primary">Stay signed in</button>
+            <button type="button" id="logoutNowBtn" class="btn btn-secondary">Log out now</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+        (function(){
+            // Overall inactivity and warning timings
+            const INACTIVITY_MS = 60 * 1000; // 1 minute
+            const WARNING_MS = 10 * 1000;    // 10 seconds warning countdown
+                const DEBUG_IDLE = true; // set false to disable debug logs
+
+            let idleTimer = null;
+            let warningTimeout = null;
+            let countdownInterval = null;
+            let performedLogout = false;
+            let lastActivity = Date.now();
+            let warningShown = false;
+
+            const modalEl = document.getElementById('inactivityWarningModal');
+            const countdownEl = document.getElementById('inactivity-countdown');
+            const stayBtn = document.getElementById('staySignedInBtn');
+            const logoutNowBtn = document.getElementById('logoutNowBtn');
+            const bsModal = modalEl ? new bootstrap.Modal(modalEl, {backdrop: 'static', keyboard: false}) : null;
+
+            function getCsrfToken(){
+                const m = document.querySelector('meta[name="csrf-token"]');
+                return m ? m.getAttribute('content') : '';
+            }
+
+            async function performLogout(){
+                if(performedLogout) return;
+                performedLogout = true;
+                    if (DEBUG_IDLE) console.log('[idle] performLogout()', new Date().toISOString());
+                const token = getCsrfToken();
+                try {
+                    // send token as form-encoded body to avoid preflight OPTIONS
+                    await fetch("{{ route('logout') }}", {
+                        method: 'POST',
+                        credentials: 'same-origin',
+                        body: new URLSearchParams({ _token: token || '' })
+                    });
+                } catch (e) {
+                    // ignore network errors
+                }
+
+                // fallback redirect (server will have logged out if request succeeded)
+                window.location.href = "{{ url('/login') }}";
+            }
+
+            function clearWarningTimers(){
+                if(warningTimeout) { clearTimeout(warningTimeout); warningTimeout = null; }
+                if(countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
+                warningShown = false;
+            }
+
+            function showWarning(){
+                if(!bsModal) return performLogout();
+                // set initial countdown display
+                let secondsLeft = Math.ceil(WARNING_MS / 1000);
+                countdownEl.textContent = secondsLeft;
+                bsModal.show();
+                // Prevent immediate re-trigger while warning is active by bumping lastActivity
+                // Use WARNING_MS so we only postpone re-trigger for the warning duration
+                lastActivity = Date.now() + WARNING_MS;
+                warningShown = true;
+                    if (DEBUG_IDLE) console.log('[idle] showWarning() secondsLeft=', secondsLeft, 'lastActivity=', new Date(lastActivity).toISOString());
+
+                // start countdown interval
+                countdownInterval = setInterval(() => {
+                    secondsLeft--;
+                    if(secondsLeft <= 0){
+                        if(countdownEl) countdownEl.textContent = 0;
+                        // stop the interval
+                        clearInterval(countdownInterval); countdownInterval = null;
+                        // prevent the scheduled timeout from also firing
+                        if(warningTimeout) { clearTimeout(warningTimeout); warningTimeout = null; }
+                        if(bsModal) bsModal.hide();
+                        performLogout();
+                    } else {
+                        countdownEl.textContent = secondsLeft;
+                    }
+                }, 1000);
+
+                // schedule automatic logout after warning period as a backup (will be cleared when countdown reaches 0)
+                warningTimeout = setTimeout(() => {
+                    // if interval didn't already trigger, perform logout now
+                    if(countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
+                    if(bsModal) bsModal.hide();
+                    warningTimeout = null;
+                    performLogout();
+                }, WARNING_MS);
+            }
+
+            function hideWarning(){
+                if(bsModal) bsModal.hide();
+                clearWarningTimers();
+            }
+
+            function markActivity(e){
+                if (e && e.isTrusted === false) return;
+                lastActivity = Date.now();
+                    if (DEBUG_IDLE) console.log('[idle] markActivity() lastActivity=', new Date(lastActivity).toISOString(), 'isTrusted=', e ? e.isTrusted : 'n/a');
+            }
+
+            // Periodic check to trigger the warning based on lastActivity
+            setInterval(() => {
+                if (warningShown) return;
+                if (performedLogout) return;
+                const idle = Date.now() - lastActivity;
+                if (idle >= Math.max(0, INACTIVITY_MS - WARNING_MS)) {
+                    showWarning();
+                }
+            }, 1000);
+
+            ['mousemove','keydown','mousedown','touchstart','scroll'].forEach(evt => {
+                document.addEventListener(evt, markActivity, { passive: true });
+            });
+
+            // Helper to reset activity and hide warning
+            function resetIdleTimer(){
+                markActivity();
+                hideWarning();
+            }
+
+            // Stay signed in button
+            if(stayBtn){
+                stayBtn.addEventListener('click', () => {
+                    resetIdleTimer();
+                });
+            }
+
+            // Immediate logout button
+            if(logoutNowBtn){
+                logoutNowBtn.addEventListener('click', () => {
+                    clearWarningTimers();
+                    if(bsModal) bsModal.hide();
+                    performLogout();
+                });
+            }
+
+            // start the idle timer immediately
+            // start the idle timer immediately
+            resetIdleTimer();
+        })();
+    </script>
+
+    <!-- Hidden logout form (fallback) -->
+    <form id="inactivityLogoutForm" method="POST" action="{{ route('logout') }}" style="display:none;">
+        @csrf
+    </form>
 </body>
 </html>

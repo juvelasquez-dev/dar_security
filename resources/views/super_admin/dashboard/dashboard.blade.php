@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Super Admin Dashboard — E-Agraryo Merkado</title>
     <link rel="icon" href="{{ asset('images/dar-logo.png') }}" type="image/png">
     <link rel="apple-touch-icon" href="{{ asset('images/dar-logo.png') }}">
@@ -1237,6 +1238,176 @@
         }
 
     });
+    </script>
+
+    <!-- Inactivity warning modal -->
+    <div class="modal fade" id="inactivityWarningModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">You're about to be signed out</h5>
+          </div>
+          <div class="modal-body">
+            <p>You have been inactive. You will be automatically logged out in <strong id="inactivity-countdown">10</strong> seconds.</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" id="staySignedInBtn" class="btn btn-primary">Stay signed in</button>
+            <button type="button" id="logoutNowBtn" class="btn btn-secondary">Log out now</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hidden logout form used as a reliable fallback for JS logout -->
+    <form id="inactivityLogoutForm" method="POST" action="{{ route('logout') }}" style="display:none;">
+        @csrf
+    </form>
+
+    <script>
+        (function(){
+            const INACTIVITY_MS = 60 * 1000; // 1 minute
+            const WARNING_MS = 10 * 1000;    // 10 seconds
+            const DEBUG_IDLE = true; // set to false to disable debug logs
+
+            let idleTimer = null;
+            let warningTimeout = null;
+            let countdownInterval = null;
+            let performedLogout = false;
+            let lastActivity = Date.now();
+            let warningShown = false;
+
+            const modalEl = document.getElementById('inactivityWarningModal');
+            const countdownEl = document.getElementById('inactivity-countdown');
+            const stayBtn = document.getElementById('staySignedInBtn');
+            const logoutNowBtn = document.getElementById('logoutNowBtn');
+            const bsModal = modalEl ? new bootstrap.Modal(modalEl, {backdrop: 'static', keyboard: false}) : null;
+
+            function getCsrfToken(){
+                const m = document.querySelector('meta[name="csrf-token"]');
+                return m ? m.getAttribute('content') : '';
+            }
+
+            async function performLogout(){
+                if(performedLogout) return;
+                performedLogout = true;
+                if (DEBUG_IDLE) console.log('[idle] performLogout()', new Date().toISOString());
+                const token = getCsrfToken();
+                // Try AJAX logout first
+                try {
+                        // Send token as form data (avoid custom headers to prevent preflight OPTIONS)
+                        const res = await fetch("{{ route('logout') }}", {
+                            method: 'POST',
+                            credentials: 'same-origin',
+                            body: new URLSearchParams({ _token: token || '' })
+                        });
+                        if (res && (res.status === 200 || res.status === 204 || res.status === 302)) {
+                            window.location.href = "{{ url('/login') }}";
+                            return;
+                        }
+                } catch (e) {
+                    // continue to form fallback
+                }
+
+                // Fallback: submit the hidden server-rendered form if present
+                try {
+                    const existingForm = document.getElementById('inactivityLogoutForm');
+                    if (existingForm) { existingForm.submit(); return; }
+                } catch (e) {}
+
+                // Last resort: create a form dynamically
+                try {
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = "{{ route('logout') }}";
+                    const tokenInput = document.createElement('input');
+                    tokenInput.type = 'hidden';
+                    tokenInput.name = '_token';
+                    tokenInput.value = token || '';
+                    form.appendChild(tokenInput);
+                    document.body.appendChild(form);
+                    form.submit();
+                } catch (e) {
+                    window.location.href = "{{ url('/login') }}";
+                }
+            }
+
+            function clearWarningTimers(){
+                if(warningTimeout) { clearTimeout(warningTimeout); warningTimeout = null; }
+                if(countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
+                warningShown = false;
+            }
+
+            function showWarning(){
+                if(!bsModal) return performLogout();
+                let secondsLeft = Math.ceil(WARNING_MS / 1000);
+                if(countdownEl) countdownEl.textContent = secondsLeft;
+                bsModal.show();
+                warningShown = true;
+                // Prevent immediate re-trigger while warning is active by bumping lastActivity
+                // Use WARNING_MS so we only postpone re-trigger for the warning duration
+                lastActivity = Date.now() + WARNING_MS;
+                if (DEBUG_IDLE) console.log('[idle] showWarning() secondsLeft=', secondsLeft, 'lastActivity=', new Date(lastActivity).toISOString());
+
+                countdownInterval = setInterval(() => {
+                    secondsLeft--;
+                    if(countdownEl) countdownEl.textContent = secondsLeft <= 0 ? 0 : secondsLeft;
+                    if(secondsLeft <= 0){
+                        // stop interval and avoid duplicate timeout
+                        clearInterval(countdownInterval); countdownInterval = null;
+                        if(warningTimeout) { clearTimeout(warningTimeout); warningTimeout = null; }
+                        if(bsModal) bsModal.hide();
+                        performLogout();
+                    }
+                }, 1000);
+
+                // Backup timeout in case interval didn't fire (cleared when interval reaches 0)
+                warningTimeout = setTimeout(() => {
+                    if(countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
+                    if(bsModal) bsModal.hide();
+                    warningTimeout = null;
+                    performLogout();
+                }, WARNING_MS);
+            }
+
+            function hideWarning(){ if(bsModal) bsModal.hide(); clearWarningTimers(); }
+
+            function markActivity(e){
+                // only mark real user interactions
+                if (e && e.isTrusted === false) return;
+                lastActivity = Date.now();
+                if (DEBUG_IDLE) console.log('[idle] markActivity() lastActivity=', new Date(lastActivity).toISOString(), 'isTrusted=', e ? e.isTrusted : 'n/a');
+                // do not dismiss the warning modal just because of incidental activity
+            }
+
+            // Periodically check inactivity based on lastActivity timestamp
+            setInterval(() => {
+                if (warningShown) return; // already showing warning
+                if (performedLogout) return; // don't re-show after logout started
+                const idle = Date.now() - lastActivity;
+                if (DEBUG_IDLE) console.log('[idle] periodic check idleMs=', idle, 'threshold=', Math.max(0, INACTIVITY_MS - WARNING_MS));
+                if (idle >= Math.max(0, INACTIVITY_MS - WARNING_MS)) {
+                    if (DEBUG_IDLE) console.log('[idle] periodic check triggered showWarning at', new Date().toISOString());
+                    showWarning();
+                }
+            }, 1000);
+
+            // Listen for genuine user input to update lastActivity
+            ['mousemove','keydown','mousedown','touchstart','scroll'].forEach(evt => {
+                document.addEventListener(evt, markActivity, { passive: true });
+            });
+
+            // Helper to reset activity and hide warning
+            function resetIdleTimer(){
+                markActivity();
+                hideWarning();
+            }
+
+            if(stayBtn) stayBtn.addEventListener('click', () => { resetIdleTimer(); });
+            if(logoutNowBtn) logoutNowBtn.addEventListener('click', () => { clearWarningTimers(); if(bsModal) bsModal.hide(); performLogout(); });
+
+            // initialize
+            resetIdleTimer();
+        })();
     </script>
 
 </body>
