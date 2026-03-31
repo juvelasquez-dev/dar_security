@@ -698,22 +698,20 @@
                     <h6 class="side-card-title"><i class="bi bi-clock-history"></i> Recent Role Changes</h6>
                 </div>
                 <ul class="activity-log">
-                    <li class="activity-item">
-                        <div class="activity-dot ad-blue"><i class="bi bi-person-plus-fill"></i></div>
-                        <div><div class="activity-title">New user account created</div><div class="activity-meta">A new Admin CARPOS user was added · 1 hour ago</div></div>
-                    </li>
-                    <li class="activity-item">
-                        <div class="activity-dot ad-green"><i class="bi bi-check-circle-fill"></i></div>
-                        <div><div class="activity-title">User reactivated</div><div class="activity-meta">Seller account restored · 3 hours ago</div></div>
-                    </li>
-                    <li class="activity-item">
-                        <div class="activity-dot ad-gold"><i class="bi bi-pencil-fill"></i></div>
-                        <div><div class="activity-title">Role updated</div><div class="activity-meta">Buyer changed to ARBO Admin · Yesterday</div></div>
-                    </li>
-                    <li class="activity-item">
-                        <div class="activity-dot ad-red"><i class="bi bi-slash-circle-fill"></i></div>
-                        <div><div class="activity-title">User deactivated</div><div class="activity-meta">Inactive buyer account disabled · Yesterday</div></div>
-                    </li>
+                    @forelse($recentActivities ?? [] as $act)
+                        <li class="activity-item">
+                            <div class="activity-dot {{ $act['dot'] }}"><i class="{{ $act['icon'] }}"></i></div>
+                            <div>
+                                <div class="activity-title">{{ $act['title'] }}</div>
+                                <div class="activity-meta">{{ $act['meta'] }} · <time class="timeago" datetime="{{ $act['timestamp'] }}">{{ $act['time'] }}</time></div>
+                            </div>
+                        </li>
+                    @empty
+                        <li class="activity-item">
+                            <div class="activity-dot ad-blue"><i class="bi bi-info-circle"></i></div>
+                            <div><div class="activity-title">No recent activity</div><div class="activity-meta">—</div></div>
+                        </li>
+                    @endforelse
                 </ul>
             </div>
         </div>
@@ -1111,6 +1109,16 @@ document.addEventListener('DOMContentLoaded', function(){
     var close = document.getElementById('branchesPanelClose');
     if(close) close.addEventListener('click', function(){ var p=document.getElementById('branchesPanel'); if(p){ p.classList.remove('open'); p.setAttribute('aria-hidden','true'); }});
 });
+</script>
+
+<!-- timeago for live-updating relative timestamps in Recent Role Changes -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/timeago.js/4.0.2/timeago.min.js"></script>
+<script>
+    if (typeof timeago !== 'undefined') {
+        document.addEventListener('DOMContentLoaded', function () {
+            try { timeago.render(document.querySelectorAll('.timeago')); } catch (e) { /* ignore */ }
+        });
+    }
 </script>
 
 </body>

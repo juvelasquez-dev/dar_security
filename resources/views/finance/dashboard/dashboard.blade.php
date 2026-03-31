@@ -744,9 +744,9 @@
                     <div class="text-muted" style="font-size:.72rem;">{{ optional(auth()->user())->email ?? '' }}</div>
                 </li>
                 <li>
-                    <a class="dropdown-item py-2" href="#" style="font-size:.84rem;">
-                        <i class="bi bi-person me-2 text-muted"></i>Profile
-                    </a>
+                    <a class="dropdown-item py-2" href="{{ route('finance.profile') }}" style="font-size:.84rem;">
+                            <i class="bi bi-person me-2 text-muted"></i>Profile
+                        </a>
                 </li>
                 <li class="border-top">
                     <form method="POST" action="{{ route('logout') }}">

@@ -6,11 +6,13 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Role;
+use App\Models\ActivityLog;
 use App\Mail\NewUserCredentials;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Carbon\Carbon;
 
 class UserRoleController extends Controller
 {
@@ -57,6 +59,60 @@ class UserRoleController extends Controller
         $totalCarposAdmins = User::whereHas('role', fn($q) => $q->whereIn('slug', ['pbd', 'arbo']))->count();
         $totalArboAdmins = $totalArbo;
 
+        // Recent activity for side card
+        $activities = ActivityLog::where('module', 'super_admin')
+            ->whereIn('action', ['create_user', 'update_user', 'activate_user', 'deactivate_user'])
+            ->latest()
+            ->take(6)
+            ->get();
+
+        $recentActivities = $activities->map(function ($a) {
+            $meta = is_array($a->meta) ? $a->meta : (array) $a->meta;
+            $title = ucfirst(str_replace('_', ' ', $a->action));
+            $metaText = '';
+            $dot = 'ad-blue';
+            $icon = 'bi-person-plus-fill';
+
+            switch ($a->action) {
+                case 'create_user':
+                    $title = 'New user account created';
+                    $role = $meta['role'] ?? '';
+                    $metaText = 'A new ' . ($role ? $role . ' ' : '') . 'user was added';
+                    $dot = 'ad-blue'; $icon = 'bi-person-plus-fill';
+                    break;
+                case 'update_user':
+                    $title = 'Role updated';
+                    $name = $meta['updated_user_name'] ?? $meta['created_user_name'] ?? 'User';
+                    $newRole = $meta['role'] ?? '';
+                    $metaText = $name . ($newRole ? ' changed to ' . $newRole : ' updated');
+                    $dot = 'ad-gold'; $icon = 'bi-pencil-fill';
+                    break;
+                case 'activate_user':
+                    $title = 'User reactivated';
+                    $name = $meta['target_user_name'] ?? $meta['created_user_name'] ?? 'User';
+                    $metaText = $name . ' account restored';
+                    $dot = 'ad-green'; $icon = 'bi-check-circle-fill';
+                    break;
+                case 'deactivate_user':
+                    $title = 'User deactivated';
+                    $name = $meta['target_user_name'] ?? $meta['created_user_name'] ?? 'User';
+                    $metaText = $name . ' account disabled';
+                    $dot = 'ad-red'; $icon = 'bi-slash-circle-fill';
+                    break;
+                default:
+                    $metaText = $meta['message'] ?? '';
+            }
+
+            return [
+                'icon' => $icon,
+                'dot' => $dot,
+                'title' => $title,
+                'meta' => $metaText,
+                'time' => $a->created_at->diffForHumans(),
+                'timestamp' => $a->created_at->toIso8601String(),
+            ];
+        })->toArray();
+
         return view('super_admin.user_role.userRole', compact(
             'users',
             'totalUsers',
@@ -66,7 +122,8 @@ class UserRoleController extends Controller
             'totalArbo',
             'totalCarposAdmins',
             'totalArboAdmins',
-            'provinces'
+            'provinces',
+            'recentActivities'
         ));
     }
 
@@ -135,6 +192,22 @@ class UserRoleController extends Controller
                 $mailError = $e->getMessage();
             }
         }
+
+        // Log activity
+        try {
+            $createdUserName = trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? '')) ?: ($user->username ?? '');
+            ActivityLog::create([
+                'user_id' => auth()->id(),
+                'action' => 'create_user',
+                'module' => 'super_admin',
+                'meta' => [
+                    'created_user_id' => $user->id,
+                    'created_user_name' => $createdUserName,
+                    'role' => $roleModel?->name ?? $request->role,
+                    'status' => $user->status,
+                ],
+            ]);
+        } catch (\Throwable $e) { /* don't break user flow for logging errors */ }
 
         // Prepare flash message reflecting mail status
         $swal = [
@@ -211,6 +284,22 @@ class UserRoleController extends Controller
 
         $user->save();
 
+        // Log update activity
+        try {
+            $updatedUserName = trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? '')) ?: ($user->username ?? '');
+            ActivityLog::create([
+                'user_id' => auth()->id(),
+                'action' => 'update_user',
+                'module' => 'super_admin',
+                'meta' => [
+                    'updated_user_id' => $user->id,
+                    'updated_user_name' => $updatedUserName,
+                    'role' => $roleModel?->name ?? $request->role,
+                    'status' => $user->status,
+                ],
+            ]);
+        } catch (\Throwable $e) { /* ignore logging errors */ }
+
         $swal = [
             'icon' => 'success',
             'title' => 'User updated',
@@ -228,6 +317,19 @@ class UserRoleController extends Controller
         $user->status = 'active';
         $user->save();
 
+        try {
+            $name = trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? '')) ?: ($user->username ?? '');
+            ActivityLog::create([
+                'user_id' => auth()->id(),
+                'action' => 'activate_user',
+                'module' => 'super_admin',
+                'meta' => [
+                    'target_user_id' => $user->id,
+                    'target_user_name' => $name,
+                ],
+            ]);
+        } catch (\Throwable $e) { /* ignore logging errors */ }
+
         $swal = [
             'icon' => 'success',
             'title' => 'User activated',
@@ -244,6 +346,19 @@ class UserRoleController extends Controller
     {
         $user->status = 'inactive';
         $user->save();
+
+        try {
+            $name = trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? '')) ?: ($user->username ?? '');
+            ActivityLog::create([
+                'user_id' => auth()->id(),
+                'action' => 'deactivate_user',
+                'module' => 'super_admin',
+                'meta' => [
+                    'target_user_id' => $user->id,
+                    'target_user_name' => $name,
+                ],
+            ]);
+        } catch (\Throwable $e) { /* ignore logging errors */ }
 
         $swal = [
             'icon' => 'success',

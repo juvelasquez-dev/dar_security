@@ -31,6 +31,10 @@ use App\Http\Controllers\Carpos\ProfileController as CarposProfileController;
 
 // FINANCE
 use App\Http\Controllers\Finance\DashboardController as FinanceDashboardController;
+use App\Http\Controllers\Finance\OrdersController as FinanceOrdersController;
+use App\Http\Controllers\Finance\PaymentController as FinancePaymentController;
+use App\Http\Controllers\Finance\RevenueController as FinanceRevenueController;
+use App\Http\Controllers\Finance\ProfileController as FinanceProfileController;
 
 /*
 |--------------------------------------------------------------------------
@@ -152,14 +156,16 @@ Route::middleware(['auth', \App\Http\Middleware\PreventBackHistory::class])->gro
         Route::get('/finance/dashboard', [FinanceDashboardController::class, 'index'])
             ->name('finance.dashboard');
 
-        // Placeholder named routes used by the finance dashboard view.
-        // These redirect to the dashboard to avoid RouteNotFoundException
-        // until full controllers are implemented.
-        Route::get('/finance/orders', function () { return redirect()->route('finance.dashboard'); })->name('finance.orders.index');
-        Route::get('/finance/orders/{id}', function ($id) { return redirect()->route('finance.dashboard'); })->name('finance.orders.show');
-        Route::get('/finance/payments', function () { return redirect()->route('finance.dashboard'); })->name('finance.payments.index');
-        Route::get('/finance/revenue', function () { return redirect()->route('finance.dashboard'); })->name('finance.revenue.index');
-        Route::get('/finance/reports/sales', function () { return redirect()->route('finance.dashboard'); })->name('finance.reports.sales');
+        // Finance orders routes
+        Route::get('/finance/orders', [FinanceOrdersController::class, 'index'])->name('finance.orders.index');
+        Route::get('/finance/orders/{id}', [FinanceOrdersController::class, 'show'])->name('finance.orders.show');
+
+        // Placeholder routes for other finance pages used in the dashboard
+        Route::get('/finance/payments', [FinancePaymentController::class, 'index'])->name('finance.payments.index');
+        Route::get('/finance/revenue', [FinanceRevenueController::class, 'index'])->name('finance.revenue.index');
+            Route::get('/finance/profile', [FinanceProfileController::class, 'index'])->name('finance.profile');
+        Route::get('/finance/reports/sales', function () { return view('finance.reports.reports'); })->name('finance.reports.sales');
+       
         Route::get('/finance/activity-logs', function () { return redirect()->route('finance.dashboard'); })->name('finance.activity-logs');
     });
 
