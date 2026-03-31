@@ -508,7 +508,7 @@
 
     <!-- Filters -->
     <div class="filter-card mb-4">
-        <form method="GET" action="{{ route('super_admin.user_roles.index') }}">
+        <form method="GET" action="{{ url()->current() }}">
             <div class="row g-3 align-items-end">
                 <div class="col-md-4">
                     <label class="form-label">Search</label>
@@ -531,7 +531,7 @@
                     <select id="filterStatus" name="status" class="form-select" style="border-radius:8px;">
                         <option value="">All Status</option>
                         <option value="active"   {{ request('status') === 'active'   ? 'selected' : '' }}>Active</option>
-                        <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Inactive</option>
+                        <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Deactivated</option>
                     </select>
                 </div>
                 <div class="col-md-2 d-flex gap-2">
@@ -596,7 +596,7 @@
                                     @if($user->status === 'active')
                                         <span class="status-badge status-active"><span class="status-dot"></span> Active</span>
                                     @else
-                                        <span class="status-badge status-inactive"><span class="status-dot"></span> Inactive</span>
+                                        <span class="status-badge status-inactive"><span class="status-dot"></span> Deactivated</span>
                                     @endif
                                 </td>
                                 <td style="font-size:.78rem; color:var(--text-muted);">{{ optional($user->created_at)->format('M d, Y') }}</td>
@@ -606,8 +606,42 @@
                                             <i class="bi bi-three-dots"></i>
                                         </button>
                                         <ul class="dropdown-menu actions-dropdown-menu dropdown-menu-end">
-                                            <li><a class="dropdown-item item-view" href="#"><i class="bi bi-eye-fill"></i> View Details</a></li>
-                                            <li><a class="dropdown-item item-edit" href="#"><i class="bi bi-pencil-fill"></i> Edit User</a></li>
+                                            <li>
+                                                <button type="button" class="dropdown-item item-view" data-bs-toggle="modal" data-bs-target="#viewUserModal"
+                                                    data-user-id="{{ $user->id }}"
+                                                    data-user-first_name="{{ e($user->first_name ?? '') }}"
+                                                    data-user-middle_name="{{ e($user->middle_name ?? '') }}"
+                                                    data-user-last_name="{{ e($user->last_name ?? '') }}"
+                                                    data-user-username="{{ e($user->username ?? '') }}"
+                                                    data-user-email="{{ e($user->email ?? '') }}"
+                                                    data-user-contact="{{ e($user->contact_number ?? '') }}"
+                                                    data-user-role="{{ e($roleLabel ?? '') }}"
+                                                    data-user-role-slug="{{ e($roleSlug ?? '') }}"
+                                                    data-user-status="{{ e($user->status ?? '') }}"
+                                                    data-user-province="{{ e($user->province->name ?? '') }}"
+                                                    data-user-avatar="{{ e($avatarUrl ?? '') }}"
+                                                    data-user-created_at="{{ optional($user->created_at)->format('M d, Y H:i') }}">
+                                                    <i class="bi bi-eye-fill"></i> View Details
+                                                </button>
+                                            </li>
+                                            <li>
+                                                <button type="button" class="dropdown-item item-edit" data-bs-toggle="modal" data-bs-target="#editUserModal"
+                                                    data-user-id="{{ $user->id }}"
+                                                    data-user-first_name="{{ e($user->first_name ?? '') }}"
+                                                    data-user-middle_name="{{ e($user->middle_name ?? '') }}"
+                                                    data-user-last_name="{{ e($user->last_name ?? '') }}"
+                                                    data-user-username="{{ e($user->username ?? '') }}"
+                                                    data-user-email="{{ e($user->email ?? '') }}"
+                                                    data-user-contact="{{ e($user->contact_number ?? '') }}"
+                                                    data-user-role-slug="{{ e($roleSlug ?? '') }}"
+                                                    data-user-role="{{ e($roleLabel ?? '') }}"
+                                                    data-user-status="{{ e($user->status ?? '') }}"
+                                                    data-user-province_id="{{ $user->province->id ?? '' }}"
+                                                    data-user-province="{{ e($user->province->name ?? '') }}"
+                                                    data-user-avatar="{{ e($avatarUrl ?? '') }}">
+                                                    <i class="bi bi-pencil-fill"></i> Edit User
+                                                </button>
+                                            </li>
                                             <li><hr class="dropdown-divider"></li>
                                             <li>
                                                 @if($user->status === 'active')
@@ -731,7 +765,7 @@
                             <label class="form-label">Status</label>
                             <select name="status" class="form-select" required style="border-radius:8px;">
                                 <option value="active"   {{ old('status', 'active') === 'active'   ? 'selected' : '' }}>Active</option>
-                                <option value="inactive" {{ old('status') === 'inactive' ? 'selected' : '' }}>Inactive</option>
+                                <option value="inactive" {{ old('status') === 'inactive' ? 'selected' : '' }}>Deactivated</option>
                             </select>
                         </div>
                     </div>
@@ -768,6 +802,100 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" style="border-radius:8px;">Cancel</button>
                     <button type="submit" id="statusSubmitBtn" class="btn btn-danger" style="border-radius:8px;">Confirm</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ── View User Modal ─────────────────────────────────── -->
+<div class="modal fade" id="viewUserModal" tabindex="-1" aria-labelledby="viewUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold" id="viewUserModalLabel"><i class="bi bi-person-circle me-2"></i> User Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex gap-3 align-items-start">
+                    <img id="viewUserAvatar" src="" alt="avatar" style="width:86px;height:86px;border-radius:12px;object-fit:cover;" />
+                    <div class="flex-fill">
+                        <h5 id="viewUserName" class="mb-1"></h5>
+                        <div class="small text-muted mb-2" id="viewUserRole"></div>
+                        <div class="row g-2">
+                            <div class="col-6"><strong>Username</strong><div id="viewUserUsername" class="text-muted small">—</div></div>
+                            <div class="col-6"><strong>Status</strong><div id="viewUserStatus" class="text-muted small">—</div></div>
+                            <div class="col-6"><strong>Email</strong><div id="viewUserEmail" class="text-muted small">—</div></div>
+                            <div class="col-6"><strong>Contact</strong><div id="viewUserContact" class="text-muted small">—</div></div>
+                            <div class="col-6"><strong>Province</strong><div id="viewUserProvince" class="text-muted small">—</div></div>
+                            <div class="col-6"><strong>Created</strong><div id="viewUserCreatedAt" class="text-muted small">—</div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" style="border-radius:8px;">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ── Edit User Modal ─────────────────────────────────── -->
+<div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <form id="editUserForm" method="POST" action="#" enctype="multipart/form-data">
+                @csrf
+                @method('PATCH')
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="editUserModalLabel">
+                        <i class="bi bi-pencil-fill me-2" style="color:var(--green-600);"></i>Edit User
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-4"><label class="form-label">First Name</label><input id="edit_first_name" type="text" name="first_name" class="form-control" required style="border-radius:8px;"></div>
+                        <div class="col-md-4"><label class="form-label">Middle Name</label><input id="edit_middle_name" type="text" name="middle_name" class="form-control" style="border-radius:8px;"></div>
+                        <div class="col-md-4"><label class="form-label">Last Name</label><input id="edit_last_name" type="text" name="last_name" class="form-control" required style="border-radius:8px;"></div>
+                        <div class="col-md-6"><label class="form-label">Email</label><input id="edit_email" type="email" name="email" class="form-control" style="border-radius:8px;"></div>
+                        <div class="col-md-6"><label class="form-label">Contact Number</label><input id="edit_contact_number" type="text" name="contact_number" class="form-control" style="border-radius:8px;"></div>
+                        <div class="col-md-6"><label class="form-label">Username</label><input id="edit_username" type="text" name="username" class="form-control" required style="border-radius:8px;"></div>
+                        <div class="col-md-6"><label class="form-label">Avatar (leave blank to keep)</label><input id="edit_avatar" type="file" name="avatar" accept="image/*" class="form-control" style="border-radius:8px;"></div>
+                        <div class="col-md-6">
+                            <label class="form-label">Role</label>
+                            <select id="edit_roleSelect" name="role" class="form-select" required style="border-radius:8px;">
+                                <option value="">Select role</option>
+                                <option value="super_admin">Super Admin</option>
+                                <option value="pbd">PBD</option>
+                                <option value="finance">Finance</option>
+                                <option value="arbo">Arbo</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6" id="editPbdRegionWrapper" style="display:none;">
+                            <label class="form-label">Province</label>
+                            <select id="editProvinceSelect" name="province_id" class="form-select" style="border-radius:8px;">
+                                <option value="">Select province</option>
+                                @foreach($provinces as $prov)
+                                    <option value="{{ $prov->id }}">{{ $prov->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Status</label>
+                            <select id="edit_status" name="status" class="form-select" required style="border-radius:8px;">
+                                <option value="active">Active</option>
+                                <option value="inactive">Deactivated</option>
+                            </select>
+                        </div>
+                        
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" style="border-radius:8px;">Cancel</button>
+                    <button type="submit" class="btn fw-semibold" style="background:var(--green-600); color:#fff; border-radius:8px; border:none;">
+                        <i class="bi bi-check-circle-fill me-1"></i> Save Changes
+                    </button>
                 </div>
             </form>
         </div>
@@ -812,6 +940,36 @@ document.addEventListener('DOMContentLoaded', function () {
             submitBtn.style.borderRadius = '8px';
             document.getElementById('statusForm').action = '/super-admin/user-roles/' + userId + '/' + action;
         });
+
+        // View User Modal - populate fields from triggering button's data attributes
+        const viewModalEl = document.getElementById('viewUserModal');
+        if (viewModalEl) {
+            viewModalEl.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                if (!button) return;
+                const avatar = button.getAttribute('data-user-avatar') || '';
+                const first = button.getAttribute('data-user-first_name') || '';
+                const middle = button.getAttribute('data-user-middle_name') || '';
+                const last = button.getAttribute('data-user-last_name') || '';
+                const name = [first, middle, last].filter(Boolean).join(' ');
+                document.getElementById('viewUserAvatar').src = avatar;
+                document.getElementById('viewUserName').textContent = name || button.getAttribute('data-user-username') || 'User';
+                document.getElementById('viewUserUsername').textContent = button.getAttribute('data-user-username') || '—';
+                document.getElementById('viewUserEmail').textContent = button.getAttribute('data-user-email') || '—';
+                document.getElementById('viewUserContact').textContent = button.getAttribute('data-user-contact') || '—';
+                document.getElementById('viewUserRole').textContent = button.getAttribute('data-user-role') || '';
+                const status = button.getAttribute('data-user-status') || '';
+                const statusEl = document.getElementById('viewUserStatus');
+                if (status === 'inactive') {
+                    statusEl.textContent = 'Deactivated';
+                } else {
+                    statusEl.textContent = status ? (status.charAt(0).toUpperCase() + status.slice(1)) : '—';
+                }
+                statusEl.className = status === 'active' ? 'status-badge status-active' : 'status-badge status-inactive';
+                document.getElementById('viewUserProvince').textContent = button.getAttribute('data-user-province') || '—';
+                document.getElementById('viewUserCreatedAt').textContent = button.getAttribute('data-user-created_at') || '';
+            });
+        }
     }
 
     // Re-open add modal on validation errors
@@ -839,6 +997,59 @@ document.addEventListener('DOMContentLoaded', function(){
         else { wrapper.style.display = 'none'; if(region){ region.removeAttribute('required'); region.value = ''; } }
     }
     if(role){ role.addEventListener('change', toggleRegion); toggleRegion(); }
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+    var editModal = document.getElementById('editUserModal');
+    if(!editModal) return;
+    editModal.addEventListener('show.bs.modal', function(event){
+        var btn = event.relatedTarget;
+        if(!btn) return;
+        var id = btn.getAttribute('data-user-id');
+        var first = btn.getAttribute('data-user-first_name') || '';
+        var middle = btn.getAttribute('data-user-middle_name') || '';
+        var last = btn.getAttribute('data-user-last_name') || '';
+        var username = btn.getAttribute('data-user-username') || '';
+        var email = btn.getAttribute('data-user-email') || '';
+        var contact = btn.getAttribute('data-user-contact') || '';
+        var role = btn.getAttribute('data-user-role-slug') || '';
+        var provinceId = btn.getAttribute('data-user-province_id') || '';
+        var status = btn.getAttribute('data-user-status') || 'active';
+
+        document.getElementById('edit_first_name').value = first;
+        document.getElementById('edit_middle_name').value = middle;
+        document.getElementById('edit_last_name').value = last;
+        document.getElementById('edit_username').value = username;
+        document.getElementById('edit_email').value = email;
+        document.getElementById('edit_contact_number').value = contact;
+        document.getElementById('edit_status').value = status;
+        var roleSelect = document.getElementById('edit_roleSelect');
+        if(roleSelect){ roleSelect.value = role; }
+        var provSelect = document.getElementById('editProvinceSelect');
+        if(provSelect){ provSelect.value = provinceId; }
+
+        // Toggle province wrapper based on role
+        var wrapper = document.getElementById('editPbdRegionWrapper');
+        if(wrapper){ wrapper.style.display = (role === 'pbd') ? '' : 'none'; if(role === 'pbd'){ provSelect.setAttribute('required','required'); } else { provSelect.removeAttribute('required'); }}
+
+        // Set form action to update route
+        var form = document.getElementById('editUserForm');
+        if(form){ form.action = '/super-admin/user-roles/' + id; }
+    });
+
+    // also toggle province field when role changed inside edit modal
+    var editRole = document.getElementById('edit_roleSelect');
+    if(editRole){
+        editRole.addEventListener('change', function(){
+            var wrapper = document.getElementById('editPbdRegionWrapper');
+            var prov = document.getElementById('editProvinceSelect');
+            if(!wrapper) return;
+            if(editRole.value === 'pbd'){ wrapper.style.display = ''; if(prov) prov.setAttribute('required','required'); }
+            else { wrapper.style.display = 'none'; if(prov){ prov.removeAttribute('required'); prov.value = ''; } }
+        });
+    }
 });
 </script>
 

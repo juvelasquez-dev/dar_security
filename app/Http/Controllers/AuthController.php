@@ -152,6 +152,16 @@ class AuthController extends Controller
                 ]);
             }
 
+            // Prevent deactivated users from logging in
+            if (isset($user->status) && $user->status !== 'active') {
+                Auth::logout();
+                return back()->withInput()->with('swal', [
+                    'icon' => 'error',
+                    'title' => 'Account deactivated',
+                    'text' => 'This account has been deactivated and cannot log in. Contact an administrator.'
+                ]);
+            }
+
             $role = $user->role?->slug;
 
             // Two-step: send verification code via email before finalizing login
@@ -257,13 +267,24 @@ class AuthController extends Controller
             ]);
         }
 
-        // Code valid — log the user in
+        // Code valid — log the user in (but prevent deactivated accounts)
         $user = User::find($userId);
         if (! $user) {
             return redirect()->route('login')->with('swal', [
                 'icon' => 'error',
                 'title' => 'User not found',
                 'text' => 'Please login again.'
+            ]);
+        }
+
+        if (isset($user->status) && $user->status !== 'active') {
+            // cleanup pending code/session
+            Cache::forget('login_code_' . $userId);
+            session()->forget('login_mfa_user_id');
+            return redirect()->route('login')->with('swal', [
+                'icon' => 'error',
+                'title' => 'Account deactivated',
+                'text' => 'This account has been deactivated and cannot log in. Contact an administrator.'
             ]);
         }
 

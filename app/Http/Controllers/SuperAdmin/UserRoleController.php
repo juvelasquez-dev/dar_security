@@ -9,6 +9,7 @@ use App\Models\Role;
 use App\Mail\NewUserCredentials;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class UserRoleController extends Controller
@@ -157,5 +158,99 @@ class UserRoleController extends Controller
         return redirect()
             ->route('super_admin.user_roles.index')
             ->with('swal', $swal);
+    }
+
+    /**
+     * Update an existing user.
+     */
+    public function update(Request $request, User $user)
+    {
+        $request->validate([
+            'first_name' => 'required|string|max:100',
+            'middle_name' => 'nullable|string|max:100',
+            'last_name' => 'required|string|max:100',
+            'email' => 'nullable|email|max:150|unique:users,email,' . $user->id,
+            'contact_number' => 'nullable|string|max:20',
+            'username' => 'required|string|max:100|unique:users,username,' . $user->id,
+            'password' => 'nullable|string|min:8|confirmed',
+            'role' => 'required|in:super_admin,pbd,finance,arbo',
+            'status' => 'required|in:active,inactive',
+            'province_id' => 'nullable|exists:provinces,id',
+            'avatar' => 'nullable|file|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
+        ]);
+
+        if ($request->role === 'pbd') {
+            $request->validate([
+                'province_id' => 'required|exists:provinces,id',
+            ]);
+        }
+
+        $roleModel = Role::where('slug', $request->role)->first();
+
+        if ($request->hasFile('avatar')) {
+            // delete old avatar if exists
+            if (!empty($user->avatar)) {
+                try { Storage::disk('public')->delete($user->avatar); } catch (\Throwable $e) { /* ignore */ }
+            }
+            $user->avatar = $request->file('avatar')->store('avatars', 'public');
+        }
+
+        if ($request->filled('password')) {
+            $user->password = Hash::make($request->password);
+        }
+
+        $user->first_name = $request->first_name;
+        $user->middle_name = $request->middle_name;
+        $user->last_name = $request->last_name;
+        $user->email = $request->email;
+        $user->contact_number = $request->contact_number;
+        $user->username = $request->username;
+        $user->role_id = $roleModel?->id;
+        $user->status = $request->status;
+        $user->province_id = $request->province_id ?? null;
+
+        $user->save();
+
+        $swal = [
+            'icon' => 'success',
+            'title' => 'User updated',
+            'text' => 'The user profile was updated successfully.'
+        ];
+
+        return redirect()->route('super_admin.user_roles.index')->with('swal', $swal);
+    }
+
+    /**
+     * Activate a user account.
+     */
+    public function activate(Request $request, User $user)
+    {
+        $user->status = 'active';
+        $user->save();
+
+        $swal = [
+            'icon' => 'success',
+            'title' => 'User activated',
+            'text' => 'The user account has been activated.'
+        ];
+
+        return redirect()->route('super_admin.user_roles.index')->with('swal', $swal);
+    }
+
+    /**
+     * Deactivate a user account.
+     */
+    public function deactivate(Request $request, User $user)
+    {
+        $user->status = 'inactive';
+        $user->save();
+
+        $swal = [
+            'icon' => 'success',
+            'title' => 'User deactivated',
+            'text' => 'The user account has been deactivated.'
+        ];
+
+        return redirect()->route('super_admin.user_roles.index')->with('swal', $swal);
     }
 }

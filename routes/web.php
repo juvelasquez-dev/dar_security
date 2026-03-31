@@ -109,6 +109,9 @@ Route::middleware(['auth', \App\Http\Middleware\PreventBackHistory::class])->gro
 
         Route::get('/super-admin/user-roles', [UserRoleController::class, 'index'])->name('super_admin.user_roles.index');
         Route::post('/super-admin/user-roles', [UserRoleController::class, 'store'])->name('super_admin.user_roles.store');
+        Route::patch('/super-admin/user-roles/{user}', [UserRoleController::class, 'update'])->name('super_admin.user_roles.update');
+        Route::patch('/super-admin/user-roles/{user}/activate', [UserRoleController::class, 'activate'])->name('super_admin.user_roles.activate');
+        Route::patch('/super-admin/user-roles/{user}/deactivate', [UserRoleController::class, 'deactivate'])->name('super_admin.user_roles.deactivate');
 
         Route::get('/roles', [UserRoleController::class, 'index'])->name('superadmin.roles');
 
