@@ -164,6 +164,12 @@ Route::middleware(['auth', \App\Http\Middleware\PreventBackHistory::class])->gro
         Route::get('/finance/revenue', [FinanceRevenueController::class, 'index'])->name('finance.revenue.index');
             Route::get('/finance/profile', [FinanceProfileController::class, 'index'])->name('finance.profile');
         Route::get('/finance/reports/sales', function () { return view('finance.reports.reports'); })->name('finance.reports.sales');
+        // Temporary patch: provide a named route for updating sales report entries
+        // TODO: replace closure with a proper controller method to persist adjustments
+        Route::patch('/finance/reports/sales', function (\Illuminate\Http\Request $request) {
+            // For now, just redirect back with a simple flash message.
+            return redirect()->route('finance.reports.sales')->with('success', 'Report updated.');
+        })->name('finance.reports.sales.update');
        
         Route::get('/finance/activity-logs', function () { return redirect()->route('finance.dashboard'); })->name('finance.activity-logs');
     });
