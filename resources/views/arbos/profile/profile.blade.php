@@ -294,8 +294,7 @@
         </div>
         <span class="sidebar-section-label">Main Menu</span>
         <a href="{{ url('/arbo/dashboard') }}" class="sidebar-link"><i class="bi bi-speedometer2"></i>Dashboard</a>
-        <a href="{{ url('/arbo/sellers') }}" class="sidebar-link"><i class="bi bi-shop"></i>Sellers<span class="sidebar-link-badge">{{ $totalSellers ?? '0' }}</span></a>
-        <a href="{{ url('/arbo/buyers') }}" class="sidebar-link"><i class="bi bi-bag"></i>Buyers<span class="sidebar-link-badge">{{ $totalBuyers ?? '0' }}</span></a>
+        
         <span class="sidebar-section-label">Marketplace</span>
         <a href="{{ url('/arbo/products') }}" class="sidebar-link"><i class="bi bi-box-seam"></i>Products<span class="sidebar-link-badge">{{ $totalProducts ?? '0' }}</span></a>
         <a href="{{ url('/arbo/orders') }}" class="sidebar-link"><i class="bi bi-cart-check"></i>Orders<span class="sidebar-link-badge">{{ $totalOrders ?? '0' }}</span></a>
