@@ -15,5 +15,4 @@ class BuyerController extends Controller
         return view('arbos.buyer.buyer');
     }
 
-    // Add other buyer-related actions here as needed.
 }
