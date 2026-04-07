@@ -6,7 +6,6 @@ use App\Http\Controllers\LandingPageController;
 
 // ARBOS
 use App\Http\Controllers\Arbos\ArbosDashboardController;
-use App\Http\Controllers\Arbos\SellerController;
 use App\Http\Controllers\Arbos\ProductsController;
 use App\Http\Controllers\Arbos\SalesReportController;
 use App\Http\Controllers\Arbos\OrdersController;
@@ -178,8 +177,7 @@ Route::middleware(['auth', \App\Http\Middleware\PreventBackHistory::class])->gro
 
         Route::prefix('arbos')->name('arbos.')->group(function () {
             Route::get('/dashboard', [ArbosDashboardController::class, 'index'])->name('dashboard');
-            Route::get('/sellers', [SellerController::class, 'index'])->name('sellers');
-            Route::get('/buyers', [BuyerController::class, 'index'])->name('buyers');
+            
             Route::get('/products', [ProductsController::class, 'index'])->name('products');
             Route::get('/reports', [SalesReportController::class, 'index'])->name('reports');
             Route::get('/orders', [OrdersController::class, 'index'])->name('orders');
@@ -188,8 +186,6 @@ Route::middleware(['auth', \App\Http\Middleware\PreventBackHistory::class])->gro
 
         // backward compatibility
         Route::get('/arbo/dashboard', [ArbosDashboardController::class, 'index']);
-        Route::get('/arbo/sellers', [SellerController::class, 'index']);
-        Route::get('/arbo/buyers', [BuyerController::class, 'index']);
         Route::get('/arbo/products', [ProductsController::class, 'index']);
         Route::get('/arbo/reports', [SalesReportController::class, 'index']);
         Route::get('/arbo/orders', [OrdersController::class, 'index']);

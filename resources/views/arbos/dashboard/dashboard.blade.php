@@ -873,17 +873,7 @@
                 Dashboard
             </a>
 
-            <a href="{{ url('/arbo/sellers') }}" class="sidebar-link">
-                <i class="bi bi-shop"></i>
-                Sellers
-                <span class="sidebar-link-badge">{{ $totalSellers ?? '0' }}</span>
-            </a>
-
-            <a href="{{ url('/arbo/buyers') }}" class="sidebar-link">
-                <i class="bi bi-bag"></i>
-                Buyers
-                <span class="sidebar-link-badge">{{ $totalBuyers ?? '0' }}</span>
-            </a>
+            
 
             <span class="sidebar-section-label">Marketplace</span>
 
@@ -946,33 +936,7 @@
 
         <!-- ── Summary Stat Cards ─────────────────────────── -->
         <div class="row g-3 mb-4">
-            <div class="col-6 col-xl-3">
-                <div class="stat-card">
-                    <div class="stat-icon-wrap stat-icon-green">
-                        <i class="bi bi-shop-window"></i>
-                    </div>
-                    <div>
-                        <div class="stat-value">{{ $totalSellers ?? '—' }}</div>
-                        <p class="stat-label">Total Sellers</p>
-                        <span class="stat-trend up"><i class="bi bi-arrow-up-short"></i> +3 this month</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-6 col-xl-3">
-                <div class="stat-card">
-                    <div class="stat-icon-wrap stat-icon-teal">
-                        <i class="bi bi-people-fill"></i>
-                    </div>
-                    <div>
-                        <div class="stat-value">{{ $totalBuyers ?? '—' }}</div>
-                        <p class="stat-label">Total Buyers</p>
-                        <span class="stat-trend up"><i class="bi bi-arrow-up-short"></i> +12 this month</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-6 col-xl-3">
+            <div class="col-6 col-md-4 col-xl-3">
                 <div class="stat-card">
                     <div class="stat-icon-wrap stat-icon-blue">
                         <i class="bi bi-box-seam-fill"></i>
@@ -985,7 +949,7 @@
                 </div>
             </div>
 
-            <div class="col-6 col-xl-3">
+            <div class="col-6 col-md-4 col-xl-3">
                 <div class="stat-card">
                     <div class="stat-icon-wrap stat-icon-gold">
                         <i class="bi bi-cart-check-fill"></i>
@@ -1024,15 +988,7 @@
                         </div>
                     </a>
                 </div>
-                <div class="col-6 col-md-3">
-                    <a href="{{ url('/arbo/sellers') }}" class="quick-action-card">
-                        <div class="quick-action-icon qa-teal"><i class="bi bi-shop"></i></div>
-                        <div>
-                            <p class="quick-action-label">View Sellers</p>
-                            <p class="quick-action-sub">Manage farmer accounts</p>
-                        </div>
-                    </a>
-                </div>
+                
                 <div class="col-6 col-md-3">
                     <a href="{{ url('/arbo/orders') }}" class="quick-action-card">
                         <div class="quick-action-icon qa-gold"><i class="bi bi-cart-check-fill"></i></div>
@@ -1346,22 +1302,16 @@
                 <!-- Composition Donut -->
                 <div class="section-title">
                     <div class="section-title-bar"></div>
-                    User Composition
+                    Marketplace Composition
                 </div>
                 <div class="chart-card">
                     <div class="chart-card-header">
-                        <span style="font-size:.84rem; font-weight:700;">Marketplace Breakdown</span>
+                        <span style="font-size:.84rem; font-weight:700;">Products vs Orders</span>
                     </div>
                     <div class="p-4" style="height:220px; position:relative;">
                         <canvas id="compositionChart"></canvas>
                     </div>
                     <div class="px-4 pb-3 d-flex flex-wrap gap-2 justify-content-center">
-                        <span class="status-badge status-active">
-                            <span class="status-dot"></span> Sellers
-                        </span>
-                        <span class="status-badge status-processing">
-                            <span class="status-dot"></span> Buyers
-                        </span>
                         <span class="status-badge status-completed">
                             <span class="status-dot"></span> Products
                         </span>
@@ -1428,21 +1378,12 @@
                             pointBorderWidth: 2, pointRadius: 4,
                         },
                         {
-                            label: 'Sellers',
-                            data: [3, 6, 9, 14, 12, 18],
-                            borderColor: 'rgba(31,128,60,1)',
-                            backgroundColor: 'rgba(31,128,60,0.08)',
+                            label: 'Orders',
+                            data: [42, 68, 85, 103, 97, 124],
+                            borderColor: 'rgba(200,146,42,1)',
+                            backgroundColor: 'rgba(200,146,42,0.08)',
                             borderWidth: 2.5, tension: 0.38, fill: false,
-                            pointBackgroundColor: '#fff', pointBorderColor: 'rgba(31,128,60,1)',
-                            pointBorderWidth: 2, pointRadius: 4,
-                        },
-                        {
-                            label: 'Buyers',
-                            data: [10, 18, 25, 40, 38, 55],
-                            borderColor: 'rgba(13,138,126,1)',
-                            backgroundColor: 'rgba(13,138,126,0.08)',
-                            borderWidth: 2.5, tension: 0.38, fill: false,
-                            pointBackgroundColor: '#fff', pointBorderColor: 'rgba(13,138,126,1)',
+                            pointBackgroundColor: '#fff', pointBorderColor: 'rgba(200,146,42,1)',
                             pointBorderWidth: 2, pointRadius: 4,
                         }
                     ]
@@ -1481,20 +1422,16 @@
         // ── Composition Donut ─────────────────────────────────
         const compCtx = document.getElementById('compositionChart');
         if (compCtx) {
-            const totalSellers  = parseInt('{{ $totalSellers  ?? 18 }}') || 18;
-            const totalBuyers   = parseInt('{{ $totalBuyers   ?? 61 }}') || 61;
             const totalProducts = parseInt('{{ $totalProducts ?? 38 }}') || 38;
             const totalOrders   = parseInt('{{ $totalOrders   ?? 124}}') || 124;
 
             new Chart(compCtx.getContext('2d'), {
                 type: 'doughnut',
                 data: {
-                    labels: ['Sellers', 'Buyers', 'Products', 'Orders'],
+                    labels: ['Products', 'Orders'],
                     datasets: [{
-                        data: [totalSellers, totalBuyers, totalProducts, totalOrders],
+                        data: [totalProducts, totalOrders],
                         backgroundColor: [
-                            'rgba(31,128,60,0.85)',
-                            'rgba(13,138,126,0.85)',
                             'rgba(26,115,232,0.85)',
                             'rgba(200,146,42,0.85)',
                         ],

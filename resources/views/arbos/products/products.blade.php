@@ -1023,14 +1023,7 @@
         <a href="{{ url('/arbo/dashboard') }}" class="sidebar-link {{ request()->is('arbo/dashboard') ? 'active' : '' }}">
             <i class="bi bi-speedometer2"></i> Dashboard
         </a>
-        <a href="{{ url('/arbo/sellers') }}" class="sidebar-link {{ request()->is('arbo/sellers*') ? 'active' : '' }}">
-            <i class="bi bi-shop"></i> Sellers
-            <span class="sidebar-link-badge">{{ $totalSellers ?? '0' }}</span>
-        </a>
-        <a href="{{ url('/arbo/buyers') }}" class="sidebar-link {{ request()->is('arbo/buyers*') ? 'active' : '' }}">
-            <i class="bi bi-bag"></i> Buyers
-            <span class="sidebar-link-badge">{{ $totalBuyers ?? '0' }}</span>
-        </a>
+        
 
         <span class="sidebar-section-label">Marketplace</span>
 
