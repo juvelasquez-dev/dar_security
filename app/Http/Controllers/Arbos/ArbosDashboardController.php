@@ -12,7 +12,15 @@ class ArbosDashboardController extends Controller
      */
     public function index()
     {
-        return view('arbos.dashboard.dashboard');
+        return view('arbos.dashboard.dashboard', [
+            'totalProducts'        => 0,
+            'totalOrders'          => 0,
+            'totalRevenue'         => 0,
+            'pendingOrders'        => 0,
+            'pendingOrdersCount'   => 0,
+            'processingOrdersCount'=> 0,
+            'completedOrdersCount' => 0,
+        ]);
     }
 
    
