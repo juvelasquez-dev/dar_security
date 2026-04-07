@@ -761,6 +761,87 @@
         .sidebar::-webkit-scrollbar { width: 4px; }
         .sidebar::-webkit-scrollbar-track { background: transparent; }
         .sidebar::-webkit-scrollbar-thumb { background: var(--gray-200); border-radius: 4px; }
+
+        /* ─── Top Selling ───────────────────────────────────── */
+        .rank-item {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            padding: 0.8rem 1.25rem;
+            border-bottom: 1px solid var(--gray-100);
+            transition: background 0.14s;
+        }
+        .rank-item:last-child { border-bottom: none; }
+        .rank-item:hover { background: var(--gray-50); }
+        .rank-num {
+            width: 26px; height: 26px;
+            border-radius: 7px;
+            background: var(--green-100);
+            color: var(--green-700);
+            font-size: 0.72rem;
+            font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .rank-num.gold { background: var(--gold-light); color: var(--gold); }
+        .rank-product { flex: 1; }
+        .rank-product-name { font-size: 0.83rem; font-weight: 600; color: var(--text-main); }
+        .rank-product-cat  { font-size: 0.71rem; color: var(--text-muted); margin-top: 1px; }
+        .rank-units { text-align: right; font-size: 0.83rem; font-weight: 700; color: var(--green-800); }
+        .rank-units small { display: block; font-size: 0.7rem; font-weight: 400; color: var(--text-muted); }
+
+        /* ─── Order Status Breakdown ────────────────────────── */
+        .status-breakdown-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.7rem 1.25rem;
+            border-bottom: 1px solid var(--gray-100);
+        }
+        .status-breakdown-item:last-child { border-bottom: none; }
+        .status-breakdown-label {
+            font-size: 0.78rem;
+            font-weight: 600;
+            min-width: 88px;
+            color: var(--text-main);
+        }
+        .status-breakdown-bar {
+            flex: 1;
+            height: 8px;
+            background: var(--gray-200);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .status-breakdown-fill { height: 100%; border-radius: 4px; }
+        .sbd-pending    .status-breakdown-fill { background: var(--gold); }
+        .sbd-processing .status-breakdown-fill { background: #0d8a7e; }
+        .sbd-completed  .status-breakdown-fill { background: #1a73e8; }
+        .status-breakdown-count {
+            font-size: 0.78rem;
+            font-weight: 700;
+            min-width: 28px;
+            text-align: right;
+            color: var(--text-main);
+        }
+
+        /* ─── Low Stock ─────────────────────────────────────── */
+        .low-stock-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1.25rem;
+            border-bottom: 1px solid var(--gray-100);
+            transition: background 0.14s;
+        }
+        .low-stock-item:last-child { border-bottom: none; }
+        .low-stock-item:hover { background: var(--gray-50); }
+        .low-stock-name { font-size: 0.83rem; font-weight: 600; color: var(--text-main); }
+        .low-stock-meta { font-size: 0.71rem; color: var(--text-muted); margin-top: 1px; }
+        .low-stock-qty  {
+            font-size: 0.83rem; font-weight: 700;
+            color: #dc3545;
+            white-space: nowrap;
+        }
     </style>
 </head>
 <body>
@@ -924,7 +1005,7 @@
             <div>
                 <h1 class="page-header-title">ARBO Marketplace Dashboard</h1>
                 <p class="page-header-sub">
-                    Manage your marketplace — products, sellers, buyers, and orders for
+                    Manage your marketplace — products and orders for
                     <strong>{{ optional(auth()->user())->arbo_name ?? 'your ARBO organization' }}</strong>.
                 </p>
             </div>
@@ -936,7 +1017,7 @@
 
         <!-- ── Summary Stat Cards ─────────────────────────── -->
         <div class="row g-3 mb-4">
-            <div class="col-6 col-md-4 col-xl-3">
+            <div class="col-6 col-xl-3">
                 <div class="stat-card">
                     <div class="stat-icon-wrap stat-icon-blue">
                         <i class="bi bi-box-seam-fill"></i>
@@ -949,7 +1030,7 @@
                 </div>
             </div>
 
-            <div class="col-6 col-md-4 col-xl-3">
+            <div class="col-6 col-xl-3">
                 <div class="stat-card">
                     <div class="stat-icon-wrap stat-icon-gold">
                         <i class="bi bi-cart-check-fill"></i>
@@ -958,6 +1039,32 @@
                         <div class="stat-value">{{ $totalOrders ?? '—' }}</div>
                         <p class="stat-label">Total Orders</p>
                         <span class="stat-trend up"><i class="bi bi-arrow-up-short"></i> +24 this month</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6 col-xl-3">
+                <div class="stat-card">
+                    <div class="stat-icon-wrap stat-icon-teal">
+                        <i class="bi bi-cash-stack"></i>
+                    </div>
+                    <div>
+                        <div class="stat-value">{{ isset($totalRevenue) && $totalRevenue ? '₱' . number_format($totalRevenue) : '₱6,310' }}</div>
+                        <p class="stat-label">Total Sales Revenue</p>
+                        <span class="stat-trend up"><i class="bi bi-arrow-up-short"></i> +12% this month</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6 col-xl-3">
+                <div class="stat-card">
+                    <div class="stat-icon-wrap" style="background:#fdecea; color:#c0392b;">
+                        <i class="bi bi-hourglass-split"></i>
+                    </div>
+                    <div>
+                        <div class="stat-value">{{ $pendingOrders ?? '2' }}</div>
+                        <p class="stat-label">Pending Orders</p>
+                        <span class="stat-trend down"><i class="bi bi-exclamation-circle"></i> Needs action</span>
                     </div>
                 </div>
             </div>
@@ -988,13 +1095,21 @@
                         </div>
                     </a>
                 </div>
-                
                 <div class="col-6 col-md-3">
                     <a href="{{ url('/arbo/orders') }}" class="quick-action-card">
                         <div class="quick-action-icon qa-gold"><i class="bi bi-cart-check-fill"></i></div>
                         <div>
                             <p class="quick-action-label">View Orders</p>
                             <p class="quick-action-sub">Monitor buyer orders</p>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-6 col-md-3">
+                    <a href="{{ url('/arbo/reports') }}" class="quick-action-card">
+                        <div class="quick-action-icon qa-teal"><i class="bi bi-bar-chart-line-fill"></i></div>
+                        <div>
+                            <p class="quick-action-label">View Reports</p>
+                            <p class="quick-action-sub">Sales & analytics</p>
                         </div>
                     </a>
                 </div>
@@ -1191,6 +1306,166 @@
             </div>
         </div>
 
+        <!-- ── Top Selling + Order Status + Low Stock ───────── -->
+        <div class="row g-4 mb-4">
+
+            <!-- Top Selling Products -->
+            <div class="col-lg-8">
+                <div class="section-title">
+                    <div class="section-title-bar"></div>
+                    Top Selling Products
+                </div>
+                <div class="table-card">
+                    <div class="table-card-header">
+                        <h6 class="table-card-title">
+                            <i class="bi bi-trophy"></i>
+                            Best Performers
+                        </h6>
+                        <a href="{{ url('/arbo/products') }}" class="btn btn-sm" style="background: var(--green-100); color: var(--green-700); border:none; font-size:.78rem; border-radius:8px; font-weight:600;">
+                            View All <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                    <div>
+                        <div class="rank-item">
+                            <div class="rank-num gold">1</div>
+                            <div class="rank-product">
+                                <div class="rank-product-name">Fresh Coconut (Whole)</div>
+                                <div class="rank-product-cat">Fruits · SKU: FRT-001</div>
+                            </div>
+                            <div class="rank-units">500 pcs<small>sold</small></div>
+                        </div>
+                        <div class="rank-item">
+                            <div class="rank-num gold">2</div>
+                            <div class="rank-product">
+                                <div class="rank-product-name">Premium White Rice</div>
+                                <div class="rank-product-cat">Grains · SKU: GRN-001</div>
+                            </div>
+                            <div class="rank-units">240 kg<small>sold</small></div>
+                        </div>
+                        <div class="rank-item">
+                            <div class="rank-num">3</div>
+                            <div class="rank-product">
+                                <div class="rank-product-name">Abaca Fiber (Raw)</div>
+                                <div class="rank-product-cat">Fiber Crops · SKU: FBR-001</div>
+                            </div>
+                            <div class="rank-units">180 kg<small>sold</small></div>
+                        </div>
+                        <div class="rank-item">
+                            <div class="rank-num">4</div>
+                            <div class="rank-product">
+                                <div class="rank-product-name">Yellow Corn (Dried)</div>
+                                <div class="rank-product-cat">Grains · SKU: GRN-002</div>
+                            </div>
+                            <div class="rank-units">85 kg<small>sold</small></div>
+                        </div>
+                        <div class="rank-item">
+                            <div class="rank-num">5</div>
+                            <div class="rank-product">
+                                <div class="rank-product-name">Organic Vegetables Bundle</div>
+                                <div class="rank-product-cat">Vegetables · SKU: VEG-001</div>
+                            </div>
+                            <div class="rank-units">12 bundles<small>sold</small></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Status Breakdown + Low Stock Alerts -->
+            <div class="col-lg-4 d-flex flex-column gap-4">
+
+                <!-- Order Status Breakdown -->
+                <div>
+                    <div class="section-title">
+                        <div class="section-title-bar"></div>
+                        Order Status Breakdown
+                    </div>
+                    <div class="table-card">
+                        <div class="table-card-header">
+                            <h6 class="table-card-title">
+                                <i class="bi bi-pie-chart"></i>
+                                Status Overview
+                            </h6>
+                        </div>
+                        <div>
+                            @php
+                                $pending    = $pendingOrdersCount    ?? 2;
+                                $processing = $processingOrdersCount ?? 1;
+                                $completed  = $completedOrdersCount  ?? 2;
+                                $total      = $pending + $processing + $completed ?: 1;
+                            @endphp
+                            <div class="status-breakdown-item sbd-pending">
+                                <span class="status-breakdown-label">
+                                    <span class="status-badge status-pending d-inline-flex me-1" style="padding:2px 8px;"><span class="status-dot"></span> Pending</span>
+                                </span>
+                                <div class="status-breakdown-bar">
+                                    <div class="status-breakdown-fill" style="width:{{ round(($pending/$total)*100) }}%"></div>
+                                </div>
+                                <span class="status-breakdown-count">{{ $pending }}</span>
+                            </div>
+                            <div class="status-breakdown-item sbd-processing">
+                                <span class="status-breakdown-label">
+                                    <span class="status-badge status-processing d-inline-flex me-1" style="padding:2px 8px;"><span class="status-dot"></span> Processing</span>
+                                </span>
+                                <div class="status-breakdown-bar">
+                                    <div class="status-breakdown-fill" style="width:{{ round(($processing/$total)*100) }}%"></div>
+                                </div>
+                                <span class="status-breakdown-count">{{ $processing }}</span>
+                            </div>
+                            <div class="status-breakdown-item sbd-completed">
+                                <span class="status-breakdown-label">
+                                    <span class="status-badge status-completed d-inline-flex me-1" style="padding:2px 8px;"><span class="status-dot"></span> Completed</span>
+                                </span>
+                                <div class="status-breakdown-bar">
+                                    <div class="status-breakdown-fill" style="width:{{ round(($completed/$total)*100) }}%"></div>
+                                </div>
+                                <span class="status-breakdown-count">{{ $completed }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Low Stock Alerts -->
+                <div>
+                    <div class="section-title">
+                        <div class="section-title-bar"></div>
+                        Low Stock Alerts
+                    </div>
+                    <div class="table-card">
+                        <div class="table-card-header">
+                            <h6 class="table-card-title">
+                                <i class="bi bi-exclamation-triangle text-warning"></i>
+                                Needs Restocking
+                            </h6>
+                        </div>
+                        <div>
+                            <div class="low-stock-item">
+                                <div>
+                                    <div class="low-stock-name">Organic Vegetables Bundle</div>
+                                    <div class="low-stock-meta">Vegetables · SKU: VEG-001</div>
+                                </div>
+                                <div class="low-stock-qty">12 bundles</div>
+                            </div>
+                            <div class="low-stock-item">
+                                <div>
+                                    <div class="low-stock-name">Yellow Corn (Dried)</div>
+                                    <div class="low-stock-meta">Grains · SKU: GRN-002</div>
+                                </div>
+                                <div class="low-stock-qty">85 kg</div>
+                            </div>
+                            <div class="low-stock-item">
+                                <div>
+                                    <div class="low-stock-name">Abaca Fiber (Raw)</div>
+                                    <div class="low-stock-meta">Fiber Crops · SKU: FBR-001</div>
+                                </div>
+                                <div class="low-stock-qty">180 kg</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
         <!-- ── Analytics + Activity ──────────────────────── -->
         <div class="row g-4 mb-4">
 
@@ -1244,20 +1519,11 @@
                     <ul class="activity-log">
                         <li class="activity-item">
                             <div class="activity-dot-wrap">
-                                <div class="activity-dot ad-green"><i class="bi bi-person-plus-fill"></i></div>
-                            </div>
-                            <div>
-                                <div class="activity-title">New seller registered</div>
-                                <div class="activity-meta">Ana Villanueva · Just now</div>
-                            </div>
-                        </li>
-                        <li class="activity-item">
-                            <div class="activity-dot-wrap">
                                 <div class="activity-dot ad-blue"><i class="bi bi-box-seam-fill"></i></div>
                             </div>
                             <div>
                                 <div class="activity-title">Product added</div>
-                                <div class="activity-meta">White Rice by Juan dela Cruz · 30 min ago</div>
+                                <div class="activity-meta">White Rice by Juan dela Cruz · Just now</div>
                             </div>
                         </li>
                         <li class="activity-item">
@@ -1271,20 +1537,20 @@
                         </li>
                         <li class="activity-item">
                             <div class="activity-dot-wrap">
-                                <div class="activity-dot ad-teal"><i class="bi bi-person-fill-add"></i></div>
-                            </div>
-                            <div>
-                                <div class="activity-title">New buyer account</div>
-                                <div class="activity-meta">Mark Lim registered · 2 hrs ago</div>
-                            </div>
-                        </li>
-                        <li class="activity-item">
-                            <div class="activity-dot-wrap">
                                 <div class="activity-dot ad-gold"><i class="bi bi-pencil-fill"></i></div>
                             </div>
                             <div>
                                 <div class="activity-title">Product listing updated</div>
-                                <div class="activity-meta">Yellow Corn by Maria Santos · 3 hrs ago</div>
+                                <div class="activity-meta">Yellow Corn by Maria Santos · 2 hrs ago</div>
+                            </div>
+                        </li>
+                        <li class="activity-item">
+                            <div class="activity-dot-wrap">
+                                <div class="activity-dot ad-teal"><i class="bi bi-cart-plus-fill"></i></div>
+                            </div>
+                            <div>
+                                <div class="activity-title">New order placed</div>
+                                <div class="activity-meta">Order #2048 · ₱1,040 · 3 hrs ago</div>
                             </div>
                         </li>
                         <li class="activity-item">
@@ -1294,6 +1560,15 @@
                             <div>
                                 <div class="activity-title">Low stock alert</div>
                                 <div class="activity-meta">Organic Vegetables — 12 left · 4 hrs ago</div>
+                            </div>
+                        </li>
+                        <li class="activity-item">
+                            <div class="activity-dot-wrap">
+                                <div class="activity-dot ad-blue"><i class="bi bi-box-seam-fill"></i></div>
+                            </div>
+                            <div>
+                                <div class="activity-title">Product status changed</div>
+                                <div class="activity-meta">Abaca Fiber set to Inactive · 5 hrs ago</div>
                             </div>
                         </li>
                     </ul>
