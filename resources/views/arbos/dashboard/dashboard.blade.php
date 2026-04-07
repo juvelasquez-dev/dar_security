@@ -924,7 +924,7 @@
             <div>
                 <h1 class="page-header-title">ARBO Marketplace Dashboard</h1>
                 <p class="page-header-sub">
-                    Manage your marketplace — products, sellers, buyers, and orders for
+                    Manage your marketplace — products and orders for
                     <strong>{{ optional(auth()->user())->arbo_name ?? 'your ARBO organization' }}</strong>.
                 </p>
             </div>
@@ -936,7 +936,7 @@
 
         <!-- ── Summary Stat Cards ─────────────────────────── -->
         <div class="row g-3 mb-4">
-            <div class="col-6 col-md-4 col-xl-3">
+            <div class="col-12 col-sm-6">
                 <div class="stat-card">
                     <div class="stat-icon-wrap stat-icon-blue">
                         <i class="bi bi-box-seam-fill"></i>
@@ -949,7 +949,7 @@
                 </div>
             </div>
 
-            <div class="col-6 col-md-4 col-xl-3">
+            <div class="col-12 col-sm-6">
                 <div class="stat-card">
                     <div class="stat-icon-wrap stat-icon-gold">
                         <i class="bi bi-cart-check-fill"></i>
@@ -970,7 +970,7 @@
                 Quick Actions
             </div>
             <div class="row g-3">
-                <div class="col-6 col-md-3">
+                <div class="col-12 col-sm-6 col-md-4">
                     <a href="{{ url('/arbo/products/create') }}" class="quick-action-card">
                         <div class="quick-action-icon qa-green"><i class="bi bi-plus-circle-fill"></i></div>
                         <div>
@@ -979,7 +979,7 @@
                         </div>
                     </a>
                 </div>
-                <div class="col-6 col-md-3">
+                <div class="col-12 col-sm-6 col-md-4">
                     <a href="{{ url('/arbo/products') }}" class="quick-action-card">
                         <div class="quick-action-icon qa-blue"><i class="bi bi-box-seam"></i></div>
                         <div>
@@ -989,7 +989,7 @@
                     </a>
                 </div>
                 
-                <div class="col-6 col-md-3">
+                <div class="col-12 col-sm-6 col-md-4">
                     <a href="{{ url('/arbo/orders') }}" class="quick-action-card">
                         <div class="quick-action-icon qa-gold"><i class="bi bi-cart-check-fill"></i></div>
                         <div>
