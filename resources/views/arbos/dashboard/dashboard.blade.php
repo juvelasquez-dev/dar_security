@@ -1120,12 +1120,12 @@
         <div class="row g-4 mb-4">
 
             <!-- Products Table -->
-            <div class="col-lg-8">
+            <div class="col-lg-8 d-flex flex-column">
                 <div class="section-title">
                     <div class="section-title-bar"></div>
                     Marketplace Products
                 </div>
-                <div class="table-card">
+                <div class="table-card flex-grow-1">
                     <div class="table-card-header">
                         <h6 class="table-card-title">
                             <i class="bi bi-box-seam"></i>
@@ -1235,12 +1235,12 @@
             </div>
 
             <!-- Recent Orders -->
-            <div class="col-lg-4">
+            <div class="col-lg-4 d-flex flex-column">
                 <div class="section-title">
                     <div class="section-title-bar"></div>
                     Recent Orders
                 </div>
-                <div class="table-card">
+                <div class="table-card flex-grow-1">
                     <div class="table-card-header">
                         <h6 class="table-card-title">
                             <i class="bi bi-cart-check"></i>
@@ -1306,26 +1306,24 @@
             </div>
         </div>
 
-        <!-- ── Top Selling + Order Status + Low Stock ───────── -->
-        <div class="row g-4 mb-4">
-
-            <!-- Top Selling Products -->
-            <div class="col-lg-8">
-                <div class="section-title">
-                    <div class="section-title-bar"></div>
-                    Top Selling Products
+        <!-- ── Top Selling Products (full width) ────────────── -->
+        <div class="mb-3">
+            <div class="section-title">
+                <div class="section-title-bar"></div>
+                Top Selling Products
+            </div>
+            <div class="table-card">
+                <div class="table-card-header">
+                    <h6 class="table-card-title">
+                        <i class="bi bi-trophy"></i>
+                        Best Performers
+                    </h6>
+                    <a href="{{ url('/arbo/products') }}" class="btn btn-sm" style="background: var(--green-100); color: var(--green-700); border:none; font-size:.78rem; border-radius:8px; font-weight:600;">
+                        View All <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
                 </div>
-                <div class="table-card">
-                    <div class="table-card-header">
-                        <h6 class="table-card-title">
-                            <i class="bi bi-trophy"></i>
-                            Best Performers
-                        </h6>
-                        <a href="{{ url('/arbo/products') }}" class="btn btn-sm" style="background: var(--green-100); color: var(--green-700); border:none; font-size:.78rem; border-radius:8px; font-weight:600;">
-                            View All <i class="bi bi-arrow-right ms-1"></i>
-                        </a>
-                    </div>
-                    <div>
+                <div class="row g-0">
+                    <div class="col-12 col-md-6 col-xl" style="border-right: 1px solid var(--gray-100);">
                         <div class="rank-item">
                             <div class="rank-num gold">1</div>
                             <div class="rank-product">
@@ -1334,6 +1332,8 @@
                             </div>
                             <div class="rank-units">500 pcs<small>sold</small></div>
                         </div>
+                    </div>
+                    <div class="col-12 col-md-6 col-xl" style="border-right: 1px solid var(--gray-100);">
                         <div class="rank-item">
                             <div class="rank-num gold">2</div>
                             <div class="rank-product">
@@ -1342,6 +1342,8 @@
                             </div>
                             <div class="rank-units">240 kg<small>sold</small></div>
                         </div>
+                    </div>
+                    <div class="col-12 col-md-6 col-xl" style="border-right: 1px solid var(--gray-100);">
                         <div class="rank-item">
                             <div class="rank-num">3</div>
                             <div class="rank-product">
@@ -1350,6 +1352,8 @@
                             </div>
                             <div class="rank-units">180 kg<small>sold</small></div>
                         </div>
+                    </div>
+                    <div class="col-12 col-md-6 col-xl" style="border-right: 1px solid var(--gray-100);">
                         <div class="rank-item">
                             <div class="rank-num">4</div>
                             <div class="rank-product">
@@ -1358,6 +1362,8 @@
                             </div>
                             <div class="rank-units">85 kg<small>sold</small></div>
                         </div>
+                    </div>
+                    <div class="col-12 col-md-6 col-xl">
                         <div class="rank-item">
                             <div class="rank-num">5</div>
                             <div class="rank-product">
@@ -1369,115 +1375,111 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Order Status Breakdown + Low Stock Alerts -->
-            <div class="col-lg-4 d-flex flex-column gap-4">
-
-                <!-- Order Status Breakdown -->
-                <div>
-                    <div class="section-title">
-                        <div class="section-title-bar"></div>
-                        Order Status Breakdown
-                    </div>
-                    <div class="table-card">
-                        <div class="table-card-header">
-                            <h6 class="table-card-title">
-                                <i class="bi bi-pie-chart"></i>
-                                Status Overview
-                            </h6>
-                        </div>
-                        <div>
-                            @php
-                                $pending    = $pendingOrdersCount    ?? 2;
-                                $processing = $processingOrdersCount ?? 1;
-                                $completed  = $completedOrdersCount  ?? 2;
-                                $total      = $pending + $processing + $completed ?: 1;
-                            @endphp
-                            <div class="status-breakdown-item sbd-pending">
-                                <span class="status-breakdown-label">
-                                    <span class="status-badge status-pending d-inline-flex me-1" style="padding:2px 8px;"><span class="status-dot"></span> Pending</span>
-                                </span>
-                                <div class="status-breakdown-bar">
-                                    <div class="status-breakdown-fill" style="width:{{ round(($pending/$total)*100) }}%"></div>
-                                </div>
-                                <span class="status-breakdown-count">{{ $pending }}</span>
-                            </div>
-                            <div class="status-breakdown-item sbd-processing">
-                                <span class="status-breakdown-label">
-                                    <span class="status-badge status-processing d-inline-flex me-1" style="padding:2px 8px;"><span class="status-dot"></span> Processing</span>
-                                </span>
-                                <div class="status-breakdown-bar">
-                                    <div class="status-breakdown-fill" style="width:{{ round(($processing/$total)*100) }}%"></div>
-                                </div>
-                                <span class="status-breakdown-count">{{ $processing }}</span>
-                            </div>
-                            <div class="status-breakdown-item sbd-completed">
-                                <span class="status-breakdown-label">
-                                    <span class="status-badge status-completed d-inline-flex me-1" style="padding:2px 8px;"><span class="status-dot"></span> Completed</span>
-                                </span>
-                                <div class="status-breakdown-bar">
-                                    <div class="status-breakdown-fill" style="width:{{ round(($completed/$total)*100) }}%"></div>
-                                </div>
-                                <span class="status-breakdown-count">{{ $completed }}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Low Stock Alerts -->
-                <div>
-                    <div class="section-title">
-                        <div class="section-title-bar"></div>
-                        Low Stock Alerts
-                    </div>
-                    <div class="table-card">
-                        <div class="table-card-header">
-                            <h6 class="table-card-title">
-                                <i class="bi bi-exclamation-triangle text-warning"></i>
-                                Needs Restocking
-                            </h6>
-                        </div>
-                        <div>
-                            <div class="low-stock-item">
-                                <div>
-                                    <div class="low-stock-name">Organic Vegetables Bundle</div>
-                                    <div class="low-stock-meta">Vegetables · SKU: VEG-001</div>
-                                </div>
-                                <div class="low-stock-qty">12 bundles</div>
-                            </div>
-                            <div class="low-stock-item">
-                                <div>
-                                    <div class="low-stock-name">Yellow Corn (Dried)</div>
-                                    <div class="low-stock-meta">Grains · SKU: GRN-002</div>
-                                </div>
-                                <div class="low-stock-qty">85 kg</div>
-                            </div>
-                            <div class="low-stock-item">
-                                <div>
-                                    <div class="low-stock-name">Abaca Fiber (Raw)</div>
-                                    <div class="low-stock-meta">Fiber Crops · SKU: FBR-001</div>
-                                </div>
-                                <div class="low-stock-qty">180 kg</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
         </div>
 
-        <!-- ── Analytics + Activity ──────────────────────── -->
+        <!-- ── Order Status Breakdown + Low Stock ─────────── -->
         <div class="row g-4 mb-4">
 
-            <!-- Charts -->
-            <div class="col-lg-8">
+            <!-- Order Status Breakdown -->
+            <div class="col-md-6 d-flex flex-column">
+                <div class="section-title">
+                    <div class="section-title-bar"></div>
+                    Order Status Breakdown
+                </div>
+                <div class="table-card flex-grow-1">
+                    <div class="table-card-header">
+                        <h6 class="table-card-title">
+                            <i class="bi bi-pie-chart"></i>
+                            Status Overview
+                        </h6>
+                    </div>
+                    <div>
+                        @php
+                            $pending    = $pendingOrdersCount    ?? 2;
+                            $processing = $processingOrdersCount ?? 1;
+                            $completed  = $completedOrdersCount  ?? 2;
+                            $total      = $pending + $processing + $completed ?: 1;
+                        @endphp
+                        <div class="status-breakdown-item sbd-pending">
+                            <span class="status-breakdown-label">
+                                <span class="status-badge status-pending d-inline-flex me-1" style="padding:2px 8px;"><span class="status-dot"></span> Pending</span>
+                            </span>
+                            <div class="status-breakdown-bar">
+                                <div class="status-breakdown-fill" style="width:{{ round(($pending/$total)*100) }}%"></div>
+                            </div>
+                            <span class="status-breakdown-count">{{ $pending }}</span>
+                        </div>
+                        <div class="status-breakdown-item sbd-processing">
+                            <span class="status-breakdown-label">
+                                <span class="status-badge status-processing d-inline-flex me-1" style="padding:2px 8px;"><span class="status-dot"></span> Processing</span>
+                            </span>
+                            <div class="status-breakdown-bar">
+                                <div class="status-breakdown-fill" style="width:{{ round(($processing/$total)*100) }}%"></div>
+                            </div>
+                            <span class="status-breakdown-count">{{ $processing }}</span>
+                        </div>
+                        <div class="status-breakdown-item sbd-completed">
+                            <span class="status-breakdown-label">
+                                <span class="status-badge status-completed d-inline-flex me-1" style="padding:2px 8px;"><span class="status-dot"></span> Completed</span>
+                            </span>
+                            <div class="status-breakdown-bar">
+                                <div class="status-breakdown-fill" style="width:{{ round(($completed/$total)*100) }}%"></div>
+                            </div>
+                            <span class="status-breakdown-count">{{ $completed }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Low Stock Alerts -->
+            <div class="col-md-6 d-flex flex-column">
+                <div class="section-title">
+                    <div class="section-title-bar"></div>
+                    Low Stock Alerts
+                </div>
+                <div class="table-card flex-grow-1">
+                    <div class="table-card-header">
+                        <h6 class="table-card-title">
+                            <i class="bi bi-exclamation-triangle text-warning"></i>
+                            Needs Restocking
+                        </h6>
+                    </div>
+                    <div>
+                        <div class="low-stock-item">
+                            <div>
+                                <div class="low-stock-name">Organic Vegetables Bundle</div>
+                                <div class="low-stock-meta">Vegetables · SKU: VEG-001</div>
+                            </div>
+                            <div class="low-stock-qty">12 bundles</div>
+                        </div>
+                        <div class="low-stock-item">
+                            <div>
+                                <div class="low-stock-name">Yellow Corn (Dried)</div>
+                                <div class="low-stock-meta">Grains · SKU: GRN-002</div>
+                            </div>
+                            <div class="low-stock-qty">85 kg</div>
+                        </div>
+                        <div class="low-stock-item">
+                            <div>
+                                <div class="low-stock-name">Abaca Fiber (Raw)</div>
+                                <div class="low-stock-meta">Fiber Crops · SKU: FBR-001</div>
+                            </div>
+                            <div class="low-stock-qty">180 kg</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ── Analytics Row 1: Activity Chart + Activity Log ── -->
+        <div class="row g-4 mb-4">
+            <div class="col-lg-8 d-flex flex-column">
                 <div class="section-title">
                     <div class="section-title-bar"></div>
                     Analytics Overview
                 </div>
-
-                <!-- Marketplace Activity Chart -->
-                <div class="chart-card mb-4">
+                <div class="chart-card flex-grow-1">
                     <div class="chart-card-header">
                         <span style="font-size:.88rem; font-weight:700;">Marketplace Activity</span>
                         <select class="form-select form-select-sm w-auto" style="font-size:.77rem;" id="activityTimeframe">
@@ -1487,35 +1489,17 @@
                             <option value="365">Last 12 months</option>
                         </select>
                     </div>
-                    <div class="p-4" style="height:260px; position:relative;">
+                    <div class="p-4" style="height:300px; position:relative;">
                         <canvas id="activityChart"></canvas>
                     </div>
                 </div>
-
-                <!-- Order Volume Chart -->
-                <div class="chart-card">
-                    <div class="chart-card-header">
-                        <span style="font-size:.88rem; font-weight:700;">Order Volume</span>
-                        <select class="form-select form-select-sm w-auto" style="font-size:.77rem;" id="orderTimeframe">
-                            <option value="7">Last 7 days</option>
-                            <option value="30" selected>Last 30 days</option>
-                            <option value="90">Last 90 days</option>
-                            <option value="365">Last 12 months</option>
-                        </select>
-                    </div>
-                    <div class="p-4" style="height:260px; position:relative;">
-                        <canvas id="orderChart"></canvas>
-                    </div>
-                </div>
             </div>
-
-            <!-- Activity Log -->
-            <div class="col-lg-4">
+            <div class="col-lg-4 d-flex flex-column">
                 <div class="section-title">
                     <div class="section-title-bar"></div>
                     Marketplace Activity Log
                 </div>
-                <div class="table-card mb-4">
+                <div class="table-card flex-grow-1">
                     <ul class="activity-log">
                         <li class="activity-item">
                             <div class="activity-dot-wrap">
@@ -1573,17 +1557,41 @@
                         </li>
                     </ul>
                 </div>
+            </div>
+        </div>
 
-                <!-- Composition Donut -->
+        <!-- ── Analytics Row 2: Order Volume + Composition ───── -->
+        <div class="row g-4 mb-4">
+            <div class="col-lg-8 d-flex flex-column">
+                <div class="section-title">
+                    <div class="section-title-bar"></div>
+                    Order Volume
+                </div>
+                <div class="chart-card flex-grow-1">
+                    <div class="chart-card-header">
+                        <span style="font-size:.88rem; font-weight:700;">Order Volume</span>
+                        <select class="form-select form-select-sm w-auto" style="font-size:.77rem;" id="orderTimeframe">
+                            <option value="7">Last 7 days</option>
+                            <option value="30" selected>Last 30 days</option>
+                            <option value="90">Last 90 days</option>
+                            <option value="365">Last 12 months</option>
+                        </select>
+                    </div>
+                    <div class="p-4" style="height:300px; position:relative;">
+                        <canvas id="orderChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 d-flex flex-column">
                 <div class="section-title">
                     <div class="section-title-bar"></div>
                     Marketplace Composition
                 </div>
-                <div class="chart-card">
+                <div class="chart-card flex-grow-1">
                     <div class="chart-card-header">
                         <span style="font-size:.84rem; font-weight:700;">Products vs Orders</span>
                     </div>
-                    <div class="p-4" style="height:220px; position:relative;">
+                    <div class="p-4" style="height:240px; position:relative;">
                         <canvas id="compositionChart"></canvas>
                     </div>
                     <div class="px-4 pb-3 d-flex flex-wrap gap-2 justify-content-center">
