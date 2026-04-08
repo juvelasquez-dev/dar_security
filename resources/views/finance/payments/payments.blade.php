@@ -180,82 +180,12 @@
         }
         .stat-card:hover { box-shadow: var(--shadow-md); transform: translateY(-3px); }
 
-        .stat-icon-wrap {
-            width: 50px; height: 50px; border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.3rem; flex-shrink: 0;
-        }
-        .stat-icon-green  { background: var(--green-100); color: var(--green-700); }
-        .stat-icon-gold   { background: var(--gold-light); color: var(--gold); }
-        .stat-icon-blue   { background: #e8f0fe; color: #1a73e8; }
-        .stat-icon-teal   { background: #e0f7f5; color: #0d8a7e; }
-        .stat-icon-red    { background: #fdecea; color: #c0392b; }
-        .stat-icon-indigo { background: #eef0ff; color: #4f46e5; }
-        .stat-icon-purple { background: #f3e8ff; color: #7c3aed; }
-
-        .stat-value { font-size: 1.75rem; font-weight: 700; color: var(--text-main); line-height: 1; margin-bottom: 3px; }
-        .stat-label { font-size: 0.8rem; font-weight: 500; color: var(--text-muted); margin: 0; }
-        .stat-trend { font-size: 0.73rem; font-weight: 600; display: inline-flex; align-items: center; gap: 3px; margin-top: 4px; }
-        .stat-trend.up   { color: var(--green-600); }
-        .stat-trend.down { color: #dc3545; }
-        .stat-trend.neutral { color: var(--gray-400); }
-
-        /* ─── Filter Bar ────────────────────────────────────── */
-        .filter-bar {
-            background: #fff; border-radius: var(--radius); border: 1px solid var(--gray-200);
-            box-shadow: var(--shadow-sm); padding: 1rem 1.25rem; margin-bottom: 1.25rem;
-            display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;
-        }
-        .filter-label { font-size: 0.75rem; font-weight: 700; color: var(--gray-600); letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap; }
-
-        .filter-select {
-            font-size: 0.82rem; border-radius: 8px; border: 1px solid var(--gray-200);
-            padding: 6px 10px; color: var(--text-main); background: var(--gray-50);
-            transition: border-color 0.18s;
-        }
-        .filter-select:focus { border-color: var(--green-500); outline: none; box-shadow: 0 0 0 3px rgba(31,128,60,0.1); }
-
-        .search-wrap { position: relative; flex: 1; min-width: 180px; max-width: 320px; }
-        .search-wrap i { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--gray-400); font-size: 0.85rem; }
-        .search-input {
-            width: 100%; padding: 7px 10px 7px 30px;
-            border: 1px solid var(--gray-200); border-radius: 8px;
-            font-size: 0.82rem; background: var(--gray-50); transition: border-color 0.18s;
-        }
-        .search-input:focus { border-color: var(--green-500); outline: none; box-shadow: 0 0 0 3px rgba(31,128,60,0.1); }
-        .search-input::placeholder { color: var(--gray-400); }
-
-        .btn-export {
-            background: var(--green-700); color: #fff; border: none; border-radius: 8px;
-            font-size: 0.82rem; font-weight: 600; padding: 7px 14px;
-            display: inline-flex; align-items: center; gap: 5px;
-            cursor: pointer; transition: background 0.18s; text-decoration: none;
-        }
-        .btn-export:hover { background: var(--green-800); color: #fff; }
-
-        /* ─── Tab Pills ─────────────────────────────────────── */
-        .tab-pill-wrap { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 1rem; }
-
-        .tab-pill {
-            padding: 6px 16px; border-radius: 20px; font-size: 0.78rem; font-weight: 600;
-            cursor: pointer; border: 1.5px solid var(--gray-200); background: #fff;
-            color: var(--gray-600); transition: all 0.18s; text-decoration: none;
-            display: inline-flex; align-items: center; gap: 5px;
-        }
-        .tab-pill:hover { border-color: var(--green-400); color: var(--green-700); }
-        .tab-pill.active { background: var(--green-700); border-color: var(--green-700); color: #fff; }
-        .tab-pill-count { background: rgba(255,255,255,0.25); border-radius: 10px; padding: 1px 6px; font-size: 0.7rem; font-weight: 700; }
-        .tab-pill:not(.active) .tab-pill-count { background: var(--gray-100); color: var(--gray-600); }
-
-        /* ─── Content Grid ──────────────────────────────────── */
-        .section-title {
-            font-size: 0.95rem; font-weight: 700; color: var(--text-main);
-            margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;
-        }
-        .section-title-bar { width: 4px; height: 18px; background: var(--green-600); border-radius: 3px; }
-        .section-title a { margin-left: auto; font-size: 0.78rem; font-weight: 600; color: var(--green-600); text-decoration: none; }
         .section-title a:hover { text-decoration: underline; }
 
+    @include('partials.idle-timer')
+
+</body>
+</html>
         /* ─── Table Card ────────────────────────────────────── */
         .table-card {
             background: #fff; border-radius: var(--radius);

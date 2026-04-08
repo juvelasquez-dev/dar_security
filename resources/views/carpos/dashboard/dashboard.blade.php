@@ -693,7 +693,7 @@
         .sidebar::-webkit-scrollbar-thumb { background: var(--gray-200); border-radius: 4px; }
     </style>
 </head>
-<body>
+    <body>
 
 @php
     $carposUser = auth()->user();
@@ -1148,172 +1148,11 @@
         </div>
 
     </main>
-<!-- Inactivity Modal -->
-<form id="inactivityLogoutForm" method="POST" action="{{ url('/logout') }}" style="display:none;">
-    @csrf
-</form>
-
-<div class="modal fade" id="inactivityWarningModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-body text-center p-4">
-                <h5 class="mb-2">You're about to be signed out</h5>
-                <p class="mb-3">
-                    For your security, you'll be logged out in 
-                    <strong id="idleCountdown">10</strong> seconds due to inactivity.
-                </p>
-                <button id="idleStayBtn" type="button" class="btn btn-success">
-                    Stay signed in
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Bootstrap JS (REQUIRED for modal) -->
+    <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- Idle Timer Script -->
-<script>
-document.addEventListener('DOMContentLoaded', function () {
+<!-- Idle Timer -->
+@include('partials.idle-timer')
 
-(function(){
-    const DEBUG_IDLE = true;
-    const INACTIVITY_MS = 15 * 60 * 1000; // test: 1 min
-    const WARNING_MS = 10 * 1000;
-
-    let lastActivity = Date.now();
-    let performedLogout = false;
-    let warningShown = false;
-    let countdownInterval = null;
-    let modalInstance = null;
-
-    function debug(...args){ if (DEBUG_IDLE) console.log('[idle]', ...args); }
-
-    function getCsrf(){
-        const form = document.getElementById('inactivityLogoutForm');
-        if (!form) return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
-        const tokenInput = form.querySelector('input[name="_token"]');
-        return tokenInput ? tokenInput.value : (document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '');
-    }
-
-    async function performLogout(){
-        if (performedLogout) return;
-        performedLogout = true;
-
-        debug('performLogout()', Date.now());
-
-        const token = getCsrf();
-        try {
-            await fetch('/logout', {
-                method: 'POST',
-                credentials: 'same-origin',
-                body: new URLSearchParams({ _token: token || '' })
-            });
-        } catch (e) {
-            debug('fetch logout failed', e);
-        }
-
-        setTimeout(()=>{ window.location = '/login'; }, 200);
-    }
-
-    function showWarning(){
-        if (warningShown || performedLogout) return;
-
-        const modalEl = document.getElementById('inactivityWarningModal');
-        const countEl = document.getElementById('idleCountdown');
-
-        if (!modalEl) {
-            debug('Modal not found!');
-            return;
-        }
-
-        warningShown = true;
-        debug('showWarning()');
-
-        if (!modalInstance) {
-            modalInstance = new bootstrap.Modal(modalEl, {
-                backdrop: 'static',
-                keyboard: false
-            });
-        }
-
-        modalInstance.show();
-
-        let seconds = Math.ceil(WARNING_MS / 1000);
-        if (countEl) countEl.textContent = seconds;
-
-        if (countdownInterval) clearInterval(countdownInterval);
-
-        countdownInterval = setInterval(()=>{
-            seconds -= 1;
-
-            if (countEl) countEl.textContent = Math.max(0, seconds);
-
-            debug('countdown', seconds);
-
-            if (seconds <= 0) {
-                clearInterval(countdownInterval);
-                countdownInterval = null;
-                performLogout();
-            }
-        }, 1000);
-    }
-
-    function hideWarning(){
-        if (!warningShown) return;
-
-        warningShown = false;
-        debug('hideWarning()');
-
-        if (countdownInterval) {
-            clearInterval(countdownInterval);
-            countdownInterval = null;
-        }
-
-        if (modalInstance) modalInstance.hide();
-
-        const countEl = document.getElementById('idleCountdown');
-        if (countEl) countEl.textContent = Math.ceil(WARNING_MS / 1000);
-    }
-
-    function markActivity(e){
-        if (e && e.isTrusted === false) return;
-        if (performedLogout) return;
-
-        // 🚫 ignore activity during warning
-        if (warningShown) {
-            debug('Ignored activity during warning');
-            return;
-        }
-
-        lastActivity = Date.now();
-        debug('markActivity', lastActivity);
-    }
-
-    ['click','mousemove','keydown','touchstart','scroll'].forEach(evt=>{
-        window.addEventListener(evt, markActivity, { passive: true });
-    });
-
-    // ✅ ONLY BUTTON WORKS
-    document.getElementById('idleStayBtn')?.addEventListener('click', function(){
-        debug('Stay button clicked');
-
-        lastActivity = Date.now();
-        hideWarning();
-    });
-
-    setInterval(()=>{
-        const idleMs = Date.now() - lastActivity;
-        const threshold = INACTIVITY_MS - WARNING_MS;
-
-        debug('periodic check', { idleMs, threshold });
-
-        if (!performedLogout && !warningShown && idleMs >= threshold) {
-            showWarning();
-        }
-    }, 1000);
-
-})();
-});
-</script>
+</body>
+</html>

@@ -1,21 +1,17 @@
-<?php
-// resources/views/finance/orders/index.php
-// Standalone PHP/HTML — no layout extension
-?>
 <!doctype html>
 <html lang="en" data-bs-theme="light">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Orders — Finance — E-Agraryo Merkado</title>
-    <link rel="icon" href="{{ asset('images/dar-logo.png') }}" type="image/png">
-    <link rel="apple-touch-icon" href="{{ asset('images/dar-logo.png') }}">
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <title>Finance — Orders</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <style>
-        /* ─── Design Tokens ─────────────────────────────────── */
+  <style>
+        /* ─── Design Tokens + Base (copied from dashboard) ───────────────────────── */
         :root {
             --green-900:  #0d3b1e;
             --green-800:  #145228;
@@ -38,11 +34,13 @@
             --text-muted: #64748b;
             --shadow-sm:  0 2px 8px rgba(13,59,30,0.06);
             --shadow-md:  0 6px 24px rgba(13,59,30,0.10);
+            --shadow-lg:  0 16px 48px rgba(13,59,30,0.13);
             --radius:     14px;
             --radius-sm:  9px;
             --sidebar-w:  260px;
         }
 
+        /* Base box-sizing and body from dashboard design */
         *, *::before, *::after { box-sizing: border-box; }
 
         body {
@@ -52,7 +50,7 @@
             min-height: 100vh;
         }
 
-        /* ─── Navbar ────────────────────────────────────────── */
+        /* ─── Navbar base from dashboard (ensures consistent look) */
         .top-navbar {
             background: var(--green-900);
             height: 62px;
@@ -65,31 +63,26 @@
             box-shadow: 0 2px 12px rgba(0,0,0,0.22);
         }
 
-        .navbar-brand-area {
-            display: flex;
-            align-items: center;
-            gap: 0.65rem;
-            text-decoration: none;
-            flex-shrink: 0;
-        }
+        .navbar-brand-area { display: flex; align-items: center; gap: 0.65rem; text-decoration: none; flex-shrink: 0; }
 
         .navbar-brand-area img { height: 38px; filter: brightness(1.15); }
 
-        .navbar-system-title {
-            font-family: 'DM Serif Display', serif;
-            font-size: 1.18rem;
-            color: #fff;
-            letter-spacing: 0.01em;
-            line-height: 1.15;
-        }
+        .navbar-system-title { font-family: 'DM Serif Display', serif; font-size: 1.18rem; color: #fff; letter-spacing: 0.01em; line-height: 1.15; }
 
-        .navbar-system-sub {
-            font-size: 0.68rem;
-            color: var(--green-200);
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-            font-weight: 500;
-        }
+        .navbar-system-sub { font-size: 0.68rem; color: var(--green-200); letter-spacing: 0.06em; text-transform: uppercase; font-weight: 500; }
+
+        .nav-icon-btn { background: none; border: none; color: rgba(255,255,255,0.75); font-size: 1.15rem; cursor: pointer; padding: 6px 8px; border-radius: 8px; position: relative; transition: color 0.18s, background 0.18s; }
+
+        .nav-icon-btn:hover { color: #fff; background: rgba(255,255,255,0.08); }
+
+        .user-pill { display: flex; align-items: center; gap: 0.5rem; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); border-radius: 30px; padding: 5px 12px 5px 6px; cursor: pointer; transition: background 0.18s; text-decoration: none; }
+
+        /* ─── Sidebar base */
+        .sidebar { position: fixed; top: 62px; left: 0; bottom: 0; width: var(--sidebar-w); background: #fff; border-right: 1px solid var(--gray-200); overflow-y: auto; z-index: 1030; display: flex; flex-direction: column; box-shadow: var(--shadow-sm); transition: transform 0.28s cubic-bezier(.4,0,.2,1); }
+
+        .sidebar-inner { padding: 1.5rem 1rem; flex: 1; display: flex; flex-direction: column; }
+
+        /* ─── Keep existing view-specific styles below (unchanged) */
 
         .navbar-page-badge {
             background: rgba(200,146,42,0.18);
@@ -120,92 +113,6 @@
         .nav-icon-btn {
             background: none; border: none;
             color: rgba(255,255,255,0.75);
-            font-size: 1.15rem; cursor: pointer;
-            padding: 6px 8px; border-radius: 8px;
-            position: relative;
-            transition: color 0.18s, background 0.18s;
-        }
-        .nav-icon-btn:hover { color: #fff; background: rgba(255,255,255,0.08); }
-
-        .nav-notif-dot {
-            position: absolute; top: 5px; right: 6px;
-            width: 8px; height: 8px;
-            background: var(--gold); border-radius: 50%;
-            border: 2px solid var(--green-900);
-        }
-
-        .user-pill {
-            display: flex; align-items: center; gap: 0.5rem;
-            background: rgba(255,255,255,0.08);
-            border: 1px solid rgba(255,255,255,0.12);
-            border-radius: 30px; padding: 5px 12px 5px 6px;
-            cursor: pointer; transition: background 0.18s; text-decoration: none;
-        }
-        .user-pill:hover { background: rgba(255,255,255,0.14); }
-
-        .user-avatar {
-            width: 30px; height: 30px; border-radius: 50%;
-            object-fit: cover; border: 1.5px solid rgba(255,255,255,0.25);
-        }
-
-        .user-pill-name { font-size: 0.82rem; font-weight: 500; color: #fff; }
-        .user-pill-role { font-size: 0.65rem; color: var(--green-200); }
-
-        /* ─── Sidebar ───────────────────────────────────────── */
-        .sidebar {
-            position: fixed;
-            top: 62px; left: 0; bottom: 0;
-            width: var(--sidebar-w);
-            background: #fff;
-            border-right: 1px solid var(--gray-200);
-            overflow-y: auto; z-index: 1030;
-            display: flex; flex-direction: column;
-            box-shadow: var(--shadow-sm);
-            transition: transform 0.28s cubic-bezier(.4,0,.2,1);
-        }
-
-        .sidebar-inner {
-            padding: 1.5rem 1rem;
-            flex: 1; display: flex; flex-direction: column;
-        }
-
-        .sidebar-section-label {
-            font-size: 0.65rem; font-weight: 700;
-            letter-spacing: 0.1em; text-transform: uppercase;
-            color: var(--gray-400); padding: 0 0.5rem;
-            margin: 1.4rem 0 0.5rem;
-        }
-        .sidebar-section-label:first-child { margin-top: 0; }
-
-        .sidebar-link {
-            display: flex; align-items: center; gap: 0.65rem;
-            padding: 0.56rem 0.75rem; border-radius: var(--radius-sm);
-            font-size: 0.875rem; font-weight: 500; color: var(--gray-600);
-            text-decoration: none; transition: all 0.18s;
-            margin-bottom: 2px; position: relative;
-        }
-        .sidebar-link i { font-size: 1rem; width: 20px; text-align: center; flex-shrink: 0; }
-        .sidebar-link:hover { background: var(--green-100); color: var(--green-700); }
-        .sidebar-link.active { background: var(--green-100); color: var(--green-700); font-weight: 600; }
-        .sidebar-link.active::before {
-            content: ''; position: absolute; left: -3px;
-            top: 20%; bottom: 20%; width: 4px;
-            background: var(--green-600); border-radius: 4px;
-        }
-
-        .sidebar-logout { margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--gray-200); }
-        .sidebar-logout .sidebar-link { color: #c0392b; }
-        .sidebar-logout .sidebar-link:hover { background: #fdf2f2; color: #c0392b; }
-
-        .sidebar-office-chip {
-            background: var(--green-50);
-            border: 1px solid var(--green-200);
-            border-radius: var(--radius-sm);
-            padding: 0.65rem 0.85rem; margin-bottom: 1rem;
-        }
-        .sidebar-office-chip .office-label {
-            font-size: 0.62rem; font-weight: 700;
-            letter-spacing: 0.1em; text-transform: uppercase; color: var(--green-600);
         }
         .sidebar-office-chip .office-name {
             font-size: 0.82rem; font-weight: 600; color: var(--green-900); margin-top: 1px;
@@ -503,7 +410,7 @@
         .sidebar::-webkit-scrollbar { width: 4px; }
         .sidebar::-webkit-scrollbar-track { background: transparent; }
         .sidebar::-webkit-scrollbar-thumb { background: var(--gray-200); border-radius: 4px; }
-    </style>
+  </style>
 </head>
 <body>
 
@@ -679,7 +586,7 @@
                 View and monitor all ARBO purchase orders across <strong>E-Agraryo Merkado</strong>.
             </p>
         </div>
-        <div class="d-flex align-items: center; gap-2">
+        <div class="d-flex align-items-center gap-2">
             <a href="{{ route('finance.reports.sales') }}" class="btn-export" style="background:var(--green-50);color:var(--green-700);border:1px solid var(--green-200);">
                 <i class="bi bi-bar-chart-line"></i> Sales Report
             </a>
@@ -1286,6 +1193,8 @@ document.addEventListener('DOMContentLoaded', function () {
     }, 1000);
 })();
 </script>
+
+@include('partials.idle-timer')
 
 </body>
 </html>

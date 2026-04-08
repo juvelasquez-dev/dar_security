@@ -1267,17 +1267,26 @@ document.addEventListener('DOMContentLoaded', function () {
     const sidebar = document.getElementById('mainSidebar');
     const overlay = document.getElementById('sidebarOverlay');
 
-    function openSidebar()  { sidebar.classList.add('show'); overlay.classList.add('show'); document.body.style.overflow = 'hidden'; }
-    function closeSidebar() { sidebar.classList.remove('show'); overlay.classList.remove('show'); document.body.style.overflow = ''; }
+    function openSidebar()  { 
+        sidebar.classList.add('show'); 
+        overlay.classList.add('show'); 
+        document.body.style.overflow = 'hidden'; 
+    }
+
+    function closeSidebar() { 
+        sidebar.classList.remove('show'); 
+        overlay.classList.remove('show'); 
+        document.body.style.overflow = ''; 
+    }
 
     if (toggle)  toggle.addEventListener('click', openSidebar);
     if (overlay) overlay.addEventListener('click', closeSidebar);
 
-    // ── Revenue Bar Chart ─────────────────────────────────
+    // ── Revenue Chart ─────────────────────────────────────
     const revCtx = document.getElementById('revenueChart');
     if (revCtx) {
-        const chartLabels = {!! json_encode(isset($chartLabels) ? $chartLabels : ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']) !!};
-        const chartData   = {!! json_encode(isset($chartData)   ? $chartData   : [42000,58000,37000,91000,76000,88000,103000,72000,115000,99000,134000,142000]) !!};
+        const chartLabels = {!! json_encode($chartLabels ?? ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']) !!};
+        const chartData   = {!! json_encode($chartData ?? [42000,58000,37000,91000,76000,88000,103000,72000,115000,99000,134000,142000]) !!};
 
         new Chart(revCtx.getContext('2d'), {
             type: 'bar',
@@ -1298,24 +1307,20 @@ document.addEventListener('DOMContentLoaded', function () {
                 plugins: {
                     legend: { display: false },
                     tooltip: {
-                        callbacks: { label: c => ' ₱' + Number(c.raw).toLocaleString('en-PH', { minimumFractionDigits: 2 }) },
-                        backgroundColor: '#0d3b1e', titleColor: '#f5d08a', bodyColor: '#fff',
-                        padding: 10, cornerRadius: 8,
+                        callbacks: {
+                            label: c => ' ₱' + Number(c.raw).toLocaleString('en-PH', { minimumFractionDigits: 2 })
+                        }
                     }
                 },
                 scales: {
-                    x: { grid: { display: false }, ticks: { font: { size: 11 }, color: '#94a3b8' } },
-                    y: {
-                        grid: { color: '#f1f3f5' },
-                        ticks: { font: { size: 11 }, color: '#94a3b8', callback: v => '₱' + (v >= 1000 ? (v/1000).toFixed(0)+'k' : v) },
-                        beginAtZero: true
-                    }
+                    x: { grid: { display: false } },
+                    y: { beginAtZero: true }
                 }
             }
         });
     }
 
-    // ── Payment Status Donut ──────────────────────────────
+    // ── Donut Chart ───────────────────────────────────────
     const donutCtx = document.getElementById('paymentDonut');
     if (donutCtx) {
         const paid      = parseInt('{{ $paidOrders ?? 0 }}') || 0;
@@ -1333,27 +1338,14 @@ document.addEventListener('DOMContentLoaded', function () {
                         'rgba(200,146,42,0.85)',
                         'rgba(192,57,43,0.85)',
                     ],
-                    borderColor: '#fff',
                     borderWidth: 3,
-                    hoverOffset: 6,
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 cutout: '68%',
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        callbacks: {
-                            label: function(ctx) {
-                                const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
-                                const pct   = total > 0 ? ((ctx.raw / total) * 100).toFixed(1) : 0;
-                                return ` ${ctx.label}: ${ctx.raw} (${pct}%)`;
-                            }
-                        }
-                    }
-                }
+                plugins: { legend: { display: false } }
             }
         });
     }
@@ -1361,140 +1353,8 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 
-<script>
-(function(){
-    const DEBUG_IDLE = true;
-    const INACTIVITY_MS = 15 * 60 * 1000; // 15 minutes
-    const WARNING_MS = 10 * 1000; // 10 seconds
+{{-- ✅ IDLE TIMER (CLEAN — NO DUPLICATES) --}}
+@include('partials.idle-timer')
 
-    let lastActivity = Date.now();
-    let performedLogout = false;
-    let warningShown = false;
-    let countdownInterval = null;
-    let modalInstance = null;
-
-    function debug(...args){ if (DEBUG_IDLE) console.log('[idle]', ...args); }
-
-    function getCsrf(){
-        const form = document.getElementById('inactivityLogoutForm');
-        if (!form) return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
-        const tokenInput = form.querySelector('input[name="_token"]');
-        return tokenInput ? tokenInput.value : (document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '');
-    }
-
-    async function performLogout(){
-        if (performedLogout) return;
-        performedLogout = true;
-
-        debug('performLogout()', Date.now());
-
-        const token = getCsrf();
-        try {
-            await fetch('{{ route('logout') }}', {
-                method: 'POST',
-                credentials: 'same-origin',
-                body: new URLSearchParams({ _token: token || '' })
-            });
-        } catch (e) {
-            debug('fetch logout failed', e);
-        }
-
-        setTimeout(()=>{ window.location = '/login'; }, 200);
-    }
-
-    function showWarning(){
-        if (warningShown || performedLogout) return;
-
-        warningShown = true;
-        debug('showWarning()');
-
-        const modalEl = document.getElementById('inactivityWarningModal');
-        const countEl = document.getElementById('idleCountdown');
-
-        if (!modalEl) return;
-
-        if (!modalInstance) {
-            modalInstance = new bootstrap.Modal(modalEl, {
-                backdrop: 'static',
-                keyboard: false
-            });
-        }
-
-        modalInstance.show();
-
-        let seconds = Math.ceil(WARNING_MS / 1000);
-        if (countEl) countEl.textContent = seconds;
-
-        countdownInterval = setInterval(()=>{
-            seconds -= 1;
-
-            if (countEl) countEl.textContent = Math.max(0, seconds);
-
-            debug('countdown', seconds);
-
-            if (seconds <= 0) {
-                clearInterval(countdownInterval);
-                countdownInterval = null;
-                performLogout();
-            }
-        }, 1000);
-    }
-
-    function hideWarning(){
-        if (!warningShown) return;
-
-        warningShown = false;
-        debug('hideWarning()');
-
-        if (countdownInterval) {
-            clearInterval(countdownInterval);
-            countdownInterval = null;
-        }
-
-        const modalEl = document.getElementById('inactivityWarningModal');
-        if (modalInstance) modalInstance.hide();
-
-        const countEl = document.getElementById('idleCountdown');
-        if (countEl) countEl.textContent = Math.ceil(WARNING_MS / 1000);
-    }
-
-    function markActivity(e){
-        if (e && e.isTrusted === false) return;
-        if (performedLogout) return;
-
-        // 🚫 FIX: Ignore ALL activity when modal is shown
-        if (warningShown) {
-            debug('Ignored activity during warning');
-            return;
-        }
-
-        lastActivity = Date.now();
-        debug('markActivity', lastActivity);
-    }
-
-    // global activity listeners
-    ['click','mousemove','keydown','touchstart','scroll'].forEach(evt=>{
-        window.addEventListener(evt, markActivity, { passive: true });
-    });
-
-    // ✅ ONLY button can cancel logout
-    document.getElementById('idleStayBtn')?.addEventListener('click', function(){
-        debug('Stay button clicked');
-
-        lastActivity = Date.now();
-        hideWarning();
-    });
-
-    setInterval(()=>{
-        const idleMs = Date.now() - lastActivity;
-        const threshold = INACTIVITY_MS - WARNING_MS;
-
-        debug('periodic check', { idleMs, threshold });
-
-        if (idleMs >= threshold && !warningShown && !performedLogout) {
-            showWarning();
-        }
-    }, 1000);
-
-})();
-</script>
+</body>
+</html>

@@ -50,85 +50,12 @@
         body {
             font-family: 'DM Sans', system-ui, sans-serif;
             background: var(--gray-100);
-            color: var(--text-main);
-            min-height: 100vh;
-        }
-
-        /* ─── Navbar ────────────────────────────────────────── */
-        .top-navbar {
-            background: var(--green-900);
-            height: 62px;
-            display: flex; align-items: center; padding: 0 1.5rem;
-            position: fixed; top: 0; left: 0; right: 0;
-            z-index: 1040; box-shadow: 0 2px 12px rgba(0,0,0,0.22);
-        }
-
-        .navbar-brand-area {
-            display: flex; align-items: center; gap: 0.65rem;
-            text-decoration: none; flex-shrink: 0;
-        }
-        .navbar-brand-area img { height: 38px; filter: brightness(1.15); }
-
-        .navbar-system-title {
-            font-family: 'DM Serif Display', serif; font-size: 1.18rem;
-            color: #fff; letter-spacing: 0.01em; line-height: 1.15;
-        }
-        .navbar-system-sub {
-            font-size: 0.68rem; color: var(--green-200);
-            letter-spacing: 0.06em; text-transform: uppercase; font-weight: 500;
-        }
-
-        .navbar-page-badge {
-            background: rgba(200,146,42,0.18); border: 1px solid rgba(200,146,42,0.35);
-            color: var(--gold-mid); font-size: 0.72rem; font-weight: 600;
-            letter-spacing: 0.05em; text-transform: uppercase;
-            padding: 3px 10px; border-radius: 20px; margin-left: 1rem;
-        }
-
-        .navbar-divider { width: 1px; height: 28px; background: rgba(255,255,255,0.12); margin: 0 1.25rem; }
-
-        .navbar-right { margin-left: auto; display: flex; align-items: center; gap: 0.75rem; }
-
-        .nav-icon-btn {
-            background: none; border: none; color: rgba(255,255,255,0.75);
-            font-size: 1.15rem; cursor: pointer; padding: 6px 8px; border-radius: 8px;
-            position: relative; transition: color 0.18s, background 0.18s;
-        }
-        .nav-icon-btn:hover { color: #fff; background: rgba(255,255,255,0.08); }
-
-        .nav-notif-dot {
-            position: absolute; top: 5px; right: 6px; width: 8px; height: 8px;
-            background: var(--gold); border-radius: 50%; border: 2px solid var(--green-900);
-        }
-
-        .user-pill {
-            display: flex; align-items: center; gap: 0.5rem;
-            background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12);
-            border-radius: 30px; padding: 5px 12px 5px 6px;
-            cursor: pointer; transition: background 0.18s; text-decoration: none;
-        }
-        .user-pill:hover { background: rgba(255,255,255,0.14); }
-
-        .user-avatar { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 1.5px solid rgba(255,255,255,0.25); }
-        .user-pill-name { font-size: 0.82rem; font-weight: 500; color: #fff; }
-        .user-pill-role { font-size: 0.65rem; color: var(--green-200); }
-
-        /* ─── Sidebar ───────────────────────────────────────── */
-        .sidebar {
-            position: fixed; top: 62px; left: 0; bottom: 0;
-            width: var(--sidebar-w); background: #fff;
-            border-right: 1px solid var(--gray-200); overflow-y: auto;
-            z-index: 1030; display: flex; flex-direction: column;
-            box-shadow: var(--shadow-sm); transition: transform 0.28s cubic-bezier(.4,0,.2,1);
-        }
-        .sidebar-inner { padding: 1.5rem 1rem; flex: 1; display: flex; flex-direction: column; }
-
-        .sidebar-section-label {
-            font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em;
-            text-transform: uppercase; color: var(--gray-400); padding: 0 0.5rem;
-            margin: 1.4rem 0 0.5rem;
         }
         .sidebar-section-label:first-child { margin-top: 0; }
+                @include('partials.idle-timer')
+
+            </body>
+            </html>
 
         .sidebar-link {
             display: flex; align-items: center; gap: 0.65rem;
