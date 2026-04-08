@@ -1764,83 +1764,135 @@
         </div>
 
         <script>
-        (function(){
-            const DEBUG_IDLE = true;
-            const INACTIVITY_MS = 15 * 60 * 1000; // 15 minutes
-            const WARNING_MS = 10 * 1000; // 10 seconds
+(function(){
+    const DEBUG_IDLE = true;
+    const INACTIVITY_MS = 15 * 60 * 1000; // (change if needed)
+    const WARNING_MS = 10 * 1000;
 
-            let lastActivity = Date.now();
-            let performedLogout = false;
-            let warningShown = false;
-            let countdownInterval = null;
-            let modalInstance = null;
+    let lastActivity = Date.now();
+    let performedLogout = false;
+    let warningShown = false;
+    let countdownInterval = null;
+    let modalInstance = null;
 
-            function debug(...args){ if (DEBUG_IDLE) console.log('[idle]', ...args); }
+    function debug(...args){ if (DEBUG_IDLE) console.log('[idle]', ...args); }
 
-            function getCsrf(){
-                const form = document.getElementById('inactivityLogoutForm');
-                if (!form) return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
-                const tokenInput = form.querySelector('input[name="_token"]');
-                return tokenInput ? tokenInput.value : (document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '');
-            }
+    function getCsrf(){
+        const form = document.getElementById('inactivityLogoutForm');
+        if (!form) return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+        const tokenInput = form.querySelector('input[name="_token"]');
+        return tokenInput ? tokenInput.value : (document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '');
+    }
 
-            async function performLogout(){
-                if (performedLogout) return; performedLogout = true;
-                debug('performLogout()', Date.now());
-                const token = getCsrf();
-                try {
-                    await fetch('{{ url('/logout') }}', { method: 'POST', credentials: 'same-origin', body: new URLSearchParams({ _token: token || '' }) });
-                } catch (e) { debug('fetch logout failed', e); }
-                setTimeout(()=>{ window.location = '/login'; }, 200);
-            }
+    async function performLogout(){
+        if (performedLogout) return;
+        performedLogout = true;
+        debug('performLogout()', Date.now());
 
-            function showWarning(){
-                if (warningShown || performedLogout) return; warningShown = true;
-                debug('showWarning()');
-                lastActivity += WARNING_MS; // bump slightly to avoid immediate re-trigger
-                const modalEl = document.getElementById('inactivityWarningModal');
-                const countEl = document.getElementById('idleCountdown');
-                if (!modalInstance) modalInstance = new bootstrap.Modal(modalEl, { backdrop: 'static', keyboard: false });
-                modalInstance.show();
-                let seconds = Math.ceil(WARNING_MS/1000);
-                if (countEl) countEl.textContent = seconds;
-                countdownInterval = setInterval(()=>{
-                    seconds -= 1;
-                    if (countEl) countEl.textContent = Math.max(0, seconds);
-                    debug('countdown', seconds);
-                    if (seconds <= 0) { clearInterval(countdownInterval); countdownInterval = null; performLogout(); }
-                }, 1000);
-            }
-
-            function hideWarning(){
-                if (!warningShown) return; warningShown = false;
-                debug('hideWarning()');
-                if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
-                const modalEl = document.getElementById('inactivityWarningModal');
-                if (modalInstance) modalInstance.hide();
-                const countEl = document.getElementById('idleCountdown'); if (countEl) countEl.textContent = Math.ceil(WARNING_MS/1000);
-            }
-
-            function markActivity(e){
-                if (e && e.isTrusted === false) return; // ignore synthetic
-                if (performedLogout) return;
-                lastActivity = Date.now();
-                debug('markActivity', lastActivity);
-                if (warningShown) hideWarning();
-            }
-
-            ['click','mousemove','keydown','touchstart','scroll'].forEach(evt=>{
-                window.addEventListener(evt, markActivity, { passive: true });
+        const token = getCsrf();
+        try {
+            await fetch('/logout', {
+                method: 'POST',
+                credentials: 'same-origin',
+                body: new URLSearchParams({ _token: token || '' })
             });
+        } catch (e) {
+            debug('fetch logout failed', e);
+        }
 
-            document.getElementById('idleStayBtn')?.addEventListener('click', function(){ markActivity(); });
+        setTimeout(()=>{ window.location = '/login'; }, 200);
+    }
 
-            setInterval(()=>{
-                const idleMs = Date.now() - lastActivity;
-                const threshold = INACTIVITY_MS - WARNING_MS;
-                debug('periodic check', { idleMs, threshold });
-                if (idleMs >= threshold && !warningShown && !performedLogout) showWarning();
-            }, 1000);
+    function showWarning(){
+        if (warningShown || performedLogout) return;
+        warningShown = true;
 
-        })();
-        </script>
+        debug('showWarning()');
+
+        const modalEl = document.getElementById('inactivityWarningModal');
+        const countEl = document.getElementById('idleCountdown');
+
+        if (!modalEl) return;
+
+        if (!modalInstance) {
+            modalInstance = new bootstrap.Modal(modalEl, {
+                backdrop: 'static',
+                keyboard: false
+            });
+        }
+
+        modalInstance.show();
+
+        let seconds = Math.ceil(WARNING_MS / 1000);
+        if (countEl) countEl.textContent = seconds;
+
+        countdownInterval = setInterval(()=>{
+            seconds -= 1;
+            if (countEl) countEl.textContent = Math.max(0, seconds);
+
+            debug('countdown', seconds);
+
+            if (seconds <= 0) {
+                clearInterval(countdownInterval);
+                countdownInterval = null;
+                performLogout();
+            }
+        }, 1000);
+    }
+
+    function hideWarning(){
+        if (!warningShown) return;
+        warningShown = false;
+
+        debug('hideWarning()');
+
+        if (countdownInterval) {
+            clearInterval(countdownInterval);
+            countdownInterval = null;
+        }
+
+        const modalEl = document.getElementById('inactivityWarningModal');
+        if (modalInstance) modalInstance.hide();
+
+        const countEl = document.getElementById('idleCountdown');
+        if (countEl) countEl.textContent = Math.ceil(WARNING_MS / 1000);
+    }
+
+    function markActivity(e){
+        if (e && e.isTrusted === false) return;
+        if (performedLogout) return;
+
+        // 🚫 IMPORTANT FIX: Ignore activity when warning is shown
+        if (warningShown) {
+            debug('Ignored activity during warning');
+            return;
+        }
+
+        lastActivity = Date.now();
+        debug('markActivity', lastActivity);
+    }
+
+    ['click','mousemove','keydown','touchstart','scroll'].forEach(evt=>{
+        window.addEventListener(evt, markActivity, { passive: true });
+    });
+
+    // ✅ ONLY THIS BUTTON resets session
+    document.getElementById('idleStayBtn')?.addEventListener('click', function(){
+        debug('Stay button clicked');
+        lastActivity = Date.now();
+        hideWarning();
+    });
+
+    setInterval(()=>{
+        const idleMs = Date.now() - lastActivity;
+        const threshold = INACTIVITY_MS - WARNING_MS;
+
+        debug('periodic check', { idleMs, threshold });
+
+        if (idleMs >= threshold && !warningShown && !performedLogout) {
+            showWarning();
+        }
+    }, 1000);
+
+})();
+</script>

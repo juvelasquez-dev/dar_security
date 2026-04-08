@@ -1148,195 +1148,172 @@
         </div>
 
     </main>
+<!-- Inactivity Modal -->
+<form id="inactivityLogoutForm" method="POST" action="{{ url('/logout') }}" style="display:none;">
+    @csrf
+</form>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+<div class="modal fade" id="inactivityWarningModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body text-center p-4">
+                <h5 class="mb-2">You're about to be signed out</h5>
+                <p class="mb-3">
+                    For your security, you'll be logged out in 
+                    <strong id="idleCountdown">10</strong> seconds due to inactivity.
+                </p>
+                <button id="idleStayBtn" type="button" class="btn btn-success">
+                    Stay signed in
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
-    <script>
-    document.addEventListener('DOMContentLoaded', function () {
+<!-- Bootstrap JS (REQUIRED for modal) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-        // ── Current Date ──────────────────────────────────────
-        const dateEl = document.getElementById('currentDate');
-        if (dateEl) {
-            const now = new Date();
-            dateEl.textContent = now.toLocaleDateString('en-PH', {
-                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+<!-- Idle Timer Script -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+(function(){
+    const DEBUG_IDLE = true;
+    const INACTIVITY_MS = 15 * 60 * 1000; // test: 1 min
+    const WARNING_MS = 10 * 1000;
+
+    let lastActivity = Date.now();
+    let performedLogout = false;
+    let warningShown = false;
+    let countdownInterval = null;
+    let modalInstance = null;
+
+    function debug(...args){ if (DEBUG_IDLE) console.log('[idle]', ...args); }
+
+    function getCsrf(){
+        const form = document.getElementById('inactivityLogoutForm');
+        if (!form) return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+        const tokenInput = form.querySelector('input[name="_token"]');
+        return tokenInput ? tokenInput.value : (document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '');
+    }
+
+    async function performLogout(){
+        if (performedLogout) return;
+        performedLogout = true;
+
+        debug('performLogout()', Date.now());
+
+        const token = getCsrf();
+        try {
+            await fetch('/logout', {
+                method: 'POST',
+                credentials: 'same-origin',
+                body: new URLSearchParams({ _token: token || '' })
+            });
+        } catch (e) {
+            debug('fetch logout failed', e);
+        }
+
+        setTimeout(()=>{ window.location = '/login'; }, 200);
+    }
+
+    function showWarning(){
+        if (warningShown || performedLogout) return;
+
+        const modalEl = document.getElementById('inactivityWarningModal');
+        const countEl = document.getElementById('idleCountdown');
+
+        if (!modalEl) {
+            debug('Modal not found!');
+            return;
+        }
+
+        warningShown = true;
+        debug('showWarning()');
+
+        if (!modalInstance) {
+            modalInstance = new bootstrap.Modal(modalEl, {
+                backdrop: 'static',
+                keyboard: false
             });
         }
 
-        // ── Mobile Sidebar Toggle ─────────────────────────────
-        const toggle    = document.getElementById('sidebarToggle');
-        const sidebar   = document.getElementById('mainSidebar');
-        const overlay   = document.getElementById('sidebarOverlay');
+        modalInstance.show();
 
-        function openSidebar() {
-            sidebar.classList.add('show');
-            overlay.classList.add('show');
-            document.body.style.overflow = 'hidden';
+        let seconds = Math.ceil(WARNING_MS / 1000);
+        if (countEl) countEl.textContent = seconds;
+
+        if (countdownInterval) clearInterval(countdownInterval);
+
+        countdownInterval = setInterval(()=>{
+            seconds -= 1;
+
+            if (countEl) countEl.textContent = Math.max(0, seconds);
+
+            debug('countdown', seconds);
+
+            if (seconds <= 0) {
+                clearInterval(countdownInterval);
+                countdownInterval = null;
+                performLogout();
+            }
+        }, 1000);
+    }
+
+    function hideWarning(){
+        if (!warningShown) return;
+
+        warningShown = false;
+        debug('hideWarning()');
+
+        if (countdownInterval) {
+            clearInterval(countdownInterval);
+            countdownInterval = null;
         }
 
-        function closeSidebar() {
-            sidebar.classList.remove('show');
-            overlay.classList.remove('show');
-            document.body.style.overflow = '';
+        if (modalInstance) modalInstance.hide();
+
+        const countEl = document.getElementById('idleCountdown');
+        if (countEl) countEl.textContent = Math.ceil(WARNING_MS / 1000);
+    }
+
+    function markActivity(e){
+        if (e && e.isTrusted === false) return;
+        if (performedLogout) return;
+
+        // 🚫 ignore activity during warning
+        if (warningShown) {
+            debug('Ignored activity during warning');
+            return;
         }
 
-        if (toggle) toggle.addEventListener('click', openSidebar);
-        if (overlay) overlay.addEventListener('click', closeSidebar);
+        lastActivity = Date.now();
+        debug('markActivity', lastActivity);
+    }
 
-        // ── Donut Chart ───────────────────────────────────────
-        const compCanvas = document.getElementById('compositionChart');
-        if (compCanvas) {
-            const totalArbos      = parseInt('{{ $totalArbos ?? 8 }}')      || 8;
-            const totalArboAdmins = parseInt('{{ $totalArboAdmins ?? 5 }}') || 5;
-            const totalSellers    = parseInt('{{ $totalSellers ?? 24 }}')   || 24;
-            const totalBuyers     = parseInt('{{ $totalBuyers ?? 61 }}')    || 61;
-
-            new Chart(compCanvas.getContext('2d'), {
-                type: 'doughnut',
-                data: {
-                    labels: ['ARBOs', 'ARBO Admins', 'Sellers', 'Buyers'],
-                    datasets: [{
-                        data: [totalArbos, totalArboAdmins, totalSellers, totalBuyers],
-                        backgroundColor: [
-                            'rgba(31, 128, 60, 0.85)',
-                            'rgba(200, 146, 42, 0.85)',
-                            'rgba(26, 115, 232, 0.85)',
-                            'rgba(13, 138, 126, 0.85)',
-                        ],
-                        borderColor: '#fff',
-                        borderWidth: 3,
-                        hoverOffset: 6,
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '68%',
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            callbacks: {
-                                label: function(ctx) {
-                                    const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
-                                    const pct   = ((ctx.raw / total) * 100).toFixed(1);
-                                    return ` ${ctx.label}: ${ctx.raw} (${pct}%)`;
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
+    ['click','mousemove','keydown','touchstart','scroll'].forEach(evt=>{
+        window.addEventListener(evt, markActivity, { passive: true });
     });
-    </script>
+
+    // ✅ ONLY BUTTON WORKS
+    document.getElementById('idleStayBtn')?.addEventListener('click', function(){
+        debug('Stay button clicked');
+
+        lastActivity = Date.now();
+        hideWarning();
+    });
+
+    setInterval(()=>{
+        const idleMs = Date.now() - lastActivity;
+        const threshold = INACTIVITY_MS - WARNING_MS;
+
+        debug('periodic check', { idleMs, threshold });
+
+        if (!performedLogout && !warningShown && idleMs >= threshold) {
+            showWarning();
+        }
+    }, 1000);
+
+})();
+});
 </script>
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        @if(session('swal'))
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const _swal = @json(session('swal'));
-                if (typeof Swal !== 'undefined' && _swal) Swal.fire(_swal);
-            });
-        </script>
-        @endif
-</body>
-</html>
-
-                <!-- Inactivity Warning Modal + Logout Script -->
-                <form id="inactivityLogoutForm" method="POST" action="{{ url('/logout') }}" style="display:none;">@csrf</form>
-
-                <div class="modal fade" id="inactivityWarningModal" tabindex="-1" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content">
-                            <div class="modal-body text-center p-4">
-                                <h5 class="mb-2">You're about to be signed out</h5>
-                                <p class="mb-3">For your security, you'll be logged out in <strong id="idleCountdown">10</strong> seconds due to inactivity.</p>
-                                <button id="idleStayBtn" type="button" class="btn btn-success">Stay signed in</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <script>
-                (function(){
-                    const DEBUG_IDLE = true;
-                    const INACTIVITY_MS = 15 * 60 * 1000; // 15 minutes
-                    const WARNING_MS = 10 * 1000; // 10 seconds
-
-                    let lastActivity = Date.now();
-                    let performedLogout = false;
-                    let warningShown = false;
-                    let countdownInterval = null;
-                    let modalInstance = null;
-
-                    function debug(...args){ if (DEBUG_IDLE) console.log('[idle]', ...args); }
-
-                    function getCsrf(){
-                        const form = document.getElementById('inactivityLogoutForm');
-                        if (!form) return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
-                        const tokenInput = form.querySelector('input[name="_token"]');
-                        return tokenInput ? tokenInput.value : (document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '');
-                    }
-
-                    async function performLogout(){
-                        if (performedLogout) return; performedLogout = true;
-                        debug('performLogout()', Date.now());
-                        const token = getCsrf();
-                        try {
-                            await fetch('{{ url('/logout') }}', { method: 'POST', credentials: 'same-origin', body: new URLSearchParams({ _token: token || '' }) });
-                        } catch (e) { debug('fetch logout failed', e); }
-                        setTimeout(()=>{ window.location = '/login'; }, 200);
-                    }
-
-                    function showWarning(){
-                        if (warningShown || performedLogout) return; warningShown = true;
-                        debug('showWarning()');
-                        lastActivity += WARNING_MS; // bump slightly to avoid immediate re-trigger
-                        const modalEl = document.getElementById('inactivityWarningModal');
-                        const countEl = document.getElementById('idleCountdown');
-                        if (!modalInstance) modalInstance = new bootstrap.Modal(modalEl, { backdrop: 'static', keyboard: false });
-                        modalInstance.show();
-                        let seconds = Math.ceil(WARNING_MS/1000);
-                        if (countEl) countEl.textContent = seconds;
-                        countdownInterval = setInterval(()=>{
-                            seconds -= 1;
-                            if (countEl) countEl.textContent = Math.max(0, seconds);
-                            debug('countdown', seconds);
-                            if (seconds <= 0) { clearInterval(countdownInterval); countdownInterval = null; performLogout(); }
-                        }, 1000);
-                    }
-
-                    function hideWarning(){
-                        if (!warningShown) return; warningShown = false;
-                        debug('hideWarning()');
-                        if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
-                        const modalEl = document.getElementById('inactivityWarningModal');
-                        if (modalInstance) modalInstance.hide();
-                        const countEl = document.getElementById('idleCountdown'); if (countEl) countEl.textContent = Math.ceil(WARNING_MS/1000);
-                    }
-
-                    function markActivity(e){
-                        if (e && e.isTrusted === false) return; // ignore synthetic
-                        if (performedLogout) return;
-                        lastActivity = Date.now();
-                        debug('markActivity', lastActivity);
-                        if (warningShown) hideWarning();
-                    }
-
-                    ['click','mousemove','keydown','touchstart','scroll'].forEach(evt=>{
-                        window.addEventListener(evt, markActivity, { passive: true });
-                    });
-
-                    document.getElementById('idleStayBtn')?.addEventListener('click', function(){ markActivity(); });
-
-                    setInterval(()=>{
-                        const idleMs = Date.now() - lastActivity;
-                        const threshold = INACTIVITY_MS - WARNING_MS;
-                        debug('periodic check', { idleMs, threshold });
-                        if (idleMs >= threshold && !warningShown && !performedLogout) showWarning();
-                    }, 1000);
-
-                })();
-                </script>
