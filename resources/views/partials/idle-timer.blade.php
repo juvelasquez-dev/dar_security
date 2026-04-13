@@ -24,9 +24,10 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function(){
-    const INACTIVITY_MS = 15 * 60 * 1000; // 15 minutes
+    const INACTIVITY_MS = 60 * 60 * 1000; // 1 hour
     const WARNING_MS = 10 * 1000; // 10 seconds warning
     const DEBUG = true;
+    
 
     let lastActivity = Date.now();
     let warningShown = false;
