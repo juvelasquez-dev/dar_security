@@ -322,6 +322,10 @@
     </style>
 </head>
 <body>
+@php
+    $userFullName = trim((optional(auth()->user())->first_name ?? '') . ' ' . (optional(auth()->user())->last_name ?? ''));
+    if ($userFullName === '') { $userFullName = null; }
+@endphp
 
 <!-- ── Top Navbar ──────────────────────────────────────── -->
 <header class="top-navbar">
@@ -387,19 +391,18 @@
         <!-- User Dropdown -->
         <div class="dropdown">
             <a class="user-pill dropdown-toggle" href="#" data-bs-toggle="dropdown">
-                <img class="user-avatar"
-                     src="{{ optional(auth()->user())->avatar
-                            ?: 'https://ui-avatars.com/api/?name=' . urlencode(optional(auth()->user())->name ?? 'Finance Admin') . '&background=1a6932&color=fff&rounded=true&size=64' }}"
-                     alt="User avatar">
+                                    <img class="user-avatar"
+                                        src="{{ optional(auth()->user())->avatar ? asset('storage/' . optional(auth()->user())->avatar) : 'https://ui-avatars.com/api/?name=' . urlencode($userFullName ?? 'Finance Admin') . '&background=1a6932&color=fff&rounded=true&size=64' }}"
+                                        alt="User avatar">
                 <div class="d-none d-md-block" style="line-height:1.2;">
-                    <div class="user-pill-name">{{ optional(auth()->user())->name ?? 'Finance Admin' }}</div>
+                    <div class="user-pill-name">{{ $userFullName ?? 'Finance Admin' }}</div>
                     <div class="user-pill-role">Admin / Finance</div>
                 </div>
             </a>
             <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0"
                 style="border-radius:12px; margin-top:8px; min-width:200px;">
                 <li class="px-3 py-2 border-bottom">
-                    <div class="fw-bold" style="font-size:.83rem;">{{ optional(auth()->user())->name ?? 'Finance Admin' }}</div>
+                    <div class="fw-bold" style="font-size:.83rem;">{{ $userFullName ?? 'Finance Admin' }}</div>
                     <div class="text-muted" style="font-size:.72rem;">{{ optional(auth()->user())->email ?? '' }}</div>
                 </li>
                 <li>
