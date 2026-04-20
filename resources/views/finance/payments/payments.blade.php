@@ -1,12 +1,9 @@
-<?php
-// resources/views/finance/payments/index.php
-// Standalone PHP/HTML — no layout extension
-?>
 <!doctype html>
 <html lang="en" data-bs-theme="light">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Payments — Finance — E-Agraryo Merkado</title>
     <link rel="icon" href="{{ asset('images/dar-logo.png') }}" type="image/png">
     <link rel="apple-touch-icon" href="{{ asset('images/dar-logo.png') }}">
@@ -39,11 +36,13 @@
             --text-muted: #64748b;
             --shadow-sm:  0 2px 8px rgba(13,59,30,0.06);
             --shadow-md:  0 6px 24px rgba(13,59,30,0.10);
+            --shadow-lg:  0 16px 48px rgba(13,59,30,0.13);
             --radius:     14px;
             --radius-sm:  9px;
             --sidebar-w:  260px;
         }
 
+        /* ─── Base ──────────────────────────────────────────── */
         *, *::before, *::after { box-sizing: border-box; }
 
         body {
@@ -57,58 +56,82 @@
         .top-navbar {
             background: var(--green-900);
             height: 62px;
-            display: flex; align-items: center; padding: 0 1.5rem;
-            position: fixed; top: 0; left: 0; right: 0;
-            z-index: 1040; box-shadow: 0 2px 12px rgba(0,0,0,0.22);
+            display: flex;
+            align-items: center;
+            padding: 0 1.5rem;
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 1040;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.22);
         }
 
         .navbar-brand-area {
             display: flex; align-items: center; gap: 0.65rem;
             text-decoration: none; flex-shrink: 0;
         }
+
         .navbar-brand-area img { height: 38px; filter: brightness(1.15); }
 
         .navbar-system-title {
-            font-family: 'DM Serif Display', serif; font-size: 1.18rem;
-            color: #fff; letter-spacing: 0.01em; line-height: 1.15;
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.18rem; color: #fff;
+            letter-spacing: 0.01em; line-height: 1.15;
         }
+
         .navbar-system-sub {
             font-size: 0.68rem; color: var(--green-200);
             letter-spacing: 0.06em; text-transform: uppercase; font-weight: 500;
         }
 
         .navbar-page-badge {
-            background: rgba(200,146,42,0.18); border: 1px solid rgba(200,146,42,0.35);
+            background: rgba(200,146,42,0.18);
+            border: 1px solid rgba(200,146,42,0.35);
             color: var(--gold-mid); font-size: 0.72rem; font-weight: 600;
             letter-spacing: 0.05em; text-transform: uppercase;
             padding: 3px 10px; border-radius: 20px; margin-left: 1rem;
         }
 
-        .navbar-divider { width: 1px; height: 28px; background: rgba(255,255,255,0.12); margin: 0 1.25rem; }
+        .navbar-divider {
+            width: 1px; height: 28px;
+            background: rgba(255,255,255,0.12);
+            margin: 0 1.25rem;
+        }
 
-        .navbar-right { margin-left: auto; display: flex; align-items: center; gap: 0.75rem; }
+        .navbar-right {
+            margin-left: auto; display: flex;
+            align-items: center; gap: 0.75rem;
+        }
 
         .nav-icon-btn {
-            background: none; border: none; color: rgba(255,255,255,0.75);
-            font-size: 1.15rem; cursor: pointer; padding: 6px 8px; border-radius: 8px;
+            background: none; border: none;
+            color: rgba(255,255,255,0.75); font-size: 1.15rem;
+            cursor: pointer; padding: 6px 8px; border-radius: 8px;
             position: relative; transition: color 0.18s, background 0.18s;
         }
+
         .nav-icon-btn:hover { color: #fff; background: rgba(255,255,255,0.08); }
 
         .nav-notif-dot {
-            position: absolute; top: 5px; right: 6px; width: 8px; height: 8px;
-            background: var(--gold); border-radius: 50%; border: 2px solid var(--green-900);
+            position: absolute; top: 5px; right: 6px;
+            width: 8px; height: 8px; background: var(--gold);
+            border-radius: 50%; border: 2px solid var(--green-900);
         }
 
         .user-pill {
             display: flex; align-items: center; gap: 0.5rem;
-            background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
             border-radius: 30px; padding: 5px 12px 5px 6px;
             cursor: pointer; transition: background 0.18s; text-decoration: none;
         }
+
         .user-pill:hover { background: rgba(255,255,255,0.14); }
 
-        .user-avatar { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 1.5px solid rgba(255,255,255,0.25); }
+        .user-avatar {
+            width: 30px; height: 30px; border-radius: 50%;
+            object-fit: cover; border: 1.5px solid rgba(255,255,255,0.25);
+        }
+
         .user-pill-name { font-size: 0.82rem; font-weight: 500; color: #fff; }
         .user-pill-role { font-size: 0.65rem; color: var(--green-200); }
 
@@ -116,106 +139,290 @@
         .sidebar {
             position: fixed; top: 62px; left: 0; bottom: 0;
             width: var(--sidebar-w); background: #fff;
-            border-right: 1px solid var(--gray-200); overflow-y: auto;
-            z-index: 1030; display: flex; flex-direction: column;
-            box-shadow: var(--shadow-sm); transition: transform 0.28s cubic-bezier(.4,0,.2,1);
+            border-right: 1px solid var(--gray-200);
+            overflow-y: auto; z-index: 1030;
+            display: flex; flex-direction: column;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.28s cubic-bezier(.4,0,.2,1);
         }
-        .sidebar-inner { padding: 1.5rem 1rem; flex: 1; display: flex; flex-direction: column; }
+
+        .sidebar-inner {
+            padding: 1.5rem 1rem; flex: 1;
+            display: flex; flex-direction: column;
+        }
 
         .sidebar-section-label {
-            font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em;
-            text-transform: uppercase; color: var(--gray-400); padding: 0 0.5rem;
+            font-size: 0.65rem; font-weight: 700;
+            letter-spacing: 0.1em; text-transform: uppercase;
+            color: var(--gray-400); padding: 0 0.5rem;
             margin: 1.4rem 0 0.5rem;
         }
+
         .sidebar-section-label:first-child { margin-top: 0; }
 
         .sidebar-link {
             display: flex; align-items: center; gap: 0.65rem;
             padding: 0.56rem 0.75rem; border-radius: var(--radius-sm);
             font-size: 0.875rem; font-weight: 500; color: var(--gray-600);
-            text-decoration: none; transition: all 0.18s; margin-bottom: 2px; position: relative;
-        }
-        .sidebar-link i { font-size: 1rem; width: 20px; text-align: center; flex-shrink: 0; }
-        .sidebar-link:hover { background: var(--green-100); color: var(--green-700); }
-        .sidebar-link.active { background: var(--green-100); color: var(--green-700); font-weight: 600; }
-        .sidebar-link.active::before {
-            content: ''; position: absolute; left: -3px; top: 20%; bottom: 20%;
-            width: 4px; background: var(--green-600); border-radius: 4px;
+            text-decoration: none; transition: all 0.18s;
+            margin-bottom: 2px; position: relative;
         }
 
-        .sidebar-logout { margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--gray-200); }
-        .sidebar-logout .sidebar-link { color: #c0392b; }
-        .sidebar-logout .sidebar-link:hover { background: #fdf2f2; color: #c0392b; }
+        .sidebar-link i { font-size: 1rem; width: 20px; text-align: center; flex-shrink: 0; }
+        .sidebar-link:hover { background: var(--green-100); color: var(--green-700); }
+
+        .sidebar-link.active {
+            background: var(--green-100); color: var(--green-700); font-weight: 600;
+        }
+
+        .sidebar-link.active::before {
+            content: ''; position: absolute; left: -3px;
+            top: 20%; bottom: 20%; width: 4px;
+            background: var(--green-600); border-radius: 4px;
+        }
 
         .sidebar-office-chip {
             background: var(--green-50); border: 1px solid var(--green-200);
             border-radius: var(--radius-sm); padding: 0.65rem 0.85rem; margin-bottom: 1rem;
         }
-        .sidebar-office-chip .office-label { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--green-600); }
-        .sidebar-office-chip .office-name { font-size: 0.82rem; font-weight: 600; color: var(--green-900); margin-top: 1px; }
 
-        /* ─── Page Wrapper ──────────────────────────────────── */
+        .sidebar-office-chip .office-label {
+            font-size: 0.62rem; font-weight: 700;
+            letter-spacing: 0.1em; text-transform: uppercase; color: var(--green-600);
+        }
+
+        .sidebar-office-chip .office-name {
+            font-size: 0.82rem; font-weight: 600; color: var(--green-900); margin-top: 1px;
+        }
+
+        .sidebar-logout {
+            margin-top: auto; padding-top: 1rem;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        .sidebar-logout .sidebar-link { color: #c0392b; }
+        .sidebar-logout .sidebar-link:hover { background: #fdf2f2; color: #c0392b; }
+
+        /* ─── Main Content ──────────────────────────────────── */
         .page-wrapper {
             margin-left: var(--sidebar-w); margin-top: 62px;
-            min-height: calc(100vh - 62px); padding: 2rem 2rem 3rem;
+            min-height: calc(100vh - 62px);
+            padding: 2rem 2rem 3rem;
         }
 
         /* ─── Page Header ───────────────────────────────────── */
         .page-header {
-            display: flex; align-items: flex-start; justify-content: space-between;
-            margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;
+            display: flex; align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 1.75rem; flex-wrap: wrap; gap: 1rem;
         }
+
         .page-header-title {
-            font-family: 'DM Serif Display', serif; font-size: 1.6rem;
-            color: var(--green-900); margin: 0 0 2px; line-height: 1.2;
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.6rem; color: var(--green-900);
+            margin: 0 0 2px; line-height: 1.2;
+            display: flex; align-items: center;
         }
+
         .page-header-sub { font-size: 0.85rem; color: var(--text-muted); margin: 0; }
+
+        /* ─── Export / Action Buttons ───────────────────────── */
+        .btn-export {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 0.45rem 1rem; border-radius: var(--radius-sm);
+            font-size: 0.8rem; font-weight: 600; font-family: inherit;
+            background: var(--green-700); color: #fff;
+            border: 1px solid var(--green-700); text-decoration: none;
+            cursor: pointer; transition: background 0.15s, transform 0.12s;
+            white-space: nowrap;
+        }
+
+        .btn-export:hover { background: var(--green-800); color: #fff; transform: translateY(-1px); }
 
         /* ─── Stat Cards ────────────────────────────────────── */
         .stat-card {
-            background: #fff; border-radius: var(--radius); box-shadow: var(--shadow-sm);
-            padding: 1.2rem 1.4rem; display: flex; align-items: center; gap: 1rem;
+            background: #fff; border-radius: var(--radius);
+            box-shadow: var(--shadow-sm); padding: 1.25rem 1.4rem;
+            display: flex; align-items: center; gap: 1rem;
             transition: box-shadow 0.22s, transform 0.22s;
             border: 1px solid var(--gray-200); height: 100%;
         }
+
         .stat-card:hover { box-shadow: var(--shadow-md); transform: translateY(-3px); }
 
-        .section-title a:hover { text-decoration: underline; }
+        .stat-icon-wrap {
+            width: 48px; height: 48px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.25rem; flex-shrink: 0;
+        }
 
-    @include('partials.idle-timer')
+        .stat-icon-green  { background: var(--green-100); color: var(--green-700); }
+        .stat-icon-gold   { background: var(--gold-light); color: var(--gold); }
+        .stat-icon-blue   { background: #e8f0fe; color: #1a73e8; }
+        .stat-icon-teal   { background: #e0f7f5; color: #0d8a7e; }
+        .stat-icon-red    { background: #fdecea; color: #c0392b; }
+        .stat-icon-purple { background: #f3e8ff; color: #7c3aed; }
 
-</body>
-</html>
+        .stat-value {
+            font-size: 1.9rem; font-weight: 700;
+            color: var(--text-main); line-height: 1; margin-bottom: 3px;
+        }
+
+        .stat-label { font-size: 0.8rem; font-weight: 500; color: var(--text-muted); margin: 0; }
+
+        .stat-trend {
+            font-size: 0.73rem; font-weight: 600;
+            display: inline-flex; align-items: center; gap: 3px; margin-top: 4px;
+        }
+
+        .stat-trend.up      { color: var(--green-600); }
+        .stat-trend.down    { color: #dc3545; }
+        .stat-trend.neutral { color: var(--gray-600); }
+
+        /* ─── Section Title ─────────────────────────────────── */
+        .section-title {
+            font-size: 0.95rem; font-weight: 700; color: var(--text-main);
+            margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;
+        }
+
+        .section-title-bar {
+            width: 4px; height: 18px;
+            background: var(--green-600); border-radius: 3px;
+        }
+
+        /* ─── Tab Pills ─────────────────────────────────────── */
+        .tab-pill-wrap {
+            display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1rem;
+        }
+
+        .tab-pill {
+            display: inline-flex; align-items: center; gap: 0.35rem;
+            padding: 0.42rem 0.9rem; border-radius: 30px;
+            font-size: 0.8rem; font-weight: 600; color: var(--gray-600);
+            background: #fff; border: 1px solid var(--gray-200);
+            text-decoration: none; transition: all 0.16s; box-shadow: var(--shadow-sm);
+        }
+
+        .tab-pill:hover { background: var(--green-50); color: var(--green-700); border-color: var(--green-200); }
+
+        .tab-pill.active { background: var(--green-700); color: #fff; border-color: var(--green-700); }
+
+        .tab-pill-count {
+            background: rgba(255,255,255,0.25); border-radius: 20px;
+            padding: 1px 7px; font-size: 0.7rem; font-weight: 700;
+        }
+
+        .tab-pill:not(.active) .tab-pill-count { background: var(--gray-100); color: var(--gray-600); }
+
+        /* ─── Filter Bar ────────────────────────────────────── */
+        .filter-bar {
+            display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem;
+            background: #fff; border: 1px solid var(--gray-200);
+            border-radius: var(--radius); padding: 0.7rem 1rem;
+            margin-bottom: 1.25rem; box-shadow: var(--shadow-sm);
+        }
+
+        .filter-label {
+            font-size: 0.75rem; font-weight: 700; color: var(--gray-600);
+            text-transform: uppercase; letter-spacing: 0.06em;
+            margin-right: 0.25rem; white-space: nowrap;
+        }
+
+        .filter-select {
+            font-size: 0.78rem; font-weight: 500; color: var(--text-main);
+            background: var(--gray-50); border: 1px solid var(--gray-200);
+            border-radius: var(--radius-sm); padding: 0.38rem 0.75rem;
+            appearance: auto; cursor: pointer;
+            transition: border-color 0.15s, background 0.15s; font-family: inherit;
+        }
+
+        .filter-select:focus { outline: none; border-color: var(--green-500); background: #fff; }
+        .filter-select:hover { border-color: var(--green-400); }
+
+        .search-wrap { position: relative; flex: 1; min-width: 180px; }
+
+        .search-wrap i {
+            position: absolute; left: 0.65rem; top: 50%;
+            transform: translateY(-50%); color: var(--gray-400);
+            font-size: 0.85rem; pointer-events: none;
+        }
+
+        .search-input {
+            width: 100%; font-size: 0.8rem; font-family: inherit;
+            color: var(--text-main); background: var(--gray-50);
+            border: 1px solid var(--gray-200); border-radius: var(--radius-sm);
+            padding: 0.38rem 0.75rem 0.38rem 2rem;
+            transition: border-color 0.15s, background 0.15s;
+        }
+
+        .search-input:focus {
+            outline: none; border-color: var(--green-500);
+            background: #fff; box-shadow: 0 0 0 3px rgba(31,128,60,0.08);
+        }
+
+        .search-input::placeholder { color: var(--gray-400); }
+
+        /* ─── Chart Card ────────────────────────────────────── */
+        .chart-card {
+            background: #fff; border-radius: var(--radius);
+            box-shadow: var(--shadow-sm); border: 1px solid var(--gray-200); overflow: hidden;
+        }
+
+        .chart-card-header {
+            padding: 1rem 1.5rem 0.9rem; border-bottom: 1px solid var(--gray-200);
+            display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: 0.5rem;
+        }
+
         /* ─── Table Card ────────────────────────────────────── */
         .table-card {
             background: #fff; border-radius: var(--radius);
             box-shadow: var(--shadow-sm); border: 1px solid var(--gray-200); overflow: hidden;
         }
+
         .table-card-header {
             padding: 1rem 1.5rem 0.9rem; border-bottom: 1px solid var(--gray-200);
-            display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;
+            display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: 0.5rem;
         }
-        .table-card-title { font-size: 0.9rem; font-weight: 700; color: var(--text-main); margin: 0; display: flex; align-items: center; gap: 0.45rem; }
+
+        .table-card-title {
+            font-size: 0.9rem; font-weight: 700; color: var(--text-main);
+            margin: 0; display: flex; align-items: center; gap: 0.45rem;
+        }
+
         .table-card-title i { color: var(--green-600); }
 
         .table-responsive { overflow-x: auto; }
 
         .fin-table { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
+
         .fin-table thead th {
-            background: var(--green-50); color: var(--green-800); font-weight: 700;
-            font-size: 0.72rem; letter-spacing: 0.05em; text-transform: uppercase;
-            padding: 0.7rem 1.1rem; border-bottom: 1px solid var(--green-200); white-space: nowrap;
+            background: var(--green-50); color: var(--green-800);
+            font-weight: 700; font-size: 0.72rem; letter-spacing: 0.05em;
+            text-transform: uppercase; padding: 0.7rem 1.1rem;
+            border-bottom: 1px solid var(--green-200); white-space: nowrap;
         }
+
         .fin-table tbody tr { border-bottom: 1px solid var(--gray-100); transition: background 0.14s; }
         .fin-table tbody tr:last-child { border-bottom: none; }
         .fin-table tbody tr:hover { background: var(--gray-50); }
+        .fin-table tbody tr.payment-row { cursor: pointer; }
+
         .fin-table td { padding: 0.78rem 1.1rem; vertical-align: middle; color: var(--text-main); }
 
         .payment-ref {
-            font-family: 'Courier New', monospace; font-weight: 700;
-            font-size: 0.82rem; color: var(--green-700);
+            font-family: 'Courier New', monospace;
+            font-weight: 700; font-size: 0.82rem; color: var(--green-700);
         }
-        .order-ref { font-family: 'Courier New', monospace; font-size: 0.78rem; color: var(--text-muted); }
+
+        .order-ref {
+            font-family: 'Courier New', monospace;
+            font-size: 0.78rem; color: var(--text-muted); text-decoration: none;
+        }
+
+        .order-ref:hover { color: var(--green-700); text-decoration: underline; }
+
         .name-cell { font-weight: 600; color: var(--green-800); }
         .name-cell small { display: block; font-weight: 400; font-size: 0.72rem; color: var(--text-muted); margin-top: 1px; }
         .amount-cell { font-weight: 700; color: var(--green-800); font-size: 0.88rem; }
@@ -223,146 +430,185 @@
         /* ─── Status Badges ─────────────────────────────────── */
         .status-badge {
             display: inline-flex; align-items: center; gap: 5px;
-            padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600;
+            padding: 3px 10px; border-radius: 20px;
+            font-size: 0.71rem; font-weight: 600; white-space: nowrap;
         }
+
         .status-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; background: currentColor; }
 
-        .status-paid       { background: var(--green-100); color: var(--green-700); }
-        .status-pending    { background: var(--gold-light); color: var(--gold); }
-        .status-cancelled  { background: #fdecea; color: #c0392b; }
-        .status-processing { background: #e0f7f5; color: #0d8a7e; }
-        .status-completed  { background: #e8f0fe; color: #1a73e8; }
-        .status-partial    { background: #f3e8ff; color: #7c3aed; }
-        .status-refunded   { background: #fff3cd; color: #856404; }
-        .status-overdue    { background: #fdecea; color: #c0392b; }
-        .status-verified   { background: var(--green-100); color: var(--green-700); }
-        .status-rejected   { background: #fdecea; color: #c0392b; }
+        .status-paid         { background: var(--green-100); color: var(--green-700); }
+        .status-pending      { background: var(--gold-light); color: var(--gold); }
+        .status-cancelled    { background: #fdecea; color: #c0392b; }
+        .status-processing   { background: #e0f7f5; color: #0d8a7e; }
+        .status-completed    { background: #e8f0fe; color: #1a73e8; }
+        .status-partial      { background: #f3e8ff; color: #7c3aed; }
+        .status-refunded     { background: #fff3cd; color: #856404; }
+        .status-overdue      { background: #fdecea; color: #c0392b; }
+        .status-verified     { background: var(--green-100); color: var(--green-700); }
+        .status-rejected     { background: #fdecea; color: #c0392b; }
         .status-forverification { background: #e8f0fe; color: #1a73e8; }
 
         /* ─── Method Badge ──────────────────────────────────── */
         .method-badge {
             display: inline-flex; align-items: center; gap: 4px;
-            padding: 2px 9px; border-radius: 6px; font-size: 0.72rem; font-weight: 600;
+            padding: 3px 9px; border-radius: 6px; font-size: 0.72rem; font-weight: 600;
             background: var(--gray-100); color: var(--gray-600);
         }
 
         /* ─── Proof Thumbnail ───────────────────────────────── */
         .proof-thumb {
             width: 34px; height: 34px; border-radius: 6px;
-            object-fit: cover; border: 1px solid var(--gray-200); cursor: pointer;
-            transition: transform 0.15s; display: block;
+            object-fit: cover; border: 1px solid var(--gray-200);
+            cursor: pointer; transition: transform 0.15s; display: block;
         }
-        .proof-thumb:hover { transform: scale(1.1); }
+
+        .proof-thumb:hover { transform: scale(1.12); box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
 
         .no-proof { font-size: 0.72rem; color: var(--gray-400); font-style: italic; }
 
-        /* ─── Verify / Reject Action Buttons ────────────────── */
+        /* ─── Action Buttons ────────────────────────────────── */
         .btn-verify {
             background: var(--green-100); color: var(--green-700); border: none;
-            font-size: 0.75rem; border-radius: 7px; font-weight: 600;
-            padding: 4px 11px; display: inline-flex; align-items: center; gap: 4px;
-            cursor: pointer; transition: background 0.15s;
+            font-size: 0.74rem; border-radius: 7px; font-weight: 600;
+            padding: 4px 10px; display: inline-flex; align-items: center; gap: 4px;
+            cursor: pointer; transition: background 0.15s; font-family: inherit;
         }
+
         .btn-verify:hover { background: #d0ebd8; color: var(--green-900); }
 
         .btn-reject {
             background: #fdecea; color: #c0392b; border: none;
-            font-size: 0.75rem; border-radius: 7px; font-weight: 600;
-            padding: 4px 11px; display: inline-flex; align-items: center; gap: 4px;
-            cursor: pointer; transition: background 0.15s;
+            font-size: 0.74rem; border-radius: 7px; font-weight: 600;
+            padding: 4px 10px; display: inline-flex; align-items: center; gap: 4px;
+            cursor: pointer; transition: background 0.15s; font-family: inherit;
         }
+
         .btn-reject:hover { background: #fbd8d4; }
 
         .btn-card-action {
             background: var(--green-100); color: var(--green-700); border: none;
-            font-size: 0.78rem; border-radius: 8px; font-weight: 600; padding: 5px 12px;
+            font-size: 0.74rem; border-radius: 8px; font-weight: 600; padding: 5px 11px;
             text-decoration: none; display: inline-flex; align-items: center; gap: 4px;
-            transition: background 0.15s; white-space: nowrap; cursor: pointer;
+            transition: background 0.15s; white-space: nowrap; cursor: pointer; font-family: inherit;
         }
+
         .btn-card-action:hover { background: #d0ebd8; color: var(--green-900); }
 
-        /* ─── Overdue highlight ─────────────────────────────── */
+        /* ─── Overdue Row ───────────────────────────────────── */
         .row-overdue { background: #fff8f8 !important; }
         .row-overdue:hover { background: #fdf0f0 !important; }
 
         /* ─── Pagination ────────────────────────────────────── */
         .pagination-wrap {
             padding: 12px 20px; border-top: 1px solid var(--gray-100);
-            display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;
+            display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: 0.5rem;
         }
+
         .pagination-info { font-size: 0.78rem; color: var(--text-muted); }
 
         /* ─── Empty State ───────────────────────────────────── */
         .empty-state { text-align: center; padding: 3.5rem 1rem; color: var(--gray-400); }
-        .empty-state i { font-size: 2.5rem; display: block; margin-bottom: 0.75rem; }
+        .empty-state i { font-size: 2.5rem; display: block; margin-bottom: 0.75rem; opacity: 0.5; }
         .empty-state p { font-size: 0.85rem; margin: 0; }
 
-        /* ─── Chart Card ────────────────────────────────────── */
-        .chart-card {
-            background: #fff; border-radius: var(--radius);
-            box-shadow: var(--shadow-sm); border: 1px solid var(--gray-200); overflow: hidden;
-        }
-        .chart-card-header {
-            padding: 1rem 1.5rem 0.9rem; border-bottom: 1px solid var(--gray-200);
-            display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;
-        }
-
         /* ─── Payment Detail Offcanvas ──────────────────────── */
-        .offcanvas { width: 540px !important; }
-        .offcanvas-header { background: var(--green-900); color: #fff; padding: 1.1rem 1.5rem; }
-        .offcanvas-header .btn-close { filter: invert(1) brightness(2); }
+        #paymentDetailOffcanvas { width: 520px !important; }
 
-        .detail-section { border-bottom: 1px solid var(--gray-200); padding: 1.1rem 1.5rem; }
+        .offcanvas-header {
+            background: var(--green-900); padding: 1.2rem 1.5rem;
+        }
+
+        .offcanvas-header .btn-close { filter: invert(1) brightness(2); opacity: 0.75; }
+        .offcanvas-header .btn-close:hover { opacity: 1; }
+
+        .detail-ref {
+            font-family: 'Courier New', monospace;
+            font-size: 1.05rem; font-weight: 700; color: var(--gold-mid); letter-spacing: 0.04em;
+        }
+
+        .detail-section { border-bottom: 1px solid var(--gray-100); padding: 1.1rem 1.5rem; }
         .detail-section:last-child { border-bottom: none; }
-        .detail-section-title { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--gray-400); margin-bottom: 0.75rem; }
-        .detail-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; font-size: 0.83rem; margin-bottom: 0.5rem; }
+
+        .detail-section-title {
+            font-size: 0.68rem; font-weight: 700;
+            letter-spacing: 0.1em; text-transform: uppercase;
+            color: var(--gray-400); margin-bottom: 0.8rem;
+        }
+
+        .detail-row {
+            display: flex; justify-content: space-between;
+            align-items: flex-start; gap: 1rem;
+            font-size: 0.83rem; margin-bottom: 0.55rem;
+        }
+
         .detail-row:last-child { margin-bottom: 0; }
         .detail-key { color: var(--text-muted); flex-shrink: 0; font-weight: 500; }
         .detail-val { color: var(--text-main); font-weight: 600; text-align: right; }
 
-        .detail-ref {
-            font-family: 'Courier New', monospace; font-size: 1rem;
-            font-weight: 700; color: var(--green-700);
-        }
-
+        /* ─── Proof in Offcanvas ────────────────────────────── */
         .proof-preview {
             width: 100%; border-radius: 10px; object-fit: cover;
             border: 1px solid var(--gray-200); max-height: 260px; cursor: zoom-in;
+            transition: opacity 0.15s;
         }
+
+        .proof-preview:hover { opacity: 0.92; }
 
         .proof-placeholder {
-            background: var(--gray-100); border-radius: 10px; border: 1px dashed var(--gray-400);
-            height: 120px; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            color: var(--gray-400); font-size: 0.82rem; gap: 0.4rem;
+            background: var(--gray-100); border-radius: 10px;
+            border: 1px dashed var(--gray-400); height: 110px;
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center; color: var(--gray-400);
+            font-size: 0.82rem; gap: 0.4rem;
         }
+
         .proof-placeholder i { font-size: 1.8rem; }
 
-        /* ─── Verify Modal ──────────────────────────────────── */
+        /* ─── Modals ────────────────────────────────────────── */
         .modal-header-green { background: var(--green-900); color: #fff; }
         .modal-header-red   { background: #c0392b; color: #fff; }
         .modal-header-green .btn-close,
         .modal-header-red   .btn-close { filter: invert(1) brightness(2); }
 
-        /* ─── Mobile ────────────────────────────────────────── */
-        .mobile-sidebar-toggle { display: none; background: none; border: none; color: #fff; font-size: 1.3rem; margin-right: 0.75rem; cursor: pointer; }
+        /* ─── Sidebar Overlay ───────────────────────────────── */
+        .sidebar-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.4); z-index: 1029;
+        }
 
+        .sidebar-overlay.show { display: block; }
+
+        /* ─── Mobile Sidebar Toggle ─────────────────────────── */
+        .mobile-sidebar-toggle {
+            display: none; background: none; border: none;
+            color: #fff; font-size: 1.3rem; margin-right: 0.75rem; cursor: pointer;
+        }
+
+        /* ─── Scrollbar ─────────────────────────────────────── */
+        .sidebar::-webkit-scrollbar { width: 4px; }
+        .sidebar::-webkit-scrollbar-track { background: transparent; }
+        .sidebar::-webkit-scrollbar-thumb { background: var(--gray-200); border-radius: 4px; }
+
+        /* ─── Responsive ────────────────────────────────────── */
         @media (max-width: 991.98px) {
             .sidebar { transform: translateX(-100%); }
             .sidebar.show { transform: translateX(0); }
             .page-wrapper { margin-left: 0; padding: 1.25rem 1rem 3rem; }
             .mobile-sidebar-toggle { display: block; }
             .navbar-page-badge { display: none; }
-            .offcanvas { width: 100vw !important; }
-            .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 1029; }
-            .sidebar-overlay.show { display: block; }
+            #paymentDetailOffcanvas { width: 100% !important; }
         }
 
-        .sidebar::-webkit-scrollbar { width: 4px; }
-        .sidebar::-webkit-scrollbar-track { background: transparent; }
-        .sidebar::-webkit-scrollbar-thumb { background: var(--gray-200); border-radius: 4px; }
+        @media (max-width: 575.98px) {
+            .stat-value { font-size: 1.45rem; }
+            .filter-bar { padding: 0.6rem; }
+            .search-wrap { min-width: 100%; }
+        }
     </style>
 </head>
 <body>
+
 @php
     $userFullName = trim((optional(auth()->user())->first_name ?? '') . ' ' . (optional(auth()->user())->last_name ?? ''));
     if ($userFullName === '') { $userFullName = null; }
@@ -392,8 +638,11 @@
                 <i class="bi bi-bell"></i>
                 <span class="nav-notif-dot"></span>
             </button>
-            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0" style="min-width:280px; border-radius:12px; margin-top:8px;">
-                <li class="px-3 py-2 border-bottom"><span class="fw-bold" style="font-size:.82rem;">Notifications</span></li>
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0"
+                style="min-width:280px; border-radius:12px; margin-top:8px;">
+                <li class="px-3 py-2 border-bottom">
+                    <span class="fw-bold" style="font-size:.82rem;">Notifications</span>
+                </li>
                 <li>
                     <a class="dropdown-item py-2" href="#" style="font-size:.82rem;">
                         <i class="bi bi-credit-card text-success me-2"></i> New payment received
@@ -407,7 +656,11 @@
                     </a>
                 </li>
                 <li class="border-top">
-                    <a class="dropdown-item text-center py-2" href="{{ route('finance.activity-logs') }}" style="font-size:.78rem; color:var(--green-700);">View all notifications</a>
+                    <a class="dropdown-item text-center py-2"
+                       href="{{ route('finance.activity-logs') }}"
+                       style="font-size:.78rem; color:var(--green-700);">
+                        View all notifications
+                    </a>
                 </li>
             </ul>
         </div>
@@ -416,7 +669,7 @@
 
         <div class="dropdown">
             <a class="user-pill dropdown-toggle" href="#" data-bs-toggle="dropdown">
-                 <img class="user-avatar"
+                <img class="user-avatar"
                      src="{{ optional(auth()->user())->avatar ? asset('storage/' . optional(auth()->user())->avatar) : 'https://ui-avatars.com/api/?name=' . urlencode($userFullName ?? 'Finance Admin') . '&background=1a6932&color=fff&rounded=true&size=64' }}"
                      alt="User avatar">
                 <div class="d-none d-md-block" style="line-height:1.2;">
@@ -424,16 +677,23 @@
                     <div class="user-pill-role">Admin / Finance</div>
                 </div>
             </a>
-            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0" style="border-radius:12px; margin-top:8px; min-width:200px;">
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0"
+                style="border-radius:12px; margin-top:8px; min-width:200px;">
                 <li class="px-3 py-2 border-bottom">
                     <div class="fw-bold" style="font-size:.83rem;">{{ $userFullName ?? 'Finance Admin' }}</div>
                     <div class="text-muted" style="font-size:.72rem;">{{ optional(auth()->user())->email ?? '' }}</div>
                 </li>
-                <li><a class="dropdown-item py-2" href="{{ route('finance.profile') }}" style="font-size:.84rem;"><i class="bi bi-person me-2 text-muted"></i>Profile</a></li>
+                <li>
+                    <a class="dropdown-item py-2" href="{{ route('finance.profile') }}" style="font-size:.84rem;">
+                        <i class="bi bi-person me-2 text-muted"></i>Profile
+                    </a>
+                </li>
                 <li class="border-top">
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
-                        <button class="dropdown-item py-2 text-danger" type="submit" style="font-size:.84rem;"><i class="bi bi-box-arrow-right me-2"></i>Logout</button>
+                        <button class="dropdown-item py-2 text-danger" type="submit" style="font-size:.84rem;">
+                            <i class="bi bi-box-arrow-right me-2"></i>Logout
+                        </button>
                     </form>
                 </li>
             </ul>
@@ -454,26 +714,34 @@
 
         <span class="sidebar-section-label">Main Menu</span>
 
-        <a href="{{ route('finance.dashboard') }}" class="sidebar-link {{ request()->routeIs('finance.dashboard') ? 'active' : '' }}">
+        <a href="{{ route('finance.dashboard') }}"
+           class="sidebar-link {{ request()->routeIs('finance.dashboard') ? 'active' : '' }}">
             <i class="bi bi-speedometer2"></i> Dashboard
         </a>
-        <a href="{{ route('finance.orders.index') }}" class="sidebar-link {{ request()->routeIs('finance.orders.*') ? 'active' : '' }}">
+        <a href="{{ route('finance.orders.index') }}"
+           class="sidebar-link {{ request()->routeIs('finance.orders.*') ? 'active' : '' }}">
             <i class="bi bi-bag-check"></i> Orders
         </a>
-        <a href="{{ route('finance.payments.index') }}" class="sidebar-link {{ request()->routeIs('finance.payments.*') ? 'active' : '' }}">
+        <a href="{{ route('finance.payments.index') }}"
+           class="sidebar-link {{ request()->routeIs('finance.payments.*') ? 'active' : '' }}">
             <i class="bi bi-credit-card-2-front"></i> Payments
         </a>
-        <a href="{{ route('finance.revenue.index') }}" class="sidebar-link {{ request()->routeIs('finance.revenue.*') ? 'active' : '' }}">
+        <a href="{{ route('finance.revenue.index') }}"
+           class="sidebar-link {{ request()->routeIs('finance.revenue.*') ? 'active' : '' }}">
             <i class="bi bi-graph-up-arrow"></i> Revenue Monitoring
         </a>
 
         <span class="sidebar-section-label">Sales Report</span>
-        <a href="{{ route('finance.reports.sales') }}" class="sidebar-link {{ request()->routeIs('finance.reports.*') ? 'active' : '' }}">
+
+        <a href="{{ route('finance.reports.sales') }}"
+           class="sidebar-link {{ request()->routeIs('finance.reports.*') ? 'active' : '' }}">
             <i class="bi bi-bar-chart-line"></i> Sales Report
         </a>
 
         <span class="sidebar-section-label">System</span>
-        <a href="{{ route('finance.activity-logs') }}" class="sidebar-link {{ request()->routeIs('finance.activity-logs') ? 'active' : '' }}">
+
+        <a href="{{ route('finance.activity-logs') }}"
+           class="sidebar-link {{ request()->routeIs('finance.activity-logs') ? 'active' : '' }}">
             <i class="bi bi-clock-history"></i> Activity Logs
         </a>
 
@@ -503,7 +771,9 @@
             </p>
         </div>
         <div class="d-flex align-items-center gap-2 flex-wrap">
-            <a href="#" class="btn-export" style="background:var(--green-50);color:var(--green-700);border:1px solid var(--green-200);" id="printBtn">
+            <a href="#" class="btn-export"
+               style="background:var(--green-50);color:var(--green-700);border:1px solid var(--green-200);"
+               id="printBtn">
                 <i class="bi bi-printer"></i> Print
             </a>
             <a href="#" class="btn-export" id="exportBtn">
@@ -723,16 +993,18 @@
 
             <select name="method" class="filter-select" onchange="document.getElementById('filterForm').submit()">
                 <option value="">All Methods</option>
-                <option value="gcash"         {{ request('method') === 'gcash'         ? 'selected' : '' }}>GCash</option>
-                <option value="bank_transfer"  {{ request('method') === 'bank_transfer' ? 'selected' : '' }}>Bank Transfer</option>
-                <option value="cash"           {{ request('method') === 'cash'           ? 'selected' : '' }}>Cash</option>
-                <option value="maya"           {{ request('method') === 'maya'           ? 'selected' : '' }}>Maya</option>
+                <option value="gcash"        {{ request('method') === 'gcash'        ? 'selected' : '' }}>GCash</option>
+                <option value="bank_transfer"{{ request('method') === 'bank_transfer'? 'selected' : '' }}>Bank Transfer</option>
+                <option value="cash"         {{ request('method') === 'cash'         ? 'selected' : '' }}>Cash</option>
+                <option value="maya"         {{ request('method') === 'maya'         ? 'selected' : '' }}>Maya</option>
             </select>
 
             <select name="arbo_id" class="filter-select" onchange="document.getElementById('filterForm').submit()">
                 <option value="">All ARBOs</option>
                 @foreach($arbos ?? [] as $arbo)
-                <option value="{{ $arbo->id }}" {{ request('arbo_id') == $arbo->id ? 'selected' : '' }}>{{ $arbo->name }}</option>
+                <option value="{{ $arbo->id }}" {{ request('arbo_id') == $arbo->id ? 'selected' : '' }}>
+                    {{ $arbo->name }}
+                </option>
                 @endforeach
             </select>
 
@@ -752,7 +1024,9 @@
             </select>
 
             @if(request()->hasAny(['search','date_range','method','arbo_id','sort']))
-            <a href="{{ route('finance.payments.index') }}" class="filter-select text-decoration-none" style="color:#c0392b;background:#fdecea;border-color:#fbd8d4;">
+            <a href="{{ route('finance.payments.index') }}"
+               class="filter-select text-decoration-none"
+               style="color:#c0392b;background:#fdecea;border-color:#fbd8d4;">
                 <i class="bi bi-x-circle me-1"></i> Clear
             </a>
             @endif
@@ -795,11 +1069,10 @@
                 <tbody>
                     @forelse($payments ?? [] as $payment)
                     @php
-                        $ps      = strtolower($payment->status ?? 'pending');
-                        $isOver  = $ps === 'overdue';
+                        $ps     = strtolower($payment->status ?? 'pending');
+                        $isOver = $ps === 'overdue';
                     @endphp
                     <tr class="payment-row {{ $isOver ? 'row-overdue' : '' }}"
-                        style="cursor:pointer;"
                         data-id="{{ $payment->id ?? 0 }}"
                         data-ref="{{ $payment->reference_no ?? '' }}"
                         data-order-no="{{ $payment->order_no ?? '' }}"
@@ -834,7 +1107,7 @@
 
                         <td>
                             @php
-                                $method = strtolower($payment->payment_method ?? 'cash');
+                                $method     = strtolower($payment->payment_method ?? 'cash');
                                 $methodIcons = ['gcash'=>'phone','bank_transfer'=>'bank2','cash'=>'cash','maya'=>'credit-card'];
                                 $methodIcon  = $methodIcons[$method] ?? 'credit-card';
                             @endphp
@@ -856,9 +1129,18 @@
 
                         <td>
                             @php
-                                $statusMap = ['paid'=>'paid','pending'=>'pending','partial'=>'partial','overdue'=>'overdue','verified'=>'verified','rejected'=>'rejected','for_verification'=>'forverification','cancelled'=>'cancelled'];
-                                $psCls     = $statusMap[$ps] ?? 'pending';
-                                $psLabel   = ucwords(str_replace('_', ' ', $ps));
+                                $statusMap = [
+                                    'paid'             => 'paid',
+                                    'pending'          => 'pending',
+                                    'partial'          => 'partial',
+                                    'overdue'          => 'overdue',
+                                    'verified'         => 'verified',
+                                    'rejected'         => 'rejected',
+                                    'for_verification' => 'forverification',
+                                    'cancelled'        => 'cancelled',
+                                ];
+                                $psCls   = $statusMap[$ps] ?? 'pending';
+                                $psLabel = ucwords(str_replace('_', ' ', $ps));
                             @endphp
                             <span class="status-badge status-{{ $psCls }}">
                                 <span class="status-dot"></span> {{ $psLabel }}
@@ -867,7 +1149,9 @@
 
                         <td>
                             @if($payment->proof_url ?? null)
-                                <img src="{{ $payment->proof_url }}" alt="Proof" class="proof-thumb" onclick="event.stopPropagation(); openProofModal('{{ $payment->proof_url }}')">
+                                <img src="{{ $payment->proof_url }}" alt="Proof"
+                                     class="proof-thumb"
+                                     onclick="event.stopPropagation(); openProofModal('{{ $payment->proof_url }}')">
                             @else
                                 <span class="no-proof">None</span>
                             @endif
@@ -886,12 +1170,11 @@
 
                         <td onclick="event.stopPropagation();">
                             <div class="d-flex gap-1 flex-wrap">
-                                <!-- View Detail -->
-                                <button type="button" class="btn-card-action view-detail-btn" data-row-id="{{ $payment->id ?? 0 }}">
+                                <button type="button" class="btn-card-action view-detail-btn"
+                                        data-row-id="{{ $payment->id ?? 0 }}">
                                     <i class="bi bi-eye-fill"></i>
                                 </button>
 
-                                <!-- Verify / Reject — Finance has Full access on Transaction Mgmt -->
                                 @if(in_array($ps, ['for_verification', 'pending']))
                                 <button type="button" class="btn-verify verify-btn"
                                         data-id="{{ $payment->id ?? 0 }}"
@@ -905,7 +1188,6 @@
                                 </button>
                                 @endif
 
-                                <!-- Print Receipt -->
                                 <button type="button" class="btn-card-action print-receipt-btn"
                                         data-id="{{ $payment->id ?? 0 }}"
                                         title="Print Receipt">
@@ -921,7 +1203,7 @@
                                 <i class="bi bi-credit-card-fill"></i>
                                 <p>No payments found{{ request('search') ? ' matching "' . e(request('search')) . '"' : '' }}.</p>
                                 @if(request()->hasAny(['search','date_range','method','arbo_id']))
-                                <a href="{{ route('finance.payments.index') }}" class="btn-card-action mt-2 d-inline-flex">
+                                <a href="{{ route('finance.payments.index') }}" class="btn-card-action mt-3 d-inline-flex">
                                     <i class="bi bi-arrow-counterclockwise"></i> Clear Filters
                                 </a>
                                 @endif
@@ -936,7 +1218,8 @@
         @if(isset($payments) && method_exists($payments, 'links') && $payments->lastPage() > 1)
         <div class="pagination-wrap">
             <span class="pagination-info">
-                Showing {{ $payments->firstItem() ?? 0 }}–{{ $payments->lastItem() ?? 0 }} of {{ number_format($payments->total()) }} payments
+                Showing {{ $payments->firstItem() ?? 0 }}–{{ $payments->lastItem() ?? 0 }}
+                of {{ number_format($payments->total()) }} payments
             </span>
             {{ $payments->appends(request()->query())->links('pagination::bootstrap-5') }}
         </div>
@@ -949,37 +1232,74 @@
 <div class="offcanvas offcanvas-end" tabindex="-1" id="paymentDetailOffcanvas">
     <div class="offcanvas-header">
         <div>
-            <h6 class="mb-0" style="color:#fff;font-size:.82rem;letter-spacing:.06em;text-transform:uppercase;">Payment Details</h6>
+            <h6 class="mb-0"
+                style="color:rgba(255,255,255,0.6);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600;">
+                Payment Details
+            </h6>
             <div class="detail-ref mt-1" id="detailRef">REF-00000</div>
         </div>
         <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
     </div>
+
     <div class="offcanvas-body p-0" style="overflow-y:auto;">
 
-        <!-- Payment Info -->
+        <!-- Transaction Info -->
         <div class="detail-section">
             <div class="detail-section-title">Transaction Info</div>
-            <div class="detail-row"><span class="detail-key">Order No.</span><span class="detail-val" id="dOrderNo">—</span></div>
-            <div class="detail-row"><span class="detail-key">Payer</span><span class="detail-val" id="dPayer">—</span></div>
-            <div class="detail-row"><span class="detail-key">Payer ARBO</span><span class="detail-val" id="dPayerArbo">—</span></div>
-            <div class="detail-row"><span class="detail-key">Payee ARBO</span><span class="detail-val" id="dPayee">—</span></div>
-            <div class="detail-row"><span class="detail-key">Date Submitted</span><span class="detail-val" id="dDate">—</span></div>
+            <div class="detail-row">
+                <span class="detail-key">Order No.</span>
+                <span class="detail-val" id="dOrderNo">—</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-key">Payer</span>
+                <span class="detail-val" id="dPayer">—</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-key">Payer ARBO</span>
+                <span class="detail-val" id="dPayerArbo">—</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-key">Payee ARBO</span>
+                <span class="detail-val" id="dPayee">—</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-key">Date Submitted</span>
+                <span class="detail-val" id="dDate">—</span>
+            </div>
         </div>
 
         <!-- Financials -->
         <div class="detail-section">
             <div class="detail-section-title">Financials</div>
-            <div class="detail-row"><span class="detail-key">Amount Paid</span><span class="detail-val amount-cell" id="dAmount">—</span></div>
-            <div class="detail-row"><span class="detail-key">Balance Due</span><span class="detail-val" id="dBalance">—</span></div>
-            <div class="detail-row"><span class="detail-key">Method</span><span class="detail-val" id="dMethod">—</span></div>
-            <div class="detail-row"><span class="detail-key">Status</span><span class="detail-val" id="dStatus">—</span></div>
+            <div class="detail-row">
+                <span class="detail-key">Amount Paid</span>
+                <span class="detail-val amount-cell" id="dAmount">—</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-key">Balance Due</span>
+                <span class="detail-val" id="dBalance">—</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-key">Method</span>
+                <span class="detail-val" id="dMethod">—</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-key">Status</span>
+                <span class="detail-val" id="dStatus">—</span>
+            </div>
         </div>
 
         <!-- Verification -->
         <div class="detail-section">
             <div class="detail-section-title">Verification</div>
-            <div class="detail-row"><span class="detail-key">Verified By</span><span class="detail-val" id="dVerifiedBy">—</span></div>
-            <div class="detail-row"><span class="detail-key">Verified At</span><span class="detail-val" id="dVerifiedAt">—</span></div>
+            <div class="detail-row">
+                <span class="detail-key">Verified By</span>
+                <span class="detail-val" id="dVerifiedBy">—</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-key">Verified At</span>
+                <span class="detail-val" id="dVerifiedAt">—</span>
+            </div>
         </div>
 
         <!-- Proof of Payment -->
@@ -996,10 +1316,10 @@
         <!-- Notes -->
         <div class="detail-section" id="dNotesWrap" style="display:none;">
             <div class="detail-section-title">Notes / Remarks</div>
-            <p id="dNotes" style="font-size:.83rem;color:var(--text-main);margin:0;"></p>
+            <p id="dNotes" style="font-size:.83rem;color:var(--text-main);margin:0;line-height:1.55;"></p>
         </div>
 
-        <!-- Offcanvas Actions -->
+        <!-- Actions -->
         <div class="detail-section d-flex gap-2 flex-wrap" id="dActionsWrap">
             <button type="button" class="btn-verify offcanvas-verify-btn">
                 <i class="bi bi-shield-check"></i> Verify Payment
@@ -1020,7 +1340,8 @@
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content border-0 bg-transparent shadow-none">
             <div class="modal-body p-2 text-center">
-                <img id="proofModalImg" src="" alt="Payment Proof" style="max-width:100%;border-radius:12px;max-height:80vh;object-fit:contain;">
+                <img id="proofModalImg" src="" alt="Payment Proof"
+                     style="max-width:100%;border-radius:12px;max-height:80vh;object-fit:contain;box-shadow:0 8px 32px rgba(0,0,0,0.35);">
             </div>
         </div>
     </div>
@@ -1029,34 +1350,41 @@
 <!-- ── Verify Confirmation Modal ──────────────────────── -->
 <div class="modal fade" id="verifyModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
+        <div class="modal-content" style="border-radius:14px;overflow:hidden;">
             <div class="modal-header modal-header-green">
-                <h5 class="modal-title" style="font-size:.95rem;"><i class="bi bi-shield-check me-2"></i>Verify Payment</h5>
+                <h5 class="modal-title" style="font-size:.95rem;">
+                    <i class="bi bi-shield-check me-2"></i>Verify Payment
+                </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body" style="padding:1.4rem;">
                 <p style="font-size:.88rem;margin-bottom:.75rem;">
                     You are about to <strong>verify</strong> payment reference:
                 </p>
                 <div style="background:var(--green-50);border:1px solid var(--green-200);border-radius:8px;padding:.75rem 1rem;">
                     <span class="payment-ref" id="verifyModalRef">REF-00000</span>
                 </div>
-                <p style="font-size:.82rem;color:var(--text-muted);margin-top:.75rem;">
+                <p style="font-size:.82rem;color:var(--text-muted);margin-top:.75rem;margin-bottom:0;">
                     This will mark the payment as <strong>Verified</strong> and update the order's payment status. This action is logged.
                 </p>
                 <div class="mt-3">
-                    <label style="font-size:.82rem;font-weight:600;margin-bottom:4px;display:block;">Remarks (optional)</label>
-                    <textarea id="verifyRemarks" class="form-control form-control-sm" rows="2" placeholder="Add a note…" style="border-radius:8px;font-size:.82rem;"></textarea>
+                    <label style="font-size:.82rem;font-weight:600;margin-bottom:4px;display:block;">
+                        Remarks <span style="color:var(--gray-400);font-weight:400;">(optional)</span>
+                    </label>
+                    <textarea id="verifyRemarks" class="form-control form-control-sm" rows="2"
+                              placeholder="Add a note…"
+                              style="border-radius:8px;font-size:.82rem;resize:none;"></textarea>
                 </div>
             </div>
-            <div class="modal-footer border-0 pt-0">
+            <div class="modal-footer border-0 pt-0" style="padding:0 1.4rem 1.2rem;">
                 <button type="button" class="btn btn-sm btn-light" data-bs-dismiss="modal">Cancel</button>
                 <form id="verifyForm" method="POST" action="">
                     @csrf
                     @method('PATCH')
                     <input type="hidden" name="action" value="verify">
                     <input type="hidden" name="remarks" id="verifyRemarksHidden">
-                    <button type="submit" class="btn btn-sm" style="background:var(--green-700);color:#fff;border-radius:8px;font-weight:600;">
+                    <button type="submit" class="btn btn-sm"
+                            style="background:var(--green-700);color:#fff;border-radius:8px;font-weight:600;padding:.38rem .9rem;">
                         <i class="bi bi-shield-check me-1"></i> Confirm Verify
                     </button>
                 </form>
@@ -1068,12 +1396,14 @@
 <!-- ── Reject Confirmation Modal ──────────────────────── -->
 <div class="modal fade" id="rejectModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
+        <div class="modal-content" style="border-radius:14px;overflow:hidden;">
             <div class="modal-header modal-header-red">
-                <h5 class="modal-title" style="font-size:.95rem;"><i class="bi bi-x-circle me-2"></i>Reject Payment</h5>
+                <h5 class="modal-title" style="font-size:.95rem;">
+                    <i class="bi bi-x-circle me-2"></i>Reject Payment
+                </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body" style="padding:1.4rem;">
                 <p style="font-size:.88rem;margin-bottom:.75rem;">
                     You are about to <strong>reject</strong> payment reference:
                 </p>
@@ -1081,18 +1411,23 @@
                     <span class="payment-ref" style="color:#c0392b;" id="rejectModalRef">REF-00000</span>
                 </div>
                 <div class="mt-3">
-                    <label style="font-size:.82rem;font-weight:600;margin-bottom:4px;display:block;">Reason for Rejection <span class="text-danger">*</span></label>
-                    <textarea id="rejectReason" class="form-control form-control-sm" rows="3" placeholder="State the reason for rejection…" style="border-radius:8px;font-size:.82rem;" required></textarea>
+                    <label style="font-size:.82rem;font-weight:600;margin-bottom:4px;display:block;">
+                        Reason for Rejection <span class="text-danger">*</span>
+                    </label>
+                    <textarea id="rejectReason" class="form-control form-control-sm" rows="3"
+                              placeholder="State the reason for rejection…"
+                              style="border-radius:8px;font-size:.82rem;resize:none;" required></textarea>
                 </div>
             </div>
-            <div class="modal-footer border-0 pt-0">
+            <div class="modal-footer border-0 pt-0" style="padding:0 1.4rem 1.2rem;">
                 <button type="button" class="btn btn-sm btn-light" data-bs-dismiss="modal">Cancel</button>
                 <form id="rejectForm" method="POST" action="">
                     @csrf
                     @method('PATCH')
                     <input type="hidden" name="action" value="reject">
                     <input type="hidden" name="reason" id="rejectReasonHidden">
-                    <button type="submit" id="rejectSubmitBtn" class="btn btn-sm" style="background:#c0392b;color:#fff;border-radius:8px;font-weight:600;">
+                    <button type="submit" class="btn btn-sm"
+                            style="background:#c0392b;color:#fff;border-radius:8px;font-weight:600;padding:.38rem .9rem;">
                         <i class="bi bi-x-circle me-1"></i> Confirm Reject
                     </button>
                 </form>
@@ -1119,21 +1454,25 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // ── Date Label ─────────────────────────────────────
     const tbl = document.getElementById('tableDate');
-    if (tbl) tbl.textContent = new Date().toLocaleDateString('en-PH', { year:'numeric', month:'long', day:'numeric' });
+    if (tbl) tbl.textContent = new Date().toLocaleDateString('en-PH', {
+        year: 'numeric', month: 'long', day: 'numeric'
+    });
 
     // ── Mobile Sidebar ─────────────────────────────────
     const toggle  = document.getElementById('sidebarToggle');
     const sidebar = document.getElementById('mainSidebar');
     const overlay = document.getElementById('sidebarOverlay');
-    const openSidebar  = () => { sidebar.classList.add('show'); overlay.classList.add('show'); document.body.style.overflow = 'hidden'; };
-    const closeSidebar = () => { sidebar.classList.remove('show'); overlay.classList.remove('show'); document.body.style.overflow = ''; };
+
+    const openSidebar  = () => { sidebar.classList.add('show');    overlay.classList.add('show');    document.body.style.overflow = 'hidden'; };
+    const closeSidebar = () => { sidebar.classList.remove('show'); overlay.classList.remove('show'); document.body.style.overflow = '';       };
+
     if (toggle)  toggle.addEventListener('click', openSidebar);
     if (overlay) overlay.addEventListener('click', closeSidebar);
 
     // ── Collections Bar Chart ──────────────────────────
     const colCtx = document.getElementById('collectionsChart');
     if (colCtx) {
-        const labels    = {!! json_encode($chartLabels   ?? ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']) !!};
+        const labels    = {!! json_encode($chartLabels    ?? ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']) !!};
         const collected = {!! json_encode($chartCollected ?? [38000,52000,31000,87000,70000,81000,97000,64000,108000,91000,126000,135000]) !!};
         const pending   = {!! json_encode($chartPending   ?? [8000,12000,7000,15000,10000,9000,11000,13000,9000,14000,12000,8000]) !!};
 
@@ -1161,17 +1500,29 @@ document.addEventListener('DOMContentLoaded', function () {
             options: {
                 responsive: true, maintainAspectRatio: false,
                 plugins: {
-                    legend: { position: 'bottom', labels: { font: { size: 11 }, boxWidth: 12, padding: 14 } },
+                    legend: {
+                        position: 'bottom',
+                        labels: { font: { size: 11 }, boxWidth: 12, padding: 14 }
+                    },
                     tooltip: {
-                        callbacks: { label: c => ` ${c.dataset.label}: ₱${Number(c.raw).toLocaleString('en-PH', { minimumFractionDigits: 2 })}` },
-                        backgroundColor: '#0d3b1e', titleColor: '#f5d08a', bodyColor: '#fff', padding: 10, cornerRadius: 8,
+                        callbacks: {
+                            label: c => ` ${c.dataset.label}: ₱${Number(c.raw).toLocaleString('en-PH', { minimumFractionDigits: 2 })}`
+                        },
+                        backgroundColor: '#0d3b1e', titleColor: '#f5d08a',
+                        bodyColor: '#fff', padding: 10, cornerRadius: 8,
                     }
                 },
                 scales: {
-                    x: { grid: { display: false }, ticks: { font: { size: 11 }, color: '#94a3b8' } },
+                    x: {
+                        grid: { display: false },
+                        ticks: { font: { size: 11 }, color: '#94a3b8' }
+                    },
                     y: {
                         grid: { color: '#f1f3f5' },
-                        ticks: { font: { size: 11 }, color: '#94a3b8', callback: v => '₱' + (v >= 1000 ? (v/1000).toFixed(0)+'k' : v) },
+                        ticks: {
+                            font: { size: 11 }, color: '#94a3b8',
+                            callback: v => '₱' + (v >= 1000 ? (v/1000).toFixed(0)+'k' : v)
+                        },
                         beginAtZero: true
                     }
                 }
@@ -1189,7 +1540,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 labels: ['GCash', 'Bank Transfer', 'Cash', 'Maya'],
                 datasets: [{
                     data: [
-                        methodData.gcash        ?? 0,
+                        methodData.gcash         ?? 0,
                         methodData.bank_transfer ?? 0,
                         methodData.cash          ?? 0,
                         methodData.maya          ?? 0,
@@ -1212,7 +1563,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             label: function(ctx) {
                                 const total = ctx.dataset.data.reduce((a,b) => a+b, 0);
                                 const pct   = total > 0 ? ((ctx.raw/total)*100).toFixed(1) : 0;
-                                return ` ${ctx.label}: ${ctx.raw}% (${pct}%)`;
+                                return ` ${ctx.label}: ${ctx.raw} (${pct}%)`;
                             }
                         }
                     }
@@ -1221,7 +1572,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // ── Status badge helper ────────────────────────────
+    // ── Status Badge Helper ────────────────────────────
     function statusBadge(status) {
         const map = {
             paid: 'status-paid', pending: 'status-pending', partial: 'status-partial',
@@ -1235,34 +1586,33 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // ── Detail Offcanvas ───────────────────────────────
     const detailOffcanvas = new bootstrap.Offcanvas(document.getElementById('paymentDetailOffcanvas'));
-    let currentPaymentId = null;
 
     function openDetail(row) {
         const d = row.dataset;
-        currentPaymentId = d.id;
 
-        document.getElementById('detailRef').textContent     = d.ref      || 'REF-00000';
-        document.getElementById('dOrderNo').textContent      = '#' + (d.orderNo || '—');
-        document.getElementById('dPayer').textContent        = d.payer    || '—';
-        document.getElementById('dPayerArbo').textContent    = d.payerArbo|| '—';
-        document.getElementById('dPayee').textContent        = d.payee    || '—';
-        document.getElementById('dDate').textContent         = d.date     || '—';
-        document.getElementById('dAmount').textContent       = '₱' + (d.amount || '0.00');
-        document.getElementById('dBalance').innerHTML        = parseFloat((d.balance || '0').replace(/,/g,'')) > 0
+        document.getElementById('detailRef').textContent   = d.ref      || 'REF-00000';
+        document.getElementById('dOrderNo').textContent    = '#' + (d.orderNo || '—');
+        document.getElementById('dPayer').textContent      = d.payer    || '—';
+        document.getElementById('dPayerArbo').textContent  = d.payerArbo|| '—';
+        document.getElementById('dPayee').textContent      = d.payee    || '—';
+        document.getElementById('dDate').textContent       = d.date     || '—';
+        document.getElementById('dAmount').textContent     = '₱' + (d.amount || '0.00');
+        document.getElementById('dMethod').textContent     = d.method   || '—';
+        document.getElementById('dStatus').innerHTML       = statusBadge(d.status || 'pending');
+        document.getElementById('dVerifiedBy').textContent = d.verifiedBy || '—';
+        document.getElementById('dVerifiedAt').textContent = d.verifiedAt || '—';
+
+        // Balance
+        const balNum = parseFloat((d.balance || '0').replace(/,/g,''));
+        document.getElementById('dBalance').innerHTML = balNum > 0
             ? `<span style="color:#c0392b;font-weight:700;">₱${d.balance}</span>`
             : `<span style="color:var(--green-600);">Settled</span>`;
-        document.getElementById('dMethod').textContent       = d.method   || '—';
-        document.getElementById('dStatus').innerHTML         = statusBadge(d.status || 'pending');
-        document.getElementById('dVerifiedBy').textContent   = d.verifiedBy || '—';
-        document.getElementById('dVerifiedAt').textContent   = d.verifiedAt || '—';
 
         // Proof
         const proofWrap = document.getElementById('dProofWrap');
-        if (d.proof) {
-            proofWrap.innerHTML = `<img src="${d.proof}" alt="Proof of Payment" class="proof-preview" onclick="openProofModal('${d.proof}')">`;
-        } else {
-            proofWrap.innerHTML = `<div class="proof-placeholder"><i class="bi bi-image"></i><span>No proof uploaded</span></div>`;
-        }
+        proofWrap.innerHTML = d.proof
+            ? `<img src="${d.proof}" alt="Proof of Payment" class="proof-preview" onclick="openProofModal('${d.proof}')">`
+            : `<div class="proof-placeholder"><i class="bi bi-image"></i><span>No proof uploaded</span></div>`;
 
         // Notes
         const notesWrap = document.getElementById('dNotesWrap');
@@ -1273,13 +1623,11 @@ document.addEventListener('DOMContentLoaded', function () {
             notesWrap.style.display = 'none';
         }
 
-        // Show/hide verify & reject in offcanvas
-        const actionsWrap = document.getElementById('dActionsWrap');
+        // Offcanvas action visibility
         const verifiable = ['for_verification', 'pending'].includes(d.status || '');
         document.querySelector('.offcanvas-verify-btn').style.display = verifiable ? '' : 'none';
         document.querySelector('.offcanvas-reject-btn').style.display = verifiable ? '' : 'none';
 
-        // Wire offcanvas buttons
         document.querySelector('.offcanvas-verify-btn').onclick = () => {
             detailOffcanvas.hide();
             openVerifyModal(d.id, d.ref);
@@ -1295,12 +1643,12 @@ document.addEventListener('DOMContentLoaded', function () {
         detailOffcanvas.show();
     }
 
-    // Row click
+    // Row clicks
     document.querySelectorAll('.payment-row').forEach(row => {
         row.addEventListener('click', () => openDetail(row));
     });
 
-    // View detail btn
+    // View btn
     document.querySelectorAll('.view-detail-btn').forEach(btn => {
         btn.addEventListener('click', function(e) {
             e.stopPropagation();
@@ -1327,14 +1675,19 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     document.querySelectorAll('.verify-btn').forEach(btn => {
-        btn.addEventListener('click', e => { e.stopPropagation(); openVerifyModal(btn.dataset.id, btn.dataset.ref); });
+        btn.addEventListener('click', e => {
+            e.stopPropagation();
+            openVerifyModal(btn.dataset.id, btn.dataset.ref);
+        });
     });
 
     document.querySelectorAll('.reject-btn').forEach(btn => {
-        btn.addEventListener('click', e => { e.stopPropagation(); openRejectModal(btn.dataset.id, btn.dataset.ref); });
+        btn.addEventListener('click', e => {
+            e.stopPropagation();
+            openRejectModal(btn.dataset.id, btn.dataset.ref);
+        });
     });
 
-    // Transfer remarks/reason to hidden inputs on submit
     document.getElementById('verifyForm').addEventListener('submit', function() {
         document.getElementById('verifyRemarksHidden').value = document.getElementById('verifyRemarks').value;
     });
@@ -1345,7 +1698,7 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('rejectReasonHidden').value = reason;
     });
 
-    // Print receipt
+    // Print receipts
     document.querySelectorAll('.print-receipt-btn').forEach(btn => {
         btn.addEventListener('click', e => {
             e.stopPropagation();
@@ -1353,7 +1706,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // ── Export ─────────────────────────────────────────
+    // Export CSV
     document.getElementById('exportBtn')?.addEventListener('click', function(e) {
         e.preventDefault();
         const params = new URLSearchParams(window.location.search);
@@ -1361,6 +1714,7 @@ document.addEventListener('DOMContentLoaded', function () {
         window.location.href = '{{ route('finance.payments.index') }}?' + params.toString();
     });
 
+    // Print Page
     document.getElementById('printBtn')?.addEventListener('click', function(e) {
         e.preventDefault();
         window.print();
@@ -1368,86 +1722,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
 });
 
-// Global proof modal opener
+// Global — called from inline onclick
 function openProofModal(src) {
-    const img = document.getElementById('proofModalImg');
-    if (img) img.src = src;
-    const modal = new bootstrap.Modal(document.getElementById('proofModal'));
-    modal.show();
+    document.getElementById('proofModalImg').src = src;
+    new bootstrap.Modal(document.getElementById('proofModal')).show();
 }
 </script>
 
-<!-- Inactivity Warning Modal + Logout Script -->
-<form id="inactivityLogoutForm" method="POST" action="{{ route('logout') }}" style="display:none;">@csrf</form>
-
-<div class="modal fade" id="inactivityWarningModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-body text-center p-4">
-                <h5 class="mb-2">You're about to be signed out</h5>
-                <p class="mb-3">For your security, you'll be logged out in <strong id="idleCountdown">10</strong> seconds due to inactivity.</p>
-                <button id="idleStayBtn" type="button" class="btn btn-success">Stay signed in</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script>
-(function(){
-    const INACTIVITY_MS = 15 * 60 * 1000;
-    const WARNING_MS    = 10 * 1000;
-    let lastActivity = Date.now(), performedLogout = false, warningShown = false,
-        countdownInterval = null, modalInstance = null;
-
-    function getCsrf(){
-        const form = document.getElementById('inactivityLogoutForm');
-        const t = form ? form.querySelector('input[name="_token"]') : null;
-        return t ? t.value : (document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '');
-    }
-
-    async function performLogout(){
-        if (performedLogout) return; performedLogout = true;
-        try { await fetch('{{ route('logout') }}', { method:'POST', credentials:'same-origin', body: new URLSearchParams({ _token: getCsrf() }) }); } catch(e){}
-        setTimeout(() => { window.location = '/login'; }, 200);
-    }
-
-    function showWarning(){
-        if (warningShown || performedLogout) return; warningShown = true;
-        const modalEl = document.getElementById('inactivityWarningModal');
-        const countEl = document.getElementById('idleCountdown');
-        if (!modalInstance) modalInstance = new bootstrap.Modal(modalEl, { backdrop:'static', keyboard:false });
-        modalInstance.show();
-        let seconds = Math.ceil(WARNING_MS/1000);
-        if (countEl) countEl.textContent = seconds;
-        countdownInterval = setInterval(() => {
-            seconds -= 1;
-            if (countEl) countEl.textContent = Math.max(0, seconds);
-            if (seconds <= 0) { clearInterval(countdownInterval); countdownInterval = null; performLogout(); }
-        }, 1000);
-    }
-
-    function hideWarning(){
-        if (!warningShown) return; warningShown = false;
-        if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
-        if (modalInstance) modalInstance.hide();
-        const countEl = document.getElementById('idleCountdown');
-        if (countEl) countEl.textContent = Math.ceil(WARNING_MS/1000);
-    }
-
-    function markActivity(e){
-        if (e && e.isTrusted === false) return;
-        if (performedLogout) return;
-        lastActivity = Date.now();
-        if (warningShown) hideWarning();
-    }
-
-    ['click','mousemove','keydown','touchstart','scroll'].forEach(evt => window.addEventListener(evt, markActivity, { passive:true }));
-    document.getElementById('idleStayBtn')?.addEventListener('click', markActivity);
-    setInterval(() => {
-        if (Date.now() - lastActivity >= INACTIVITY_MS - WARNING_MS && !warningShown && !performedLogout) showWarning();
-    }, 1000);
-})();
-</script>
+{{-- ✅ IDLE TIMER --}}
+@include('partials.idle-timer')
 
 </body>
 </html>
