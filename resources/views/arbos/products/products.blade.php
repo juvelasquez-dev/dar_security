@@ -1220,35 +1220,36 @@
 
     <!-- ── Product Cards Grid ───────────────────────────────── -->
     @php
-        $sampleProducts = [
-            ['id'=>'PRD-2024-001','name'=>'Premium White Rice','sku'=>'SKU: GRN-001','cat'=>'Grains / Rice','cat_key'=>'grains','seller'=>'Juan dela Cruz','price'=>'₱52.00','unit'=>'per kg','stock'=>240,'max'=>300,'level'=>'high','status'=>'active','icon'=>'bi-box-seam','img_bg'=>'img-bg-grains'],
-            ['id'=>'PRD-2024-002','name'=>'Yellow Corn (Dried)','sku'=>'SKU: GRN-002','cat'=>'Grains / Rice','cat_key'=>'grains','seller'=>'Maria Santos','price'=>'₱28.00','unit'=>'per kg','stock'=>85,'max'=>200,'level'=>'med','status'=>'active','icon'=>'bi-box-seam','img_bg'=>'img-bg-grains'],
-            ['id'=>'PRD-2024-003','name'=>'Fresh Coconut (Whole)','sku'=>'SKU: FRT-001','cat'=>'Fruits','cat_key'=>'fruits','seller'=>'Pedro Reyes','price'=>'₱35.00','unit'=>'per piece','stock'=>500,'max'=>500,'level'=>'high','status'=>'active','icon'=>'bi-tree','img_bg'=>'img-bg-fruits'],
-            ['id'=>'PRD-2024-004','name'=>'Organic Vegetables Bundle','sku'=>'SKU: VEG-001','cat'=>'Vegetables','cat_key'=>'veggies','seller'=>'Rosa Bautista','price'=>'₱120.00','unit'=>'per bundle','stock'=>12,'max'=>80,'level'=>'low','status'=>'pending','icon'=>'bi-flower2','img_bg'=>'img-bg-veggies'],
-            ['id'=>'PRD-2024-005','name'=>'Abaca Fiber (Raw)','sku'=>'SKU: FBR-001','cat'=>'Fiber Crops','cat_key'=>'fiber','seller'=>'Carlos Mendoza','price'=>'₱95.00','unit'=>'per kg','stock'=>180,'max'=>300,'level'=>'med','status'=>'inactive','icon'=>'bi-layers','img_bg'=>'img-bg-fiber'],
-            ['id'=>'PRD-2024-006','name'=>'Native Chicken (Live)','sku'=>'SKU: LST-001','cat'=>'Livestock','cat_key'=>'livestock','seller'=>'Luz Villanueva','price'=>'₱380.00','unit'=>'per head','stock'=>45,'max'=>100,'level'=>'med','status'=>'active','icon'=>'bi-egg','img_bg'=>'img-bg-livestock'],
-            ['id'=>'PRD-2024-007','name'=>'Processed Coconut Oil','sku'=>'SKU: PRC-001','cat'=>'Processed Goods','cat_key'=>'processed','seller'=>'Elena Torres','price'=>'₱210.00','unit'=>'per 500ml','stock'=>0,'max'=>60,'level'=>'none','status'=>'soldout','icon'=>'bi-droplet-fill','img_bg'=>'img-bg-processed'],
-            ['id'=>'PRD-2024-008','name'=>'Bangus Fry (Fingerlings)','sku'=>'SKU: FRM-001','cat'=>'Livestock','cat_key'=>'livestock','seller'=>'Juan dela Cruz','price'=>'₱8.00','unit'=>'per piece','stock'=>3200,'max'=>5000,'level'=>'high','status'=>'active','icon'=>'bi-water','img_bg'=>'img-bg-livestock'],
-            ['id'=>'PRD-2024-009','name'=>'Sitaw (String Beans)','sku'=>'SKU: VEG-002','cat'=>'Vegetables','cat_key'=>'veggies','seller'=>'Maria Santos','price'=>'₱45.00','unit'=>'per kg','stock'=>60,'max'=>150,'level'=>'med','status'=>'active','icon'=>'bi-flower2','img_bg'=>'img-bg-veggies'],
-            ['id'=>'PRD-2024-010','name'=>'Ripe Cavendish Banana','sku'=>'SKU: FRT-002','cat'=>'Fruits','cat_key'=>'fruits','seller'=>'Pedro Reyes','price'=>'₱25.00','unit'=>'per kg','stock'=>200,'max'=>400,'level'=>'high','status'=>'active','icon'=>'bi-tree','img_bg'=>'img-bg-fruits'],
-            ['id'=>'PRD-2024-011','name'=>'Brown Rice (Unmilled)','sku'=>'SKU: GRN-003','cat'=>'Grains / Rice','cat_key'=>'grains','seller'=>'Carlos Mendoza','price'=>'₱65.00','unit'=>'per kg','stock'=>8,'max'=>200,'level'=>'low','status'=>'pending','icon'=>'bi-box-seam','img_bg'=>'img-bg-grains'],
-            ['id'=>'PRD-2024-012','name'=>'Native Pork (Dressed)','sku'=>'SKU: LST-002','cat'=>'Livestock','cat_key'=>'livestock','seller'=>'Rosa Bautista','price'=>'₱280.00','unit'=>'per kg','stock'=>35,'max'=>80,'level'=>'med','status'=>'active','icon'=>'bi-egg','img_bg'=>'img-bg-livestock'],
-        ];
-
-        $catClass = ['grains'=>'cat-grains','veggies'=>'cat-veggies','fruits'=>'cat-fruits','livestock'=>'cat-livestock','fiber'=>'cat-fiber','processed'=>'cat-processed'];
+        $catClass = ['grains'=>'cat-grains','veggies'=>'cat-veggies','fruits'=>'cat-fruits','livestock'=>'cat-livestock','fiber'=>'cat-fiber','processed'=>'cat-processed','other'=>'cat-other'];
         $ribbonClass = ['active'=>'ribbon-active','pending'=>'ribbon-pending','inactive'=>'ribbon-inactive','soldout'=>'ribbon-soldout'];
         $ribbonLabel = ['active'=>'Active','pending'=>'Pending','inactive'=>'Inactive','soldout'=>'Sold Out'];
     @endphp
 
     <div class="products-grid" id="productsGrid">
-        @foreach($sampleProducts as $p)
-        @php $pct = $p['max'] > 0 ? min(100, round(($p['stock'] / $p['max']) * 100)) : 0; @endphp
-        <div class="product-card" data-cat="{{ $p['cat_key'] }}" data-status="{{ $p['status'] }}">
+        @foreach($products ?? [] as $p)
+        @php
+            $catKey = 'other';
+            $cat = strtolower($p->category ?? '');
+            if (strpos($cat, 'rice') !== false || strpos($cat, 'grain') !== false) $catKey = 'grains';
+            elseif (strpos($cat, 'veg') !== false) $catKey = 'veggies';
+            elseif (strpos($cat, 'fruit') !== false) $catKey = 'fruits';
+            elseif (strpos($cat, 'livestock') !== false) $catKey = 'livestock';
+            elseif (strpos($cat, 'fiber') !== false) $catKey = 'fiber';
+            elseif (strpos($cat, 'process') !== false) $catKey = 'processed';
+
+            $stock = intval($p->stock ?? 0);
+            $max = max(1, $stock, 100);
+            $pct = $max > 0 ? min(100, round(($stock / $max) * 100)) : 0;
+            $level = $stock === 0 ? 'none' : ($stock < 20 ? 'low' : ($stock < 100 ? 'med' : 'high'));
+            $status = $p->status ?? 'inactive';
+            $priceLabel = isset($p->price) ? '₱' . number_format($p->price, 2) : '₱0.00';
+        @endphp
+        <div class="product-card" data-cat="{{ $catKey }}" data-status="{{ $status }}">
 
             <!-- Image Area -->
             <div class="product-card-img {{ $p['img_bg'] }}">
                 {{-- Replace with <img src="{{ asset('storage/'.$p['image']) }}" ...> when real images exist --}}
-                <i class="bi {{ $p['icon'] }} product-img-icon" style="color: {{ in_array($p['cat_key'], ['grains']) ? '#a07000' : (in_array($p['cat_key'],['veggies']) ? '#1a6932' : (in_array($p['cat_key'],['fruits']) ? '#b03060' : (in_array($p['cat_key'],['livestock']) ? '#e07b2a' : (in_array($p['cat_key'],['fiber']) ? '#0d8a7e' : '#1a73e8')))) }};opacity:0.45;"></i>
+                <i class="bi bi-box-seam product-img-icon" style="color: {{ in_array($catKey, ['grains']) ? '#a07000' : (in_array($catKey,['veggies']) ? '#1a6932' : (in_array($catKey,['fruits']) ? '#b03060' : (in_array($catKey,['livestock']) ? '#e07b2a' : (in_array($catKey,['fiber']) ? '#0d8a7e' : '#1a73e8')))) }};opacity:0.45;"></i>
 
                 <!-- Status Ribbon -->
                 <div class="card-ribbon {{ $ribbonClass[$p['status']] ?? 'ribbon-inactive' }}">
@@ -1256,12 +1257,12 @@
                 </div>
 
                 <!-- Seller Badge -->
-                <div class="card-seller-badge" title="{{ $p['seller'] }}">
-                    <i class="bi bi-shop me-1"></i>{{ $p['seller'] }}
+                <div class="card-seller-badge" title="{{ $p->seller_name }}">
+                    <i class="bi bi-shop me-1"></i>{{ $p->seller_name }}
                 </div>
 
                 <!-- Sold Out Stamp -->
-                @if($p['status'] === 'soldout')
+                @if($status === 'soldout')
                 <div class="soldout-overlay">
                     <div class="soldout-stamp">Sold Out</div>
                 </div>
@@ -1269,15 +1270,15 @@
 
                 <!-- Hover Overlay Actions -->
                 <div class="card-overlay">
-                    <button class="overlay-btn ov-view"
-                            data-bs-toggle="modal"
-                            data-bs-target="#viewProductModal"
-                            title="View Details">
-                        <i class="bi bi-eye-fill"></i> View
-                    </button>
+                        <button class="overlay-btn ov-view"
+                                data-bs-toggle="modal"
+                                data-bs-target="#viewProductModal-{{ $p->id }}"
+                                title="View Details">
+                            <i class="bi bi-eye-fill"></i> View
+                        </button>
                     <button class="overlay-btn ov-edit"
                             data-bs-toggle="modal"
-                            data-bs-target="#editProductModal"
+                            data-bs-target="#editProductModal-{{ $p->id }}"
                             title="Edit Product">
                         <i class="bi bi-pencil-fill"></i> Edit
                     </button>
@@ -1286,32 +1287,32 @@
 
             <!-- Card Body -->
             <div class="product-card-body">
-                <div class="product-card-cat {{ $catClass[$p['cat_key']] ?? 'cat-other' }}">
-                    {{ $p['cat'] }}
+                <div class="product-card-cat {{ $catClass[$catKey] ?? 'cat-other' }}">
+                    {{ $p->category ?? 'Uncategorized' }}
                 </div>
-                <div class="product-card-name">{{ $p['name'] }}</div>
-                <div class="product-card-sku">{{ $p['sku'] }}</div>
+                <div class="product-card-name">{{ $p->name }}</div>
+                <div class="product-card-sku">{{ $p->sku }}</div>
                 <div class="product-card-price">
-                    {{ $p['price'] }} <span>{{ $p['unit'] }}</span>
+                    {{ $priceLabel }} <span>{{ $p->unit ?? '' }}</span>
                 </div>
             </div>
 
             <!-- Card Footer: Stock + Archive -->
             <div class="product-card-footer">
-                <div class="stock-mini stock-{{ $p['level'] }}">
+                <div class="stock-mini stock-{{ $level }}">
                     <div class="stock-mini-bar">
                         <div class="stock-mini-fill" style="width:{{ $pct }}%"></div>
                     </div>
                     <span class="stock-mini-label">
-                        Stock: {{ number_format($p['stock']) }}
-                        @if($p['level']==='low' && $p['stock']>0)
+                        Stock: {{ number_format($stock) }}
+                        @if($level==='low' && $stock>0)
                             &bull; <span style="color:#dc3545;font-weight:700;">Low</span>
-                        @elseif($p['stock']==0)
+                        @elseif($stock==0)
                             &bull; <span style="color:#7c3aed;font-weight:700;">Out</span>
                         @endif
                     </span>
                 </div>
-                @if($p['status']==='active')
+                @if($status==='active')
                     <button class="card-arch-btn" title="Archive product">
                         <i class="bi bi-archive"></i> Archive
                     </button>
@@ -1325,9 +1326,94 @@
         @endforeach
     </div>
 
+    {{-- Per-product view/edit modals populated from imported Excel metadata --}}
+    @foreach($products ?? [] as $p)
+        @php
+            $meta = null;
+            if (!empty($p->description)) {
+                $d = @json_decode($p->description, true);
+                if (is_array($d)) $meta = $d;
+            }
+        @endphp
+
+        <!-- View Modal -->
+        <div class="modal fade" id="viewProductModal-{{ $p->id }}" tabindex="-1" aria-labelledby="viewProductModalLabel-{{ $p->id }}" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header modal-header-dark">
+                        <h5 class="modal-title" id="viewProductModalLabel-{{ $p->id }}"><i class="bi bi-box-seam-fill me-2"></i>{{ $p->name }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body p-4">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="modal-section-label">ARBO / Seller</div>
+                                <div class="view-detail-row"><span class="view-detail-label">ARBO Name</span><span class="view-detail-value">{{ $meta['arbo'] ?? $p->seller_name }}</span></div>
+                                <div class="view-detail-row"><span class="view-detail-label">Province</span><span class="view-detail-value">{{ $meta['province'] ?? '' }}</span></div>
+                                <div class="view-detail-row"><span class="view-detail-label">Municipality</span><span class="view-detail-value">{{ $meta['municipality'] ?? '' }}</span></div>
+                                <div class="view-detail-row"><span class="view-detail-label">Area of Production</span><span class="view-detail-value">{{ $meta['area_of_production'] ?? '' }}</span></div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="modal-section-label">Contact</div>
+                                <div class="view-detail-row"><span class="view-detail-label">Contact Person</span><span class="view-detail-value">{{ $meta['contact_person'] ?? '' }}</span></div>
+                                <div class="view-detail-row"><span class="view-detail-label">Contact Number</span><span class="view-detail-value">{{ $meta['contact_number'] ?? '' }}</span></div>
+                                <div class="view-detail-row"><span class="view-detail-label">Marketing Arrangement</span><span class="view-detail-value">{{ $meta['marketing_arrangement'] ?? '' }}</span></div>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="modal-section-label">Services Provided</div>
+                                <p class="text-muted">{{ $meta['services'] ?? '' }}</p>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="modal-section-label">Products (as listed in Excel)</div>
+                                <p class="text-muted">{{ $meta['products_raw'] ?? '' }}</p>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="modal-section-label">Specific Products</div>
+                                <p class="text-muted">{{ $meta['specific_products'] ?? '' }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="border-top:1px solid var(--gray-200);padding:.9rem 1.5rem;">
+                        <button class="btn-reset-filter" data-bs-dismiss="modal"><i class="bi bi-x-circle"></i> Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Modal (basic stub) -->
+        <div class="modal fade" id="editProductModal-{{ $p->id }}" tabindex="-1" aria-labelledby="editProductModalLabel-{{ $p->id }}" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header modal-header-dark">
+                        <h5 class="modal-title" id="editProductModalLabel-{{ $p->id }}">Edit — {{ $p->name }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body p-4">
+                        <!-- Keep edit form simple — fields can be expanded later -->
+                        <form method="POST" action="#">
+                            @csrf @method('PUT')
+                            <div class="row g-3">
+                                <div class="col-12"><label class="modal-form-label">Product Name</label><input class="modal-form-input" name="name" value="{{ $p->name }}"></div>
+                                <div class="col-md-6"><label class="modal-form-label">Category</label><input class="modal-form-input" name="category" value="{{ $p->category }}"></div>
+                                <div class="col-md-6"><label class="modal-form-label">Seller</label><input class="modal-form-input" name="seller_name" value="{{ $p->seller_name }}"></div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer" style="border-top:1px solid var(--gray-200);padding:.9rem 1.5rem;">
+                        <button class="btn-reset-filter" data-bs-dismiss="modal"><i class="bi bi-x-circle"></i> Cancel</button>
+                        <button class="btn-green-primary"><i class="bi bi-check-circle-fill"></i> Save Changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endforeach
+
     <!-- Pagination -->
     <div class="pagination-bar">
-        <div>Showing <strong>1–12</strong> of <strong>{{ $totalProducts ?? 58 }}</strong> products</div>
+        <div>Showing <strong>1–{{ ($products->count() ?? 0) }}</strong> of <strong>{{ $totalProducts ?? 0 }}</strong> products</div>
         <nav aria-label="Products pagination">
             <ul class="pagination mb-0 custom-pagination">
                 <li class="page-item disabled"><a class="page-link" href="#">&laquo;</a></li>

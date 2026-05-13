@@ -1148,86 +1148,27 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                @foreach(($products ?? []) as $product)
+                                @php
+                                    $stock = $product->stock ?? 0;
+                                    $stockClass = $stock > 200 ? 'stock-high' : ($stock > 50 ? 'stock-med' : 'stock-low');
+                                @endphp
                                 <tr>
                                     <td class="arbo-name-cell">
-                                        Premium White Rice
-                                        <small>SKU: GRN-001</small>
+                                        {{ $product->name }}
+                                        <small>SKU: {{ $product->sku ?? '—' }}</small>
                                     </td>
-                                    <td>Juan dela Cruz</td>
-                                    <td>Grains</td>
-                                    <td class="price-cell">₱52<span>/kg</span></td>
+                                    <td>{{ $product->seller_name ?? '—' }}</td>
+                                    <td>{{ $product->category ?? '—' }}</td>
+                                    <td class="price-cell">₱{{ number_format($product->price ?? 0, 2) }}<span>/{{ $product->unit ?? '' }}</span></td>
                                     <td>
-                                        <div class="stock-wrap stock-high">
-                                            <div class="stock-bar"><div class="stock-bar-fill" style="width:80%"></div></div>
-                                            <span class="stock-val">240 kg</span>
+                                        <div class="stock-wrap {{ $stockClass }}">
+                                            <span class="stock-val">{{ $stock }} {{ $product->unit ?? '' }}</span>
                                         </div>
                                     </td>
-                                    <td><span class="status-badge status-active"><span class="status-dot"></span> Active</span></td>
+                                    <td><span class="status-badge status-{{ $product->status ?? 'active' }}"><span class="status-dot"></span> {{ ucfirst($product->status ?? 'active') }}</span></td>
                                 </tr>
-                                <tr>
-                                    <td class="arbo-name-cell">
-                                        Yellow Corn (Dried)
-                                        <small>SKU: GRN-002</small>
-                                    </td>
-                                    <td>Maria Santos</td>
-                                    <td>Grains</td>
-                                    <td class="price-cell">₱28<span>/kg</span></td>
-                                    <td>
-                                        <div class="stock-wrap stock-med">
-                                            <div class="stock-bar"><div class="stock-bar-fill" style="width:40%"></div></div>
-                                            <span class="stock-val">85 kg</span>
-                                        </div>
-                                    </td>
-                                    <td><span class="status-badge status-active"><span class="status-dot"></span> Active</span></td>
-                                </tr>
-                                <tr>
-                                    <td class="arbo-name-cell">
-                                        Fresh Coconut (Whole)
-                                        <small>SKU: FRT-001</small>
-                                    </td>
-                                    <td>Pedro Reyes</td>
-                                    <td>Fruits</td>
-                                    <td class="price-cell">₱35<span>/pc</span></td>
-                                    <td>
-                                        <div class="stock-wrap stock-high">
-                                            <div class="stock-bar"><div class="stock-bar-fill" style="width:92%"></div></div>
-                                            <span class="stock-val">500 pcs</span>
-                                        </div>
-                                    </td>
-                                    <td><span class="status-badge status-active"><span class="status-dot"></span> Active</span></td>
-                                </tr>
-                                <tr>
-                                    <td class="arbo-name-cell">
-                                        Organic Vegetables Bundle
-                                        <small>SKU: VEG-001</small>
-                                    </td>
-                                    <td>Rosa Bautista</td>
-                                    <td>Vegetables</td>
-                                    <td class="price-cell">₱120<span>/bundle</span></td>
-                                    <td>
-                                        <div class="stock-wrap stock-low">
-                                            <div class="stock-bar"><div class="stock-bar-fill" style="width:15%"></div></div>
-                                            <span class="stock-val">12 bundles</span>
-                                        </div>
-                                    </td>
-                                    <td><span class="status-badge status-pending"><span class="status-dot"></span> Pending</span></td>
-                                </tr>
-                                <tr>
-                                    <td class="arbo-name-cell">
-                                        Abaca Fiber (Raw)
-                                        <small>SKU: FBR-001</small>
-                                    </td>
-                                    <td>Carlos Mendoza</td>
-                                    <td>Fiber Crops</td>
-                                    <td class="price-cell">₱95<span>/kg</span></td>
-                                    <td>
-                                        <div class="stock-wrap stock-med">
-                                            <div class="stock-bar"><div class="stock-bar-fill" style="width:55%"></div></div>
-                                            <span class="stock-val">180 kg</span>
-                                        </div>
-                                    </td>
-                                    <td><span class="status-badge status-inactive"><span class="status-dot"></span> Inactive</span></td>
-                                </tr>
+                                @endforeach
                             </tbody>
                         </table>
                     </div>
@@ -1323,56 +1264,18 @@
                     </a>
                 </div>
                 <div class="row g-0">
+                    @foreach(($topProducts ?? []) as $p)
                     <div class="col-12 col-md-6 col-xl" style="border-right: 1px solid var(--gray-100);">
                         <div class="rank-item">
-                            <div class="rank-num gold">1</div>
+                            <div class="rank-num {{ $loop->iteration <= 2 ? 'gold' : '' }}">{{ $loop->iteration }}</div>
                             <div class="rank-product">
-                                <div class="rank-product-name">Fresh Coconut (Whole)</div>
-                                <div class="rank-product-cat">Fruits · SKU: FRT-001</div>
+                                <div class="rank-product-name">{{ $p->name }}</div>
+                                <div class="rank-product-cat">{{ $p->category }} · SKU: {{ $p->sku ?? '—' }}</div>
                             </div>
-                            <div class="rank-units">500 pcs<small>sold</small></div>
+                            <div class="rank-units">{{ $p->stock ?? 0 }} {{ $p->unit ?? '' }}<small>available</small></div>
                         </div>
                     </div>
-                    <div class="col-12 col-md-6 col-xl" style="border-right: 1px solid var(--gray-100);">
-                        <div class="rank-item">
-                            <div class="rank-num gold">2</div>
-                            <div class="rank-product">
-                                <div class="rank-product-name">Premium White Rice</div>
-                                <div class="rank-product-cat">Grains · SKU: GRN-001</div>
-                            </div>
-                            <div class="rank-units">240 kg<small>sold</small></div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-6 col-xl" style="border-right: 1px solid var(--gray-100);">
-                        <div class="rank-item">
-                            <div class="rank-num">3</div>
-                            <div class="rank-product">
-                                <div class="rank-product-name">Abaca Fiber (Raw)</div>
-                                <div class="rank-product-cat">Fiber Crops · SKU: FBR-001</div>
-                            </div>
-                            <div class="rank-units">180 kg<small>sold</small></div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-6 col-xl" style="border-right: 1px solid var(--gray-100);">
-                        <div class="rank-item">
-                            <div class="rank-num">4</div>
-                            <div class="rank-product">
-                                <div class="rank-product-name">Yellow Corn (Dried)</div>
-                                <div class="rank-product-cat">Grains · SKU: GRN-002</div>
-                            </div>
-                            <div class="rank-units">85 kg<small>sold</small></div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-6 col-xl">
-                        <div class="rank-item">
-                            <div class="rank-num">5</div>
-                            <div class="rank-product">
-                                <div class="rank-product-name">Organic Vegetables Bundle</div>
-                                <div class="rank-product-cat">Vegetables · SKU: VEG-001</div>
-                            </div>
-                            <div class="rank-units">12 bundles<small>sold</small></div>
-                        </div>
-                    </div>
+                    @endforeach
                 </div>
             </div>
         </div>
