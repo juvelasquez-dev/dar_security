@@ -2,6 +2,7 @@
 <html lang="en" data-bs-theme="light">
 <head>
     <meta charset="utf-8">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Product Management — E-Agraryo Merkado</title>
     <link rel="icon" href="{{ asset('images/dar-logo.png') }}" type="image/png">
@@ -136,6 +137,7 @@
             border: 2px solid var(--green-900);
         }
 
+        /* ─── User Pill ────────────────────────────────────── */
         .user-pill {
             display: flex; align-items: center; gap: 0.5rem;
             background: rgba(255,255,255,0.08);
@@ -156,8 +158,359 @@
             border: 1.5px solid rgba(255,255,255,0.25);
         }
 
-        .user-pill-name { font-size: 0.82rem; font-weight: 500; color: #fff; }
-        .user-pill-role { font-size: 0.65rem; color: var(--green-200); }
+        .user-pill-name { font-size: 0.82rem; font-weight: 500; color: #fff !important; }
+        .user-pill-role { font-size: 0.65rem; color: var(--green-200) !important; }
+
+        /* Override Bootstrap anchor color inside pill */
+        .user-pill, .user-pill:visited, .user-pill:hover { color: #fff; }
+
+        /* ─── Cart Icon Button ─────────────────────────────── */
+        .nav-cart-btn {
+            background: rgba(200,146,42,0.15);
+            border: 1px solid rgba(200,146,42,0.3);
+            color: var(--gold-mid);
+            font-size: 1.1rem;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 8px;
+            position: relative;
+            transition: color 0.18s, background 0.18s;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .nav-cart-btn:hover {
+            background: rgba(200,146,42,0.28);
+            color: #fff;
+        }
+
+        .nav-cart-count {
+            background: var(--gold);
+            color: #fff;
+            font-size: 0.62rem;
+            font-weight: 800;
+            min-width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--green-900);
+            position: absolute;
+            top: 2px; right: 2px;
+            transition: transform 0.2s cubic-bezier(.34,1.56,.64,1);
+        }
+
+        .nav-cart-count.bump {
+            transform: scale(1.4);
+        }
+
+        /* ─── Cart Drawer ──────────────────────────────────── */
+        .cart-drawer {
+            position: fixed;
+            top: 62px; right: 0; bottom: 0;
+            width: 360px;
+            background: #fff;
+            box-shadow: -8px 0 40px rgba(13,59,30,0.15);
+            z-index: 1035;
+            transform: translateX(100%);
+            transition: transform 0.3s cubic-bezier(.4,0,.2,1);
+            display: flex;
+            flex-direction: column;
+            border-left: 1px solid var(--gray-200);
+        }
+
+        .cart-drawer.open {
+            transform: translateX(0);
+        }
+
+        .cart-drawer-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.35);
+            z-index: 1034;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .cart-drawer-overlay.open {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .cart-drawer-header {
+            background: var(--green-900);
+            padding: 1rem 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .cart-drawer-header h6 {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: #fff;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .cart-drawer-header h6 i { color: var(--gold-mid); }
+
+        .cart-close-btn {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: rgba(255,255,255,0.8);
+            font-size: 1.1rem;
+            border-radius: 7px;
+            padding: 3px 8px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .cart-close-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
+
+        .cart-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0.75rem;
+        }
+
+        .cart-empty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--text-muted);
+            gap: 0.75rem;
+            padding: 2rem;
+        }
+
+        .cart-empty i {
+            font-size: 3.5rem;
+            color: var(--gray-200);
+        }
+
+        .cart-empty p {
+            font-size: 0.85rem;
+            text-align: center;
+            margin: 0;
+        }
+
+        .cart-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: var(--gray-50);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-sm);
+            margin-bottom: 0.5rem;
+            transition: background 0.15s;
+            position: relative;
+        }
+
+        .cart-item:hover { background: var(--green-50); border-color: var(--green-200); }
+
+        .cart-item-icon {
+            width: 44px; height: 44px;
+            border-radius: 9px;
+            background: var(--green-100);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.15rem;
+            color: var(--green-700);
+            flex-shrink: 0;
+        }
+
+        .cart-item-name {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text-main);
+            line-height: 1.3;
+        }
+
+        .cart-item-seller {
+            font-size: 0.68rem;
+            color: var(--text-muted);
+        }
+
+        .cart-item-price {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--green-800);
+            white-space: nowrap;
+        }
+
+        .cart-qty-ctrl {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 4px;
+        }
+
+        .cart-qty-btn {
+            width: 22px; height: 22px;
+            border-radius: 5px;
+            border: 1.5px solid var(--gray-200);
+            background: #fff;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--green-700);
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.15s;
+            padding: 0;
+        }
+
+        .cart-qty-btn:hover { background: var(--green-100); border-color: var(--green-600); }
+
+        .cart-qty-num {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-main);
+            min-width: 20px;
+            text-align: center;
+        }
+
+        .cart-remove-btn {
+            position: absolute;
+            top: 6px; right: 7px;
+            background: none; border: none;
+            color: var(--gray-400);
+            font-size: 0.8rem;
+            cursor: pointer;
+            padding: 2px 4px;
+            border-radius: 4px;
+            transition: all 0.15s;
+        }
+
+        .cart-remove-btn:hover { color: #c0392b; background: #fdecea; }
+
+        .cart-footer {
+            border-top: 1px solid var(--gray-200);
+            padding: 1rem 1.25rem;
+            flex-shrink: 0;
+            background: #fff;
+        }
+
+        .cart-total-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .cart-total-label {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .cart-total-value {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--green-800);
+        }
+
+        .btn-checkout {
+            background: var(--green-800);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 0.87rem;
+            font-weight: 700;
+            padding: 0.65rem 1.25rem;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: background 0.18s, transform 0.18s;
+        }
+
+        .btn-checkout:hover { background: var(--green-700); transform: translateY(-1px); }
+
+        .btn-clear-cart {
+            background: transparent;
+            color: var(--gray-400);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.4rem 0.75rem;
+            width: 100%;
+            cursor: pointer;
+            margin-top: 0.5rem;
+            transition: all 0.15s;
+        }
+
+        .btn-clear-cart:hover { color: #c0392b; border-color: #c0392b; background: #fdecea; }
+
+        /* ─── Add to Cart button styles ────────────────────── */
+        .ov-cart {
+            background: var(--gold);
+            color: #fff;
+        }
+
+        .ov-cart:hover { background: #b07820; }
+
+        /* Quick add-to-cart button on card footer */
+        .card-cart-btn {
+            background: var(--green-600);
+            color: #fff;
+            border: none;
+            border-radius: 7px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 5px 10px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            transition: all 0.18s;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .card-cart-btn:hover { background: var(--green-800); transform: translateY(-1px); }
+
+        .card-cart-btn.added {
+            background: var(--gold);
+        }
+
+        /* Cart toast notification */
+        .cart-toast {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            background: var(--green-900);
+            color: #fff;
+            border-radius: var(--radius-sm);
+            padding: 0.65rem 1.1rem;
+            font-size: 0.82rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: var(--shadow-lg);
+            z-index: 9999;
+            transform: translateY(80px);
+            opacity: 0;
+            transition: transform 0.3s cubic-bezier(.34,1.56,.64,1), opacity 0.3s;
+        }
+
+        .cart-toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .cart-toast i { color: var(--gold-mid); }
 
         /* ─── Sidebar ───────────────────────────────────────── */
         .sidebar {
@@ -582,16 +935,16 @@
             text-overflow: ellipsis;
         }
 
-        /* Wishlist / action hover overlay */
+        /* Hover overlay */
         .card-overlay {
             position: absolute;
             bottom: 0; left: 0; right: 0;
-            background: linear-gradient(to top, rgba(13,59,30,0.85) 0%, transparent 100%);
+            background: linear-gradient(to top, rgba(13,59,30,0.88) 0%, transparent 100%);
             display: flex;
             align-items: flex-end;
             justify-content: center;
-            gap: 0.4rem;
-            padding: 0.75rem 0.6rem;
+            gap: 0.35rem;
+            padding: 0.75rem 0.55rem;
             opacity: 0;
             transition: opacity 0.22s;
         }
@@ -601,11 +954,11 @@
         .overlay-btn {
             border: none;
             border-radius: 8px;
-            font-size: 0.72rem;
+            font-size: 0.7rem;
             font-weight: 700;
-            padding: 0.35rem 0.7rem;
+            padding: 0.35rem 0.6rem;
             cursor: pointer;
-            display: inline-flex; align-items: center; gap: 0.25rem;
+            display: inline-flex; align-items: center; gap: 0.22rem;
             transition: all 0.16s;
             white-space: nowrap;
         }
@@ -614,6 +967,8 @@
         .ov-view:hover  { background: #fff; }
         .ov-edit  { background: var(--green-600); color: #fff; }
         .ov-edit:hover  { background: var(--green-700); }
+        .ov-cart  { background: var(--gold); color: #fff; }
+        .ov-cart:hover  { background: #b07820; }
 
         /* Body */
         .product-card-body {
@@ -675,11 +1030,11 @@
         /* Footer: stock + quick actions */
         .product-card-footer {
             border-top: 1px solid var(--gray-100);
-            padding: 0.6rem 0.9rem;
+            padding: 0.55rem 0.9rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 0.5rem;
+            gap: 0.4rem;
         }
 
         .stock-mini {
@@ -687,6 +1042,7 @@
             flex-direction: column;
             gap: 2px;
             flex: 1;
+            min-width: 0;
         }
 
         .stock-mini-bar {
@@ -720,6 +1076,7 @@
             transition: all 0.16s;
             white-space: nowrap;
             display: flex; align-items: center; gap: 3px;
+            flex-shrink: 0;
         }
 
         .card-arch-btn:hover { border-color: #c0392b; color: #c0392b; background: #fdecea; }
@@ -912,6 +1269,7 @@
             }
             .sidebar-overlay.show { display: block; }
             .products-grid { grid-template-columns: repeat(2, 1fr); }
+            .cart-drawer { width: 100%; }
         }
 
         @media (max-width: 575px) {
@@ -922,6 +1280,9 @@
         .sidebar::-webkit-scrollbar { width: 4px; }
         .sidebar::-webkit-scrollbar-track { background: transparent; }
         .sidebar::-webkit-scrollbar-thumb { background: var(--gray-200); border-radius: 4px; }
+        .cart-body::-webkit-scrollbar { width: 4px; }
+        .cart-body::-webkit-scrollbar-track { background: transparent; }
+        .cart-body::-webkit-scrollbar-thumb { background: var(--gray-200); border-radius: 4px; }
     </style>
 </head>
 <body>
@@ -944,6 +1305,13 @@
 
     <div class="navbar-right">
         <button class="nav-icon-btn" title="Search"><i class="bi bi-search"></i></button>
+
+        <!-- ── Cart Button (Navbar) ── -->
+        <button class="nav-cart-btn" id="navCartBtn" title="View Cart" onclick="openCart()">
+            <i class="bi bi-cart3"></i>
+            <span style="font-size:0.78rem;font-weight:700;color:var(--gold-mid);" id="navCartLabel">Cart</span>
+            <span class="nav-cart-count" id="navCartCount" style="display:none;">0</span>
+        </button>
 
         <div class="dropdown">
             <button class="nav-icon-btn" data-bs-toggle="dropdown" aria-label="Notifications">
@@ -1006,6 +1374,41 @@
     </div>
 </header>
 
+<!-- ══════════════════════ CART DRAWER ══════════════════════ -->
+<div class="cart-drawer-overlay" id="cartOverlay" onclick="closeCart()"></div>
+
+<div class="cart-drawer" id="cartDrawer">
+    <div class="cart-drawer-header">
+        <h6><i class="bi bi-cart3"></i> Shopping Cart <span id="cartItemCountLabel" style="font-size:0.72rem;color:rgba(255,255,255,0.6);font-weight:400;">(0 items)</span></h6>
+        <button class="cart-close-btn" onclick="closeCart()"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="cart-body" id="cartBody">
+        <div class="cart-empty" id="cartEmpty">
+            <i class="bi bi-cart-x"></i>
+            <p>Your cart is empty.<br>Browse products and click <strong>Add to Cart</strong> to get started.</p>
+        </div>
+        <div id="cartItemsList"></div>
+    </div>
+    <div class="cart-footer" id="cartFooter" style="display:none;">
+        <div class="cart-total-row">
+            <span class="cart-total-label">Subtotal (<span id="footerItemCount">0</span> items • <span id="footerDistinctCount">0</span> types)</span>
+            <span class="cart-total-value" id="cartTotal">₱0.00</span>
+        </div>
+        <button class="btn-checkout" onclick="handleCheckout()">
+            <i class="bi bi-bag-check-fill"></i> Proceed to Checkout
+        </button>
+        <button class="btn-clear-cart" onclick="clearCart()">
+            <i class="bi bi-trash3 me-1"></i> Clear Cart
+        </button>
+    </div>
+</div>
+
+<!-- ══════════════════════ CART TOAST ═══════════════════════ -->
+<div class="cart-toast" id="cartToast">
+    <i class="bi bi-check-circle-fill"></i>
+    <span id="cartToastMsg">Item added to cart!</span>
+</div>
+
 <!-- ══════════════════════ SIDEBAR OVERLAY ══════════════════ -->
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
@@ -1023,7 +1426,6 @@
         <a href="{{ url('/arbo/dashboard') }}" class="sidebar-link {{ request()->is('arbo/dashboard') ? 'active' : '' }}">
             <i class="bi bi-speedometer2"></i> Dashboard
         </a>
-        
 
         <span class="sidebar-section-label">Marketplace</span>
 
@@ -1243,45 +1645,55 @@
             $level = $stock === 0 ? 'none' : ($stock < 20 ? 'low' : ($stock < 100 ? 'med' : 'high'));
             $status = $p->status ?? 'inactive';
             $priceLabel = isset($p->price) ? '₱' . number_format($p->price, 2) : '₱0.00';
+            $isSoldOut = $status === 'soldout' || $stock === 0;
         @endphp
-        <div class="product-card" data-cat="{{ $catKey }}" data-status="{{ $status }}">
+        <div class="product-card" data-cat="{{ $catKey }}" data-status="{{ $status }}"
+             data-id="{{ $p->id }}"
+             data-name="{{ $p->name }}"
+             data-price="{{ $p->price ?? 0 }}"
+             data-unit="{{ $p->unit ?? '' }}"
+             data-seller="{{ $p->seller_name }}"
+             data-catkey="{{ $catKey }}">
 
             <!-- Image Area -->
-            <div class="product-card-img {{ $p['img_bg'] }}">
-                {{-- Replace with <img src="{{ asset('storage/'.$p['image']) }}" ...> when real images exist --}}
+            <div class="product-card-img {{ $p['img_bg'] ?? '' }}">
                 <i class="bi bi-box-seam product-img-icon" style="color: {{ in_array($catKey, ['grains']) ? '#a07000' : (in_array($catKey,['veggies']) ? '#1a6932' : (in_array($catKey,['fruits']) ? '#b03060' : (in_array($catKey,['livestock']) ? '#e07b2a' : (in_array($catKey,['fiber']) ? '#0d8a7e' : '#1a73e8')))) }};opacity:0.45;"></i>
 
-                <!-- Status Ribbon -->
-                <div class="card-ribbon {{ $ribbonClass[$p['status']] ?? 'ribbon-inactive' }}">
-                    {{ $ribbonLabel[$p['status']] ?? $p['status'] }}
+                <div class="card-ribbon {{ $ribbonClass[$p['status'] ?? 'inactive'] ?? 'ribbon-inactive' }}">
+                    {{ $ribbonLabel[$p['status'] ?? 'inactive'] ?? ($p['status'] ?? 'inactive') }}
                 </div>
 
-                <!-- Seller Badge -->
                 <div class="card-seller-badge" title="{{ $p->seller_name }}">
                     <i class="bi bi-shop me-1"></i>{{ $p->seller_name }}
                 </div>
 
-                <!-- Sold Out Stamp -->
                 @if($status === 'soldout')
                 <div class="soldout-overlay">
                     <div class="soldout-stamp">Sold Out</div>
                 </div>
                 @endif
 
-                <!-- Hover Overlay Actions -->
+                <!-- Hover Overlay Actions (3 buttons: View, Edit, Add to Cart) -->
                 <div class="card-overlay">
-                        <button class="overlay-btn ov-view"
-                                data-bs-toggle="modal"
-                                data-bs-target="#viewProductModal-{{ $p->id }}"
-                                title="View Details">
-                            <i class="bi bi-eye-fill"></i> View
-                        </button>
+                    <button class="overlay-btn ov-view"
+                            data-bs-toggle="modal"
+                            data-bs-target="#viewProductModal-{{ $p->id }}"
+                            title="View Details">
+                        <i class="bi bi-eye-fill"></i> View
+                    </button>
                     <button class="overlay-btn ov-edit"
                             data-bs-toggle="modal"
                             data-bs-target="#editProductModal-{{ $p->id }}"
                             title="Edit Product">
                         <i class="bi bi-pencil-fill"></i> Edit
                     </button>
+                    @if(!$isSoldOut)
+                    <button class="overlay-btn ov-cart"
+                            onclick="addToCartFromCard(this)"
+                            title="Add to Cart">
+                        <i class="bi bi-cart-plus-fill"></i> Cart
+                    </button>
+                    @endif
                 </div>
             </div>
 
@@ -1297,7 +1709,7 @@
                 </div>
             </div>
 
-            <!-- Card Footer: Stock + Archive -->
+            <!-- Card Footer: Stock + Archive + Add to Cart -->
             <div class="product-card-footer">
                 <div class="stock-mini stock-{{ $level }}">
                     <div class="stock-mini-bar">
@@ -1312,13 +1724,25 @@
                         @endif
                     </span>
                 </div>
+
+                <!-- Add to Cart footer button -->
+                @if(!$isSoldOut)
+                <button class="card-cart-btn" onclick="addToCartFromCard(this)" title="Add to Cart">
+                    <i class="bi bi-cart-plus-fill"></i>
+                </button>
+                @else
+                <button class="card-arch-btn" style="pointer-events:none;opacity:0.45;" disabled>
+                    <i class="bi bi-slash-circle"></i>
+                </button>
+                @endif
+
                 @if($status==='active')
                     <button class="card-arch-btn" title="Archive product">
-                        <i class="bi bi-archive"></i> Archive
+                        <i class="bi bi-archive"></i>
                     </button>
                 @else
                     <button class="card-arch-btn card-activ-btn" title="Activate product">
-                        <i class="bi bi-check-circle"></i> Activate
+                        <i class="bi bi-check-circle"></i>
                     </button>
                 @endif
             </div>
@@ -1326,7 +1750,7 @@
         @endforeach
     </div>
 
-    {{-- Per-product view/edit modals populated from imported Excel metadata --}}
+    {{-- Per-product view/edit modals --}}
     @foreach($products ?? [] as $p)
         @php
             $meta = null;
@@ -1359,17 +1783,14 @@
                                 <div class="view-detail-row"><span class="view-detail-label">Contact Number</span><span class="view-detail-value">{{ $meta['contact_number'] ?? '' }}</span></div>
                                 <div class="view-detail-row"><span class="view-detail-label">Marketing Arrangement</span><span class="view-detail-value">{{ $meta['marketing_arrangement'] ?? '' }}</span></div>
                             </div>
-
                             <div class="col-12">
                                 <div class="modal-section-label">Services Provided</div>
                                 <p class="text-muted">{{ $meta['services'] ?? '' }}</p>
                             </div>
-
                             <div class="col-12">
                                 <div class="modal-section-label">Products (as listed in Excel)</div>
                                 <p class="text-muted">{{ $meta['products_raw'] ?? '' }}</p>
                             </div>
-
                             <div class="col-12">
                                 <div class="modal-section-label">Specific Products</div>
                                 <p class="text-muted">{{ $meta['specific_products'] ?? '' }}</p>
@@ -1378,12 +1799,23 @@
                     </div>
                     <div class="modal-footer" style="border-top:1px solid var(--gray-200);padding:.9rem 1.5rem;">
                         <button class="btn-reset-filter" data-bs-dismiss="modal"><i class="bi bi-x-circle"></i> Close</button>
+                        <button class="btn-green-primary"
+                                data-id="{{ $p->id }}"
+                                data-name="{{ $p->name }}"
+                                data-price="{{ $p->price ?? 0 }}"
+                                data-unit="{{ $p->unit ?? '' }}"
+                                data-seller="{{ $p->seller_name }}"
+                                data-catkey="other"
+                                onclick="addToCartDirect(this)"
+                                data-bs-dismiss="modal">
+                            <i class="bi bi-cart-plus-fill"></i> Add to Cart
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Edit Modal (basic stub) -->
+        <!-- Edit Modal -->
         <div class="modal fade" id="editProductModal-{{ $p->id }}" tabindex="-1" aria-labelledby="editProductModalLabel-{{ $p->id }}" aria-hidden="true">
             <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
                 <div class="modal-content">
@@ -1392,7 +1824,6 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body p-4">
-                        <!-- Keep edit form simple — fields can be expanded later -->
                         <form method="POST" action="#">
                             @csrf @method('PUT')
                             <div class="row g-3">
@@ -1452,13 +1883,13 @@
                         </div>
                         <i class="bi bi-chevron-right ms-auto" style="font-size:.72rem;color:var(--gray-400);"></i>
                     </button>
-                    <button class="qa-row">
+                    <button class="qa-row" onclick="openCart()">
                         <div class="qa-icon-wrap" style="background:var(--gold-light);color:var(--gold);">
-                            <i class="bi bi-clock-history"></i>
+                            <i class="bi bi-cart3"></i>
                         </div>
                         <div>
-                            <div style="font-weight:600;font-size:.83rem;">Review Pending Listings</div>
-                            <div style="font-size:.72rem;color:var(--text-muted);">{{ $pendingProducts ?? 3 }} products awaiting approval</div>
+                            <div style="font-weight:600;font-size:.83rem;">View Cart</div>
+                            <div style="font-size:.72rem;color:var(--text-muted);" id="qaCartLabel">0 items in cart</div>
                         </div>
                         <i class="bi bi-chevron-right ms-auto" style="font-size:.72rem;color:var(--gray-400);"></i>
                     </button>
@@ -1701,7 +2132,6 @@
                             <span style="background:var(--green-100);color:var(--green-700);font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:20px;display:inline-flex;align-items:center;gap:5px;">
                                 <span style="width:6px;height:6px;border-radius:50%;background:var(--green-600);display:inline-block;"></span>Active
                             </span>
-                            <span class="cat-badge cat-grains" style="font-size:.72rem;">Grains / Rice</span>
                         </div>
                     </div>
                     <div class="text-end">
@@ -1726,17 +2156,8 @@
                         <div class="view-detail-row"><span class="view-detail-label">Buyer Rating</span><span class="view-detail-value" style="color:var(--gold);font-weight:700;"><i class="bi bi-star-fill me-1"></i>4.8 / 5.0</span></div>
                     </div>
                     <div class="col-12">
-                        <div class="modal-section-label">Performance Overview</div>
-                        <div class="row g-2 text-center">
-                            <div class="col-3"><div style="background:var(--green-50);border:1px solid var(--green-200);border-radius:10px;padding:.75rem;"><div style="font-size:1.25rem;font-weight:700;color:var(--green-800);">38</div><div style="font-size:.68rem;color:var(--text-muted);font-weight:600;">Orders</div></div></div>
-                            <div class="col-3"><div style="background:var(--green-50);border:1px solid var(--green-200);border-radius:10px;padding:.75rem;"><div style="font-size:1.25rem;font-weight:700;color:var(--green-800);">36</div><div style="font-size:.68rem;color:var(--text-muted);font-weight:600;">Fulfilled</div></div></div>
-                            <div class="col-3"><div style="background:var(--gold-light);border:1px solid var(--gold-mid);border-radius:10px;padding:.75rem;"><div style="font-size:1.25rem;font-weight:700;color:var(--gold);">4.8</div><div style="font-size:.68rem;color:var(--text-muted);font-weight:600;">Rating</div></div></div>
-                            <div class="col-3"><div style="background:var(--green-50);border:1px solid var(--green-200);border-radius:10px;padding:.75rem;"><div style="font-size:1.25rem;font-weight:700;color:var(--green-800);">95%</div><div style="font-size:.68rem;color:var(--text-muted);font-weight:600;">Fill Rate</div></div></div>
-                        </div>
-                    </div>
-                    <div class="col-12">
                         <div class="modal-section-label">Description</div>
-                        <p style="font-size:.83rem;color:var(--text-muted);margin:0;line-height:1.7;">High-quality white rice harvested from the farm fields of Nabua, Camarines Sur. Freshly milled, clean, and free from foreign materials. Suitable for direct consumption and bulk distribution. Packaging available in 5 kg and 25 kg sacks.</p>
+                        <p style="font-size:.83rem;color:var(--text-muted);margin:0;line-height:1.7;">High-quality white rice harvested from the farm fields of Nabua, Camarines Sur.</p>
                     </div>
                 </div>
             </div>
@@ -1745,8 +2166,12 @@
                 <button style="background:#fdecea;color:#c0392b;border:none;border-radius:6px;font-size:.81rem;font-weight:600;padding:.44rem .95rem;display:inline-flex;align-items:center;gap:.3rem;cursor:pointer;">
                     <i class="bi bi-archive-fill"></i> Archive
                 </button>
-                <button class="btn-green-primary" data-bs-toggle="modal" data-bs-target="#editProductModal" data-bs-dismiss="modal">
-                    <i class="bi bi-pencil-fill"></i> Edit Product
+                <button class="btn-green-primary"
+                        data-id="demo-1" data-name="Premium White Rice"
+                        data-price="52" data-unit="per kg"
+                        data-seller="Juan dela Cruz" data-catkey="grains"
+                        onclick="addToCartDirect(this)" data-bs-dismiss="modal">
+                    <i class="bi bi-cart-plus-fill"></i> Add to Cart
                 </button>
             </div>
         </div>
@@ -1844,6 +2269,256 @@
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
 <script>
+/* ════════════════════════════════════════════════════════════
+   CART STATE
+════════════════════════════════════════════════════════════ */
+let cart = [];
+
+// Key used in localStorage
+const CART_STORAGE_KEY = 'arbo_cart_v1';
+
+function saveCartToStorage() {
+    try {
+        localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+    } catch (e) {
+        console.warn('Could not save cart to storage', e);
+    }
+}
+
+function loadCartFromStorage() {
+    try {
+        const raw = localStorage.getItem(CART_STORAGE_KEY);
+        if (!raw) return;
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) cart = parsed;
+    } catch (e) {
+        console.warn('Could not load cart from storage', e);
+        cart = [];
+    }
+}
+
+/* ── Cart icons per category ── */
+const catIcons = {
+    grains: 'bi-box-seam', veggies: 'bi-flower2', fruits: 'bi-tree',
+    livestock: 'bi-egg', fiber: 'bi-layers', processed: 'bi-droplet-fill', other: 'bi-bag'
+};
+
+/* ── Add to cart from card (footer btn or overlay btn) ── */
+function addToCartFromCard(btn) {
+    // Walk up to find the .product-card
+    const card = btn.closest('.product-card');
+    if (!card) return;
+
+    const product = {
+        id:     card.dataset.id     || 'id-' + Date.now(),
+        name:   card.dataset.name   || 'Product',
+        price:  parseFloat(card.dataset.price) || 0,
+        unit:   card.dataset.unit   || '',
+        seller: card.dataset.seller || '',
+        cat:    card.dataset.catkey || 'other'
+    };
+    addToCart(product);
+}
+
+/* ── Add to cart from modal button ── */
+function addToCartDirect(btn) {
+    const product = {
+        id:     btn.dataset.id     || 'id-' + Date.now(),
+        name:   btn.dataset.name   || 'Product',
+        price:  parseFloat(btn.dataset.price) || 0,
+        unit:   btn.dataset.unit   || '',
+        seller: btn.dataset.seller || '',
+        cat:    btn.dataset.catkey || 'other'
+    };
+    addToCart(product);
+}
+
+/* ── Core add-to-cart logic ── */
+function addToCart(product) {
+    const existing = cart.find(i => i.id === product.id);
+    if (existing) {
+        existing.qty += 1;
+    } else {
+        cart.push({ ...product, qty: 1 });
+    }
+    renderCart();
+    showToast(product.name);
+    bumpCartCounter();
+    saveCartToStorage();
+}
+
+/* ── Increase / Decrease quantity ── */
+function changeQty(id, delta) {
+    const item = cart.find(i => i.id === id);
+    if (!item) return;
+    item.qty += delta;
+    if (item.qty <= 0) {
+        removeFromCart(id);
+        return;
+    }
+    renderCart();
+    saveCartToStorage();
+}
+
+/* ── Remove item ── */
+function removeFromCart(id) {
+    cart = cart.filter(i => i.id !== id);
+    renderCart();
+    saveCartToStorage();
+}
+
+/* ── Clear cart ── */
+function clearCart() {
+    cart = [];
+    renderCart();
+    try { localStorage.removeItem(CART_STORAGE_KEY); } catch(e){}
+}
+
+/* ── Render cart drawer contents ── */
+function renderCart() {
+    const body    = document.getElementById('cartItemsList');
+    const empty   = document.getElementById('cartEmpty');
+    const footer  = document.getElementById('cartFooter');
+    const count   = document.getElementById('navCartCount');
+    const label   = document.getElementById('cartItemCountLabel');
+    const fCount  = document.getElementById('footerItemCount');
+    const total   = document.getElementById('cartTotal');
+    const qaLabel = document.getElementById('qaCartLabel');
+
+    const totalQty = cart.reduce((s, i) => s + i.qty, 0);
+    const totalAmt = cart.reduce((s, i) => s + (i.price * i.qty), 0);
+
+    const distinctCount = cart.length;
+
+    // Navbar counter
+    count.textContent = totalQty;
+    count.style.display = totalQty > 0 ? 'inline-flex' : 'none';
+
+    // Labels
+    label.textContent       = `(${totalQty} item${totalQty !== 1 ? 's' : ''} )`;
+    fCount.textContent      = totalQty;
+    const distinctEl        = document.getElementById('footerDistinctCount');
+    if (distinctEl) distinctEl.textContent = distinctCount;
+    total.textContent       = '₱' + totalAmt.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    if (qaLabel) qaLabel.textContent = totalQty > 0 ? `${totalQty} item${totalQty !== 1 ? 's' : ''} in cart` : '0 items in cart';
+
+    // Show/hide
+    if (cart.length === 0) {
+        empty.style.display  = 'flex';
+        footer.style.display = 'none';
+        body.innerHTML       = '';
+        return;
+    }
+
+    empty.style.display  = 'none';
+    footer.style.display = 'block';
+
+    body.innerHTML = cart.map(item => {
+        const icon = catIcons[item.cat] || 'bi-bag';
+        const subtotal = (item.price * item.qty).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        return `
+        <div class="cart-item">
+            <div class="cart-item-icon"><i class="bi ${icon}"></i></div>
+            <div style="flex:1;min-width:0;">
+                <div class="cart-item-name">${escHtml(item.name)}</div>
+                <div class="cart-item-seller"><i class="bi bi-shop me-1"></i>${escHtml(item.seller)}</div>
+                <div class="cart-qty-ctrl">
+                    <button class="cart-qty-btn" onclick="changeQty('${escAttr(item.id)}', -1)"><i class="bi bi-dash"></i></button>
+                    <span class="cart-qty-num">${item.qty}</span>
+                    <button class="cart-qty-btn" onclick="changeQty('${escAttr(item.id)}', 1)"><i class="bi bi-plus"></i></button>
+                    <span style="font-size:0.7rem;color:var(--text-muted);margin-left:4px;">× ₱${item.price.toFixed(2)}</span>
+                </div>
+            </div>
+            <div style="text-align:right;flex-shrink:0;">
+                <div class="cart-item-price">₱${subtotal}</div>
+                <div style="font-size:0.65rem;color:var(--text-muted);">${escHtml(item.unit)}</div>
+            </div>
+            <button class="cart-remove-btn" onclick="removeFromCart('${escAttr(item.id)}')"><i class="bi bi-x-lg"></i></button>
+        </div>`;
+    }).join('');
+}
+
+/* ── Escape helpers ── */
+function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function escAttr(s) { return String(s).replace(/'/g,"\\'"); }
+
+/* ── Toast ── */
+let toastTimer;
+function showToast(name) {
+    const toast = document.getElementById('cartToast');
+    const msg   = document.getElementById('cartToastMsg');
+    msg.textContent = `"${name}" added to cart!`;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 2800);
+}
+
+/* ── Bump animation ── */
+function bumpCartCounter() {
+    const count = document.getElementById('navCartCount');
+    count.classList.remove('bump');
+    void count.offsetWidth; // reflow
+    count.classList.add('bump');
+    setTimeout(() => count.classList.remove('bump'), 400);
+}
+
+/* ── Cart Drawer open/close ── */
+function openCart() {
+    document.getElementById('cartDrawer').classList.add('open');
+    document.getElementById('cartOverlay').classList.add('open');
+}
+
+function closeCart() {
+    document.getElementById('cartDrawer').classList.remove('open');
+    document.getElementById('cartOverlay').classList.remove('open');
+}
+
+/* ── Checkout stub ── */
+function handleCheckout() {
+    if (cart.length === 0) return;
+    const payload = { cart };
+    fetch('/arbo/checkout', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+        },
+        body: JSON.stringify(payload)
+    })
+    .then(async (res) => {
+        const text = await res.text();
+        // Try parse JSON if possible
+        try {
+            const data = JSON.parse(text || '{}');
+            if (res.ok) {
+                if (data.redirect) {
+                    try { localStorage.removeItem(CART_STORAGE_KEY); } catch(e){}
+                    window.location = data.redirect;
+                    return;
+                }
+                try { localStorage.removeItem(CART_STORAGE_KEY); } catch(e){}
+                window.location = '/arbo/orders';
+                return;
+            }
+            // non-ok JSON response
+            console.error('Checkout error', res.status, data);
+            alert(data.message || 'Checkout failed.');
+        } catch (e) {
+            // Not JSON
+            console.error('Checkout failed, response text:', text);
+            alert('Checkout failed: ' + (text || res.statusText));
+        }
+    })
+    .catch(err => { console.error('Fetch error', err); alert('Checkout failed. See console for details.'); });
+}
+
+/* ════════════════════════════════════════════════════════════
+   PAGE INIT
+════════════════════════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', function () {
 
     /* ── Mobile Sidebar ── */
@@ -1856,15 +2531,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (toggle)  toggle.addEventListener('click', openSidebar);
     if (overlay) overlay.addEventListener('click', closeSidebar);
+
+    /* ── Load stored cart and initial render ── */
+    loadCartFromStorage();
+    renderCart();
 });
 
 /* ── Category Pill Filter ── */
 function filterCat(btn, cat) {
-    // Update pill active state
     document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
     btn.classList.add('active');
 
-    // Show/hide cards
     const cards = document.querySelectorAll('#productsGrid .product-card');
     let visible = 0;
     cards.forEach(card => {
@@ -1877,7 +2554,7 @@ function filterCat(btn, cat) {
 
 /* ── View Toggle (Grid / List) ── */
 function setView(mode) {
-    const grid = document.getElementById('productsGrid');
+    const grid    = document.getElementById('productsGrid');
     const gridBtn = document.getElementById('gridViewBtn');
     const listBtn = document.getElementById('listViewBtn');
 
@@ -1890,7 +2567,6 @@ function setView(mode) {
         gridBtn.classList.add('active');
         listBtn.classList.remove('active');
     } else {
-        // List view: single column, horizontal card layout
         grid.style.gridTemplateColumns = '1fr';
         grid.querySelectorAll('.product-card').forEach(c => {
             c.style.flexDirection = 'row';

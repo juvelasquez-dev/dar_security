@@ -1135,7 +1135,7 @@
                 <thead>
                     <tr>
                         <th>Order No.</th>
-                        <th>Buyer</th>
+                        <th>Seller</th>
                         <th>Products</th>
                         <th>Total Amount</th>
                         <th class="text-center">Order Status</th>
@@ -1145,7 +1145,66 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {{-- Replace with @foreach($orders as $order) in production --}}
+                    @if(isset($orders) && $orders->count())
+                        @foreach($orders as $order)
+                            <tr>
+                                <td>
+                                    <span class="order-no">{{ $order->order_no }}</span>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="buyer-avatar-sm">{{ strtoupper(substr($order->order_no, -2)) }}</div>
+                                        <div>
+                                            <div style="font-size:.83rem;font-weight:600;color:var(--green-800);">Order #{{ $order->id }}</div>
+                                            <div style="font-size:.7rem;color:var(--text-muted);">Marketplace Buyer</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex flex-wrap gap-1">
+                                        @foreach($order->items->take(2) as $it)
+                                            <span class="product-chip {{ $loop->last && $order->items->count() > 2 ? 'product-chip-more' : '' }}">
+                                                {{ $it->name }}
+                                            </span>
+                                        @endforeach
+                                        @if($order->items->count() > 2)
+                                            <span class="product-chip product-chip-more">+{{ $order->items->count() - 2 }} more</span>
+                                        @endif
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="amount-val">₱ {{ number_format($order->total_amount,2) }}</span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="status-badge {{ 'ord-' . $order->status }}">
+                                        <span class="status-dot"></span>
+                                        {{ ucfirst($order->status) }}
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="status-badge {{ 'pay-' . $order->payment_status }}">
+                                        <span class="status-dot"></span>
+                                        {{ ucfirst($order->payment_status) }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div style="font-size:.82rem;font-weight:500;">{{ $order->created_at->format('M d, Y') }}</div>
+                                    <div style="font-size:.7rem;color:var(--text-muted);">{{ $order->created_at->format('g:i A') }}</div>
+                                </td>
+                                <td class="text-center">
+                                    <div class="d-flex gap-1 justify-content-center flex-wrap">
+                                        <button class="tbl-action-btn btn-view-tbl"
+                                                data-order-id="{{ $order->id }}"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#viewOrderModal"
+                                                title="View Order Details">
+                                            <i class="bi bi-eye-fill"></i> View
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    @else
                     @php
                         $sampleOrders = [
                             [
@@ -1332,6 +1391,7 @@
                         </td>
                     </tr>
                     @endforeach
+                    @endif
                 </tbody>
             </table>
         </div>
@@ -1510,17 +1570,16 @@
                         <i class="bi bi-cart-check-fill"></i>
                     </div>
                     <div style="flex:1;">
-                        <div style="font-size:1.1rem;font-weight:700;color:var(--green-900);">Order #ORD-2024-047</div>
-                        <div style="font-size:.78rem;color:var(--text-muted);">Felix Soriano &bull; Marketplace Buyer</div>
-                        <div class="mt-2 d-flex gap-2 flex-wrap">
-                            <span class="status-badge ord-processing"><span class="status-dot"></span>Processing</span>
-                            <span class="status-badge pay-paid"><span class="status-dot"></span>Paid</span>
+                        <div id="modalOrderNo" style="font-size:1.1rem;font-weight:700;color:var(--green-900);">Order #</div>
+                        <div style="font-size:.78rem;color:var(--text-muted);"><span id="modalBuyerName">Marketplace Buyer</span></div>
+                        <div id="modalStatusBadges" class="mt-2 d-flex gap-2 flex-wrap">
+                            <!-- status badges inserted here -->
                         </div>
                     </div>
                     <div class="text-end">
                         <div style="font-size:.7rem;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px;">Order Total</div>
-                        <div style="font-size:1.25rem;font-weight:700;color:var(--green-800);">₱ 760.00</div>
-                        <div style="font-size:.7rem;color:var(--text-muted);margin-top:.2rem;">Jun 15, 2024 · 9:04 AM</div>
+                        <div id="modalOrderTotal" style="font-size:1.25rem;font-weight:700;color:var(--green-800);">₱ 0.00</div>
+                        <div id="modalOrderDate" style="font-size:.7rem;color:var(--text-muted);margin-top:.2rem;">-</div>
                     </div>
                 </div>
 
@@ -1530,19 +1589,19 @@
                         <div class="modal-section-label">Buyer Information</div>
                         <div class="view-detail-row">
                             <span class="view-detail-label">Full Name</span>
-                            <span class="view-detail-value">Felix Soriano</span>
+                            <span id="modalBuyerFullName" class="view-detail-value">-</span>
                         </div>
                         <div class="view-detail-row">
                             <span class="view-detail-label">Contact Number</span>
-                            <span class="view-detail-value">09168887890</span>
+                            <span id="modalBuyerContact" class="view-detail-value">-</span>
                         </div>
                         <div class="view-detail-row">
                             <span class="view-detail-label">Delivery Address</span>
-                            <span class="view-detail-value">Libmanan, Camarines Sur</span>
+                            <span id="modalBuyerAddress" class="view-detail-value">-</span>
                         </div>
                         <div class="view-detail-row">
                             <span class="view-detail-label">Username</span>
-                            <span class="view-detail-value" style="font-family:'Courier New',monospace;">@fsoriano</span>
+                            <span id="modalBuyerUsername" class="view-detail-value" style="font-family:'Courier New',monospace;">-</span>
                         </div>
                     </div>
 
@@ -1551,19 +1610,19 @@
                         <div class="modal-section-label">Order Information</div>
                         <div class="view-detail-row">
                             <span class="view-detail-label">Order Number</span>
-                            <span class="view-detail-value" style="font-family:'Courier New',monospace;">ORD-2024-047</span>
+                            <span id="modalOrderNumber" class="view-detail-value" style="font-family:'Courier New',monospace;">-</span>
                         </div>
                         <div class="view-detail-row">
                             <span class="view-detail-label">Order Date</span>
-                            <span class="view-detail-value">Jun 15, 2024 · 9:04 AM</span>
+                            <span id="modalOrderDateInfo" class="view-detail-value">-</span>
                         </div>
                         <div class="view-detail-row">
                             <span class="view-detail-label">Payment Method</span>
-                            <span class="view-detail-value">GCash</span>
+                            <span id="modalPaymentMethod" class="view-detail-value">-</span>
                         </div>
                         <div class="view-detail-row">
                             <span class="view-detail-label">Reference No.</span>
-                            <span class="view-detail-value" style="font-family:'Courier New',monospace;">GC-20240615-9872</span>
+                            <span id="modalReferenceNo" class="view-detail-value" style="font-family:'Courier New',monospace;">-</span>
                         </div>
                     </div>
 
@@ -1581,17 +1640,8 @@
                                         <th class="text-right" style="text-align:right;">Subtotal</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>
-                                            <div style="font-weight:600;font-size:.83rem;color:var(--green-800);">Native Chicken (Live)</div>
-                                            <div style="font-size:.7rem;color:var(--text-muted);">SKU: LST-001</div>
-                                        </td>
-                                        <td style="font-size:.8rem;">Luz Villanueva</td>
-                                        <td class="text-center" style="font-size:.82rem;font-weight:600;">2 heads</td>
-                                        <td class="text-center" style="font-size:.82rem;font-weight:600;">₱380.00</td>
-                                        <td style="text-align:right;font-weight:700;color:var(--green-800);font-size:.88rem;">₱760.00</td>
-                                    </tr>
+                                <tbody id="modalItemsTbody">
+                                    <!-- items populated via JS -->
                                 </tbody>
                                 <tfoot>
                                     <tr>
@@ -1717,6 +1767,60 @@ document.addEventListener('DOMContentLoaded', function () {
         tab.addEventListener('click', function () {
             document.querySelectorAll('.status-tab').forEach(t => t.classList.remove('active'));
             this.classList.add('active');
+        });
+    });
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.btn-view-tbl[data-order-id]').forEach(function(btn){
+        btn.addEventListener('click', function(){
+            const id = this.getAttribute('data-order-id');
+            if (!id) return;
+            fetch('/arbo/orders/' + id, { credentials: 'same-origin', headers: { 'Accept': 'application/json' } })
+                .then(r => r.json())
+                .then(order => {
+                    document.getElementById('modalOrderNo').textContent = order.order_no || ('Order #' + order.id);
+                    document.getElementById('modalOrderNumber').textContent = order.order_no || ('ORD-' + order.id);
+                    document.getElementById('modalBuyerName').textContent = order.meta?.buyer_name ?? 'Marketplace Buyer';
+                    document.getElementById('modalBuyerFullName').textContent = order.meta?.buyer_name ?? '-';
+                    document.getElementById('modalBuyerContact').textContent = order.meta?.buyer_contact ?? '-';
+                    document.getElementById('modalBuyerAddress').textContent = order.meta?.buyer_address ?? '-';
+                    document.getElementById('modalBuyerUsername').textContent = order.meta?.buyer_username ?? '-';
+                    document.getElementById('modalOrderTotal').textContent = '₱ ' + Number(order.total_amount || 0).toFixed(2);
+                    document.getElementById('modalOrderDate').textContent = (new Date(order.created_at)).toLocaleString();
+                    document.getElementById('modalOrderDateInfo').textContent = (new Date(order.created_at)).toLocaleString();
+                    document.getElementById('modalPaymentMethod').textContent = order.meta?.payment_method ?? '-';
+                    document.getElementById('modalReferenceNo').textContent = order.meta?.payment_ref ?? '-';
+
+                    const statusArea = document.getElementById('modalStatusBadges');
+                    statusArea.innerHTML = '';
+                    const s1 = document.createElement('span');
+                    s1.className = 'status-badge ord-' + (order.status || 'pending');
+                    s1.innerHTML = '<span class="status-dot"></span>' + (order.status ? order.status.charAt(0).toUpperCase() + order.status.slice(1) : 'Pending');
+                    const s2 = document.createElement('span');
+                    s2.className = 'status-badge pay-' + (order.payment_status || 'pending');
+                    s2.innerHTML = '<span class="status-dot"></span>' + (order.payment_status ? order.payment_status.charAt(0).toUpperCase() + order.payment_status.slice(1) : 'Pending');
+                    statusArea.appendChild(s1); statusArea.appendChild(s2);
+
+                    const tbody = document.getElementById('modalItemsTbody');
+                    tbody.innerHTML = '';
+                    (order.items || []).forEach(function(it){
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>
+                                <div style="font-weight:600;font-size:.83rem;color:var(--green-800);">${it.name}</div>
+                                <div style="font-size:.7rem;color:var(--text-muted);">${(it.meta && it.meta.sku) ? 'SKU: ' + it.meta.sku : ''}</div>
+                            </td>
+                            <td style="font-size:.8rem;">${(it.meta && it.meta.seller) ? it.meta.seller : '-'}</td>
+                            <td class="text-center" style="font-size:.82rem;font-weight:600;">${it.qty}</td>
+                            <td class="text-center" style="font-size:.82rem;font-weight:600;">₱${Number(it.price).toFixed(2)}</td>
+                            <td style="text-align:right;font-weight:700;color:var(--green-800);font-size:.88rem;">₱${Number(it.subtotal).toFixed(2)}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                })
+                .catch(err => { console.error('Could not load order', err); alert('Could not load order details.'); });
         });
     });
 });

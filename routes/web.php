@@ -9,6 +9,7 @@ use App\Http\Controllers\Arbos\ArbosDashboardController;
 use App\Http\Controllers\Arbos\ProductsController;
 use App\Http\Controllers\Arbos\SalesReportController;
 use App\Http\Controllers\Arbos\OrdersController;
+use App\Http\Controllers\Arbos\CheckoutController;
 use App\Http\Controllers\Arbos\ProfileController;
 use App\Http\Controllers\Arbos\BuyerController;
 
@@ -195,6 +196,8 @@ Route::middleware(['auth', \App\Http\Middleware\PreventBackHistory::class])->gro
         Route::get('/arbo/products', [ProductsController::class, 'index']);
         Route::get('/arbo/reports', [SalesReportController::class, 'index']);
         Route::get('/arbo/orders', [OrdersController::class, 'index']);
+           Route::get('/arbo/orders/{id}', [OrdersController::class, 'show'])->name('arbo.orders.show');
+        Route::post('/arbo/checkout', [CheckoutController::class, 'store'])->name('arbo.checkout');
         Route::get('/arbo/profile', [ProfileController::class, 'index']);
     });
 
